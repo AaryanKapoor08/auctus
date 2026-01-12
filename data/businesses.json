@@ -1,0 +1,135 @@
+[
+  {
+    "id": "biz-1",
+    "name": "Aroma Coffee House",
+    "industry": "Food & Beverage",
+    "location": "Downtown Fredericton",
+    "revenue": 250000,
+    "employees": 5,
+    "description": "Artisanal coffee shop and bakery serving locally roasted beans and fresh pastries",
+    "needs": ["Wholesale supplier", "Marketing help", "Event space"],
+    "offers": ["Catering services", "Event hosting", "Barista training"],
+    "yearEstablished": 2019,
+    "website": "aromacoffee.ca",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": true,
+      "employeesUnder50": true,
+      "industries": ["Food & Beverage", "Tourism", "Retail"]
+    }
+  },
+  {
+    "id": "biz-2",
+    "name": "Maritime Manufacturing Ltd",
+    "industry": "Manufacturing",
+    "location": "North Fredericton Industrial Park",
+    "revenue": 1500000,
+    "employees": 25,
+    "description": "Custom metal fabrication and precision manufacturing for industrial clients",
+    "needs": ["Export assistance", "Skilled welders", "Government grants"],
+    "offers": ["Contract manufacturing", "Metal fabrication", "Engineering services"],
+    "yearEstablished": 2015,
+    "website": "maritimemanufacturing.com",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": true,
+      "industries": ["Manufacturing", "Industrial", "Technology"]
+    }
+  },
+  {
+    "id": "biz-3",
+    "name": "Digital Dreams Agency",
+    "industry": "Technology",
+    "location": "Knowledge Park",
+    "revenue": 500000,
+    "employees": 12,
+    "description": "Full-service digital marketing agency specializing in web design and SEO",
+    "needs": ["Office space", "Sales leads", "Graphic designer"],
+    "offers": ["Website development", "SEO services", "Social media management"],
+    "yearEstablished": 2018,
+    "website": "digitaldreamsagency.com",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": true,
+      "industries": ["Technology", "Professional Services", "Creative"]
+    }
+  },
+  {
+    "id": "biz-4",
+    "name": "River Valley Bakery",
+    "industry": "Food & Beverage",
+    "location": "Northside Fredericton",
+    "revenue": 180000,
+    "employees": 4,
+    "description": "Traditional bakery specializing in artisan breads and European pastries",
+    "needs": ["Bulk flour supplier", "Delivery service", "Wholesale partners"],
+    "offers": ["Wholesale baked goods", "Custom cakes", "Baking classes"],
+    "yearEstablished": 2020,
+    "website": "rivervalleybakery.ca",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": true,
+      "employeesUnder50": true,
+      "industries": ["Food & Beverage", "Retail"]
+    }
+  },
+  {
+    "id": "biz-5",
+    "name": "Atlantic Adventures Tours",
+    "industry": "Tourism",
+    "location": "Historic Garrison District",
+    "revenue": 320000,
+    "employees": 8,
+    "description": "Eco-tourism company offering kayaking, hiking, and cultural tours",
+    "needs": ["Marketing expertise", "Booking system", "Seasonal staff"],
+    "offers": ["Tour packages", "Event coordination", "Tourism consulting"],
+    "yearEstablished": 2017,
+    "website": "atlanticadventures.ca",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": true,
+      "employeesUnder50": true,
+      "industries": ["Tourism", "Recreation", "Hospitality"]
+    }
+  },
+  {
+    "id": "biz-6",
+    "name": "Green Thumb Garden Supply",
+    "industry": "Retail",
+    "location": "South Fredericton",
+    "revenue": 420000,
+    "employees": 7,
+    "description": "Garden center and landscaping supply store with organic products",
+    "needs": ["Landscaping contractors", "Delivery vehicles", "E-commerce platform"],
+    "offers": ["Gardening supplies", "Landscaping materials", "Gardening workshops"],
+    "yearEstablished": 2016,
+    "website": "greenthumbgarden.ca",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": true,
+      "employeesUnder50": true,
+      "industries": ["Retail", "Agriculture"]
+    }
+  },
+  {
+    "id": "biz-7",
+    "name": "TechStart Incubator",
+    "industry": "Technology",
+    "location": "Knowledge Park",
+    "revenue": 280000,
+    "employees": 6,
+    "description": "Startup incubator providing mentorship, workspace, and funding connections",
+    "needs": ["Mentor network", "Funding sources", "Legal services"],
+    "offers": ["Startup mentorship", "Co-working space", "Networking events"],
+    "yearEstablished": 2021,
+    "website": "techstartfredericton.com",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": true,
+      "employeesUnder50": true,
+      "industries": ["Technology", "Professional Services", "Education"]
+    }
+  }
+]

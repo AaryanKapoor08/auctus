@@ -1,7 +1,20 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactStrictMode: true,
+  poweredByHeader: false,
+  
+  // Image optimization
+  images: {
+    formats: ['image/webp', 'image/avif'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    // Allow external image domains if needed (currently all avatars are optional)
+    remotePatterns: [],
+  },
+  
+  // Performance optimizations
+  compress: true,
 };
 
 export default nextConfig;

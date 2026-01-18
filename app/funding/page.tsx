@@ -33,46 +33,16 @@ export default function FundingPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("match");
 
-  // Loading state
-  if (!currentBusiness) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-6">
-          {/* Header Skeleton */}
-          <div className="mb-6 space-y-3">
-            <div className="h-10 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-            <div className="h-6 bg-gray-200 rounded w-1/3 animate-pulse"></div>
-          </div>
-
-          {/* Stats Banner Skeleton */}
-          <SkeletonGrid count={3} />
-
-          {/* Content Grid Skeleton */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-                <div className="h-6 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                <div className="h-32 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-            </div>
-            <div className="lg:col-span-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse"></div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Get all categories (excluding "All")
-  const allCategories = getGrantCategories().filter((c) => c !== "All");
+  const allCategories = useMemo(() => {
+    return getGrantCategories().filter((c) => c !== "All");
+  }, []);
 
   // Get matched grants for current business
-  const matchedGrants = getMatchedGrants(currentBusiness.id);
+  const matchedGrants = useMemo(() => {
+    if (!currentBusiness) return [];
+    return getMatchedGrants(currentBusiness.id);
+  }, [currentBusiness]);
 
   // Filter and sort grants
   const filteredAndSortedGrants = useMemo(() => {
@@ -128,16 +98,55 @@ export default function FundingPage() {
   ]);
 
   // Calculate stats
-  const totalAvailable = matchedGrants.reduce(
-    (sum, grant) => sum + grant.amount,
-    0
-  );
-  const yourMatches = matchedGrants.filter(
-    (grant) => grant.matchPercentage > 60
-  ).length;
-  const deadlinesThisMonth = matchedGrants.filter(
-    (grant) => getDaysUntilDeadline(grant.deadline) <= 30
-  ).length;
+  const stats = useMemo(() => {
+    const totalAvailable = matchedGrants.reduce(
+      (sum, grant) => sum + grant.amount,
+      0
+    );
+    const yourMatches = matchedGrants.filter(
+      (grant) => grant.matchPercentage > 60
+    ).length;
+    const deadlinesThisMonth = matchedGrants.filter(
+      (grant) => getDaysUntilDeadline(grant.deadline) <= 30
+    ).length;
+    
+    return { totalAvailable, yourMatches, deadlinesThisMonth };
+  }, [matchedGrants]);
+
+  // Loading state
+  if (!currentBusiness) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Header Skeleton */}
+          <div className="mb-6 space-y-3">
+            <div className="h-10 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+            <div className="h-6 bg-gray-200 rounded w-1/3 animate-pulse"></div>
+          </div>
+
+          {/* Stats Banner Skeleton */}
+          <SkeletonGrid count={3} />
+
+          {/* Content Grid Skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-8">
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-1/2 animate-pulse"></div>
+                <div className="h-32 bg-gray-200 rounded animate-pulse"></div>
+              </div>
+            </div>
+            <div className="lg:col-span-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Reset all filters
   const resetFilters = () => {
@@ -189,7 +198,7 @@ export default function FundingPage() {
               <div>
                 <p className="text-sm text-gray-600">Total Available</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  ${totalAvailable.toLocaleString()}
+                  ${stats.totalAvailable.toLocaleString()}
                 </p>
               </div>
             </div>
@@ -203,7 +212,7 @@ export default function FundingPage() {
               <div>
                 <p className="text-sm text-gray-600">Your Matches</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {yourMatches} grants
+                  {stats.yourMatches} grants
                 </p>
               </div>
             </div>
@@ -217,7 +226,7 @@ export default function FundingPage() {
               <div>
                 <p className="text-sm text-gray-600">Deadlines This Month</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {deadlinesThisMonth} grants
+                  {stats.deadlinesThisMonth} grants
                 </p>
               </div>
             </div>

@@ -35,14 +35,14 @@ export function Toast({ id, type, message, duration = 5000, onClose }: ToastProp
   const styles = {
     success: "bg-green-50 border-green-500 text-green-900",
     error: "bg-red-50 border-red-500 text-red-900",
-    info: "bg-blue-50 border-blue-500 text-blue-900",
+    info: "bg-gray-100 border-gray-700 text-gray-900",
     warning: "bg-orange-50 border-orange-500 text-orange-900",
   };
 
   const iconStyles = {
     success: "text-green-600",
     error: "text-red-600",
-    info: "text-blue-600",
+    info: "text-gray-700",
     warning: "text-orange-600",
   };
 

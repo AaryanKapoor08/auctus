@@ -34,8 +34,6 @@ export default function GrantCard({
 
   // Format amount
   const formattedAmount = new Intl.NumberFormat("en-CA", {
-    style: "currency",
-    currency: "CAD",
     minimumFractionDigits: 0,
   }).format(amount);
 

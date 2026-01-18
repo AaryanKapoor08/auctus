@@ -357,8 +357,8 @@ export default function DashboardPage() {
                         key={`thread-${thread.id}`}
                         className="flex items-start gap-3 pb-3 border-b border-gray-100 last:border-0"
                       >
-                        <div className="bg-blue-100 p-2 rounded-lg flex-shrink-0">
-                          <MessageSquare className="h-4 w-4 text-blue-600" />
+                        <div className="bg-gray-800 p-2 rounded-lg flex-shrink-0">
+                          <MessageSquare className="h-4 w-4 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">

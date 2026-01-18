@@ -57,7 +57,7 @@ export default function Home() {
             </Badge>
             <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
               Grow Your Business with{" "}
-              <span className="text-primary-600">Auctus AI</span>
+              <span className="text-gray-900">Auctus AI</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
               Connect with grants, partners, and opportunities in Fredericton's thriving business ecosystem. 
@@ -85,7 +85,7 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-4xl font-bold text-primary-600 mb-2">
+                <div className="text-4xl font-bold text-gray-900 mb-2">
                   {stat.value}
                 </div>
                 <div className="text-sm text-gray-600">{stat.label}</div>
@@ -197,12 +197,12 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-primary-600 text-white py-20">
+      <section className="bg-white border-t border-gray-200 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl font-bold mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Ready to Grow Your Business?
           </h2>
-          <p className="text-xl text-primary-100 mb-8">
+          <p className="text-xl text-gray-600 mb-8">
             Join Fredericton's premier business growth platform today.
           </p>
           <Link href="/dashboard">

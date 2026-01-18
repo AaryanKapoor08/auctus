@@ -235,9 +235,9 @@ export default function MatchmakerPage() {
 
         {/* Info Box for Current Tab */}
         {activeTab !== "all" && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-start gap-3">
-            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-blue-900">
+          <div className="bg-gray-100 border border-gray-300 rounded-lg p-4 mb-6 flex items-start gap-3">
+            <Info className="h-5 w-5 text-gray-700 mt-0.5 flex-shrink-0" />
+            <div className="text-sm text-gray-900">
               {activeTab === "you-need" && (
                 <p>
                   <strong>You Need / They Offer:</strong> These businesses

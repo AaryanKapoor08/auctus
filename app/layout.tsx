@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import dynamic from "next/dynamic";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import ChatbotWrapper from "@/components/ChatbotWrapper";
 import { Providers } from "./providers";
-
-// Dynamic import for AI Chatbot (not needed for initial page load)
-const AIChatbot = dynamic(() => import("@/components/AIChatbot"), {
-  ssr: false,
-  loading: () => null,
-});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -44,7 +38,7 @@ export default function RootLayout({
             <Navbar />
             <main className="min-h-screen">{children}</main>
             <Footer />
-            <AIChatbot />
+            <ChatbotWrapper />
           </Providers>
         </ErrorBoundary>
       </body>

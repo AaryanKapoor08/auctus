@@ -128,6 +128,19 @@ export function getAIResponse(userMessage: string, context: AIContext): AIRespon
     return handleRegistrationQuery(message, context);
   }
 
+  // 5.5. Permits/License queries
+  if (
+    message.includes("permit") ||
+    message.includes("license") ||
+    message.includes("legal") ||
+    message.includes("requirement") ||
+    message.includes("compliance") ||
+    message.includes("regulations") ||
+    message.includes("city")
+  ) {
+    return handlePermitsQuery(message, context);
+  }
+
   // 6. Match percentage explanation
   if (
     message.includes("match") ||
@@ -345,6 +358,32 @@ Would you like help finding startup grants or connecting with other entrepreneur
       { label: "Find Startup Grants", action: "/funding" },
       { label: "Ask in Forum", action: "/forum/new" },
       { label: "Browse Resources", action: "/dashboard" },
+    ],
+  };
+}
+
+/**
+ * Handle permits/licenses queries
+ */
+function handlePermitsQuery(message: string, context: AIContext): AIResponse {
+  return {
+    message: `📋 **Business Permits in Fredericton**
+
+Common permits you may need:
+
+• **Business Operating License** - Required for all businesses
+• **Development Permit** - For renovations or signage changes
+• **Food Service Permit** - Restaurants and food vendors
+• **Home-Based Business Permit** - If operating from home
+
+**Contact:** City of Fredericton Business Development
+📞 (506) 460-2020
+
+For specific requirements, visit the City of Fredericton's website or contact their Business Development office.`,
+    quickActions: [
+      { label: "Find Grants", action: "/funding" },
+      { label: "Ask in Forum", action: "/forum/new" },
+      { label: "Back to Dashboard", action: "/dashboard" },
     ],
   };
 }

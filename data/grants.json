@@ -1,443 +1,715 @@
 [
   {
     "id": "grant-1",
-    "name": "Canada Small Business Financing Program",
-    "amount": 50000,
-    "deadline": "2026-03-15",
-    "category": "Business Expansion",
-    "description": "Federal program supporting small businesses looking to expand operations, hire new employees, or invest in equipment and technology.",
-    "provider": "Government of Canada",
+    "name": "Canada-New Brunswick Job Grant (CNBJG)",
+    "amount": 10000,
+    "deadline": "2026-12-31",
+    "category": "Training",
+    "description": "Provides training grants to employers for third-party training programs that improve employee skills in areas such as leadership, technology, marketing, and project management.",
+    "provider": "Government of New Brunswick",
     "eligibility": {
       "isNewBrunswick": true,
-      "revenueUnder500k": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Trainee must be a resident of New Brunswick, permanent Canadian citizen, or granted refugee status",
+      "Training must improve employability and value employees provide",
+      "Training programs must be delivered by accredited third-party providers",
+      "Training must start within 6 months of approval",
+      "Training must be completed within 12 months of start date"
+    ],
+    "applicationUrl": "https://www2.gnb.ca/content/gnb/en/departments/post-secondary_education_training_and_labour.html"
+  },
+  {
+    "id": "grant-2",
+    "name": "NRC IRAP (Industrial Research Assistance Program)",
+    "amount": 500000,
+    "deadline": "2026-12-31",
+    "category": "Research",
+    "description": "Provides advisory services and funding to help Canadian SMEs increase their innovation capacity and develop new products, services, or technologies through R&D activities.",
+    "provider": "National Research Council Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Technology", "Manufacturing", "Environment"]
+    },
+    "requirements": [
+      "Must be an incorporated, profit-oriented Canadian business",
+      "Must have 500 or fewer full-time equivalent employees",
+      "Project must involve technical uncertainty and systematic investigation",
+      "Must demonstrate innovation capacity and commercialization potential",
+      "Must maintain proper documentation of R&D activities"
+    ],
+    "applicationUrl": "https://nrc.canada.ca/en/support-technology-innovation"
+  },
+  {
+    "id": "grant-3",
+    "name": "ACOA Business Development Program",
+    "amount": 250000,
+    "deadline": "2026-12-31",
+    "category": "Business Expansion",
+    "description": "Interest-free repayable contributions for SMEs to support business expansion, modernizing equipment, marketing initiatives, and skills development in Atlantic Canada.",
+    "provider": "Atlantic Canada Opportunities Agency (ACOA)",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Must be a for-profit business operating in Atlantic Canada",
+      "Project must demonstrate economic benefits to the region",
+      "Business must be financially viable",
+      "Must provide matching funds (typically 50% of project costs)",
+      "Must create or maintain jobs in Atlantic Canada"
+    ],
+    "applicationUrl": "https://www.canada.ca/en/atlantic-canada-opportunities.html"
+  },
+  {
+    "id": "grant-4",
+    "name": "CanExport SMEs",
+    "amount": 50000,
+    "deadline": "2026-05-31",
+    "category": "Export",
+    "description": "Cost-sharing program providing financial assistance for export development activities to help Canadian SMEs explore and expand into new international markets.",
+    "provider": "Global Affairs Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Must be a for-profit incorporated Canadian business",
+      "Annual revenues between $100,000 and $100 million",
+      "Target market must generate less than $100,000 or 10% of total sales",
+      "Project budget must be between $20,000 and $100,000",
+      "Business must be financially stable"
+    ],
+    "applicationUrl": "https://www.tradecommissioner.gc.ca/en/our-solutions/funding-financing-international-business/canexport-smes.html"
+  },
+  {
+    "id": "grant-5",
+    "name": "Canada Digital Adoption Program - Grow Your Business Online",
+    "amount": 2400,
+    "deadline": "2025-09-30",
+    "category": "Technology",
+    "description": "Micro-grant to help small businesses establish or enhance their online presence through e-commerce solutions and digital marketing tools.",
+    "provider": "Innovation, Science and Economic Development Canada (ISED)",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Retail", "Food & Beverage", "Professional Services"]
+    },
+    "requirements": [
+      "Must be a for-profit business (including social enterprises and co-ops)",
+      "Must be registered or incorporated in Canada",
+      "Must sell directly to consumers",
+      "Must employ at least one person aside from owner OR report minimum $30,000 annual revenue",
+      "Must commit to maintaining digital adoption strategy for six months"
+    ],
+    "applicationUrl": "https://ised-isde.canada.ca/site/canada-digital-adoption-program/en"
+  },
+  {
+    "id": "grant-6",
+    "name": "SR&ED Tax Credit (Scientific Research & Experimental Development)",
+    "amount": 2100000,
+    "deadline": "2026-12-31",
+    "category": "Research",
+    "description": "Tax incentive program providing refundable and non-refundable tax credits for businesses conducting R&D activities in Canada.",
+    "provider": "Canada Revenue Agency",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Technology", "Manufacturing", "Professional Services"]
+    },
+    "requirements": [
+      "Must conduct systematic investigation or search in science or technology",
+      "Work must involve technological uncertainty",
+      "Must formulate hypotheses to reduce or eliminate uncertainty",
+      "Must maintain proper documentation of R&D activities",
+      "Must file SR&ED claim with annual tax return"
+    ],
+    "applicationUrl": "https://www.canada.ca/en/revenue-agency/services/scientific-research-experimental-development-tax-incentive-program.html"
+  },
+  {
+    "id": "grant-7",
+    "name": "Community Futures New Brunswick",
+    "amount": 150000,
+    "deadline": "2026-12-31",
+    "category": "Rural Development",
+    "description": "Provides loans, training, and advisory services to rural businesses and entrepreneurs through Community Business Development Corporations (CBDCs).",
+    "provider": "Atlantic Canada Opportunities Agency (ACOA)",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Business must be located in a rural, coastal, or remote area",
+      "Must demonstrate viability and growth potential",
+      "May require personal guarantees or collateral",
+      "Business plan must be submitted",
+      "Must participate in business counseling services"
+    ],
+    "applicationUrl": "https://www.cbdc.ca"
+  },
+  {
+    "id": "grant-8",
+    "name": "Women Entrepreneurship Loan Fund",
+    "amount": 50000,
+    "deadline": "2026-12-31",
+    "category": "General",
+    "description": "Microloans to support women-owned businesses (51%+ women ownership) to start up, scale up, and access international markets.",
+    "provider": "Various regional organizations funded by ISED",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
       "employeesUnder50": true,
       "industries": ["All"]
     },
     "requirements": [
-      "Located in New Brunswick",
-      "Annual revenue under $500,000",
-      "Less than 50 employees",
+      "Business must be 51% or more owned by women",
+      "Must demonstrate business viability",
       "Business plan required",
-      "Operating for at least 1 year"
+      "May require personal guarantees",
+      "Priority for underrepresented groups (Indigenous, racialized, rural, LGBTQ2S+)"
     ],
-    "applicationUrl": "https://canada.ca/small-business"
+    "applicationUrl": "https://ised-isde.canada.ca/site/ised/en/programs-and-initiatives/women-entrepreneurship-strategy"
   },
   {
-    "id": "grant-2",
-    "name": "Tourism Recovery Fund",
+    "id": "grant-9",
+    "name": "Tourism Recovery Fund (New Brunswick)",
     "amount": 25000,
-    "deadline": "2026-04-30",
+    "deadline": "2026-03-31",
     "category": "Tourism",
-    "description": "Helping tourism and hospitality businesses recover from economic challenges and modernize their operations.",
-    "provider": "Tourism New Brunswick",
+    "description": "Financial support for tourism and hospitality businesses to recover from economic challenges and modernize operations.",
+    "provider": "Tourism New Brunswick / ACOA",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Tourism", "Hospitality", "Food & Beverage"]
+    },
+    "requirements": [
+      "Must be a for-profit tourism business operating in New Brunswick",
+      "Must employ between 2 to 99 full-time equivalent employees",
+      "Evidence of revenue decrease (20% compared to 2019 or 10% compared to previous year)",
+      "Business must be financially viable",
+      "Must demonstrate how funds will support recovery and growth"
+    ],
+    "applicationUrl": "https://www2.gnb.ca/content/gnb/en/departments/tourism.html"
+  },
+  {
+    "id": "grant-10",
+    "name": "New Brunswick Innovation Foundation (NBIF) Research & Development Grant",
+    "amount": 50000,
+    "deadline": "2026-12-31",
+    "category": "Research",
+    "description": "Funding for collaboration between small businesses and research institutions to develop innovative products or services.",
+    "provider": "New Brunswick Innovation Foundation",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Technology", "Environment", "Professional Services"]
+    },
+    "requirements": [
+      "Must be a New Brunswick-based small business",
+      "Must partner with accredited research institution",
+      "Project must be innovative and technology-driven",
+      "Covers up to 80% of research and development costs",
+      "Must demonstrate commercialization potential"
+    ],
+    "applicationUrl": "https://www.nbif.ca"
+  },
+  {
+    "id": "grant-11",
+    "name": "Ignite Seed Grant Fund (Atlantic Canada)",
+    "amount": 25000,
+    "deadline": "2026-12-31",
+    "category": "General",
+    "description": "Non-repayable seed funding for high-potential startups in Atlantic Canada for early-stage development, prototyping, and market validation.",
+    "provider": "Ignite (in partnership with ACOA)",
     "eligibility": {
       "isNewBrunswick": true,
       "revenueUnder500k": true,
       "employeesUnder50": true,
-      "industries": ["Tourism", "Hospitality", "Food & Beverage"]
+      "industries": ["Technology"]
     },
     "requirements": [
-      "Tourism or hospitality business",
-      "Located in New Brunswick",
-      "Revenue loss documentation",
-      "Modernization plan required"
+      "Must be an early-stage startup or new business",
+      "Business must demonstrate high growth potential",
+      "Must be located in Atlantic Canada (Nova Scotia or New Brunswick focus)",
+      "Project must involve innovation or new technology",
+      "Business plan and pitch required"
     ],
-    "applicationUrl": "https://tourismnb.ca/grants"
+    "applicationUrl": "https://igniteatlanticcanada.ca"
   },
   {
-    "id": "grant-3",
-    "name": "Manufacturing Innovation Grant",
-    "amount": 100000,
-    "deadline": "2026-05-20",
-    "category": "Manufacturing",
-    "description": "Supporting manufacturing companies investing in new technology, automation, and process improvements.",
+    "id": "grant-12",
+    "name": "Green Business Initiative Grant (New Brunswick)",
+    "amount": 40000,
+    "deadline": "2026-06-29",
+    "category": "Environment",
+    "description": "Supports businesses implementing sustainable practices, renewable energy solutions, or eco-friendly operations in New Brunswick.",
+    "provider": "Opportunities NB / Provincial Environment Department",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Must demonstrate environmental benefits",
+      "Project must involve sustainable practices, renewable energy, or waste reduction",
+      "Must provide detailed environmental impact assessment",
+      "Matching funds may be required",
+      "Must meet provincial environmental standards"
+    ],
+    "applicationUrl": "https://onbcanada.ca"
+  },
+  {
+    "id": "grant-13",
+    "name": "Youth Employment and Skills Strategy (YESS)",
+    "amount": 7300,
+    "deadline": "2026-12-31",
+    "category": "Employment",
+    "description": "Wage subsidy to help businesses hire young Canadians (15-30 years) and provide work experience opportunities.",
+    "provider": "Employment and Social Development Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Must hire youth between 15-30 years old",
+      "Position must provide meaningful work experience",
+      "Minimum 6-week placement",
+      "Must pay at least minimum wage",
+      "Cannot displace existing employees"
+    ],
+    "applicationUrl": "https://www.canada.ca/en/employment-social-development/services/funding/youth-employment-skills-strategy.html"
+  },
+  {
+    "id": "grant-14",
+    "name": "Canada Small Business Financing Program",
+    "amount": 500000,
+    "deadline": "2026-12-31",
+    "category": "Business Expansion",
+    "description": "Government-backed loan program helping SMEs access affordable financing for equipment, leasehold improvements, and real property purchases.",
+    "provider": "Innovation, Science and Economic Development Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Must be a for-profit business operating in Canada",
+      "Gross annual revenues of $10 million or less",
+      "Loans must be used for eligible business purposes",
+      "Must work with participating financial institution",
+      "Personal guarantees typically required"
+    ],
+    "applicationUrl": "https://ised-isde.canada.ca/site/canada-small-business-financing-program/en"
+  },
+  {
+    "id": "grant-15",
+    "name": "Export Development Canada (EDC) Export Guarantee Program",
+    "amount": 75000,
+    "deadline": "2026-12-31",
+    "category": "Export",
+    "description": "Helps New Brunswick businesses expand into international markets by providing credit insurance and working capital solutions.",
+    "provider": "Export Development Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Manufacturing", "Technology", "Professional Services"]
+    },
+    "requirements": [
+      "Must be a Canadian exporter or planning to export",
+      "Must demonstrate export viability",
+      "Creditworthiness assessment required",
+      "Must have international sales or contracts",
+      "Business plan for export markets required"
+    ],
+    "applicationUrl": "https://www.edc.ca"
+  },
+  {
+    "id": "grant-16",
+    "name": "Digital Transformation Grant (New Brunswick specific)",
+    "amount": 35000,
+    "deadline": "2026-03-30",
+    "category": "Technology",
+    "description": "Funding for New Brunswick businesses to adopt digital technologies, upgrade software systems, and implement e-commerce platforms.",
     "provider": "Opportunities NB",
     "eligibility": {
       "isNewBrunswick": true,
       "revenueUnder500k": false,
-      "employeesUnder50": true,
-      "industries": ["Manufacturing", "Industrial"]
+      "employeesUnder50": false,
+      "industries": ["Retail", "Professional Services", "Technology"]
     },
     "requirements": [
-      "Manufacturing industry",
-      "Innovation or automation project",
-      "Job creation commitment",
-      "Matching funds required"
+      "Must provide comprehensive digital adoption plan",
+      "Must detail intended software and technology upgrades",
+      "Covers up to 50% of eligible costs",
+      "Must implement upgrades within 12 months of receiving grant",
+      "Business must be registered in New Brunswick"
     ],
-    "applicationUrl": "https://onbcanada.ca/manufacturing"
-  },
-  {
-    "id": "grant-4",
-    "name": "Digital Transformation Grant",
-    "amount": 35000,
-    "deadline": "2026-03-31",
-    "category": "Technology",
-    "description": "Funds for businesses adopting digital technologies, e-commerce platforms, or upgrading IT infrastructure.",
-    "provider": "ACOA - Atlantic Canada Opportunities Agency",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["All"]
-    },
-    "requirements": [
-      "Atlantic Canada location",
-      "Digital transformation project",
-      "Less than 100 employees",
-      "Technology implementation plan"
-    ],
-    "applicationUrl": "https://acoa.ca/digital"
-  },
-  {
-    "id": "grant-5",
-    "name": "Women in Business Grant",
-    "amount": 15000,
-    "deadline": "2026-04-15",
-    "category": "General",
-    "description": "Supporting women-owned businesses with funding for growth, training, and business development.",
-    "provider": "Women in Business NB",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["All"]
-    },
-    "requirements": [
-      "Woman-owned (51%+ ownership)",
-      "New Brunswick business",
-      "Business development plan",
-      "Training component included"
-    ],
-    "applicationUrl": "https://wnb.ca/grants"
-  },
-  {
-    "id": "grant-6",
-    "name": "Green Business Initiative",
-    "amount": 40000,
-    "deadline": "2026-06-30",
-    "category": "Environment",
-    "description": "Supporting businesses implementing sustainable practices, renewable energy, or eco-friendly operations.",
-    "provider": "Environment Canada",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["All"]
-    },
-    "requirements": [
-      "Environmental improvement project",
-      "Measurable sustainability goals",
-      "Energy audit completed",
-      "Implementation timeline"
-    ],
-    "applicationUrl": "https://canada.ca/green-business"
-  },
-  {
-    "id": "grant-7",
-    "name": "Export Development Program",
-    "amount": 75000,
-    "deadline": "2026-05-15",
-    "category": "Export",
-    "description": "Helping New Brunswick businesses expand into international markets and increase export capacity.",
-    "provider": "Export Development Canada",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": false,
-      "employeesUnder50": true,
-      "industries": ["Manufacturing", "Technology", "Food & Beverage"]
-    },
-    "requirements": [
-      "Export-ready product/service",
-      "Market research completed",
-      "Export plan required",
-      "Previous sales history"
-    ],
-    "applicationUrl": "https://edc.ca/export-grants"
-  },
-  {
-    "id": "grant-8",
-    "name": "Youth Employment Incentive",
-    "amount": 20000,
-    "deadline": "2026-04-01",
-    "category": "Employment",
-    "description": "Wage subsidies for businesses hiring youth aged 15-30 for full-time or internship positions.",
-    "provider": "Service Canada",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["All"]
-    },
-    "requirements": [
-      "Hiring youth aged 15-30",
-      "Full-time position (30+ hours)",
-      "Minimum 6-month commitment",
-      "Training plan required"
-    ],
-    "applicationUrl": "https://canada.ca/youth-employment"
-  },
-  {
-    "id": "grant-9",
-    "name": "Rural Business Development Fund",
-    "amount": 30000,
-    "deadline": "2026-07-15",
-    "category": "Rural Development",
-    "description": "Supporting businesses in rural communities to create jobs and strengthen local economies.",
-    "provider": "Regional Development Corporation",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["All"]
-    },
-    "requirements": [
-      "Rural location (outside cities)",
-      "Job creation plan",
-      "Community benefit statement",
-      "Business sustainability plan"
-    ],
-    "applicationUrl": "https://rdc.ca/rural-grants"
-  },
-  {
-    "id": "grant-10",
-    "name": "Food Industry Innovation Grant",
-    "amount": 45000,
-    "deadline": "2026-03-25",
-    "category": "Food & Beverage",
-    "description": "Supporting food and beverage businesses with product development, equipment upgrades, and food safety improvements.",
-    "provider": "Agriculture and Agri-Food Canada",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["Food & Beverage", "Agriculture"]
-    },
-    "requirements": [
-      "Food processing or production",
-      "Food safety certification",
-      "Innovation or equipment upgrade",
-      "Market expansion plan"
-    ],
-    "applicationUrl": "https://agr.gc.ca/food-grants"
-  },
-  {
-    "id": "grant-11",
-    "name": "Retail Modernization Fund",
-    "amount": 28000,
-    "deadline": "2026-05-30",
-    "category": "Retail",
-    "description": "Helping retail businesses upgrade point-of-sale systems, implement e-commerce, and modernize operations.",
-    "provider": "Retail Council of Canada",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["Retail"]
-    },
-    "requirements": [
-      "Retail business operation",
-      "Technology upgrade plan",
-      "Customer experience improvement",
-      "E-commerce component"
-    ],
-    "applicationUrl": "https://retailcouncil.org/grants"
-  },
-  {
-    "id": "grant-12",
-    "name": "Apprenticeship Training Grant",
-    "amount": 18000,
-    "deadline": "2026-06-15",
-    "category": "Training",
-    "description": "Supporting businesses that hire and train apprentices in skilled trades.",
-    "provider": "Skills Canada",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": false,
-      "employeesUnder50": true,
-      "industries": ["Manufacturing", "Construction", "Trades"]
-    },
-    "requirements": [
-      "Skilled trades business",
-      "Apprentice hiring commitment",
-      "Training program in place",
-      "Certified journeyperson mentor"
-    ],
-    "applicationUrl": "https://skillscanada.com/apprentice-grants"
-  },
-  {
-    "id": "grant-13",
-    "name": "Cultural Industries Fund",
-    "amount": 22000,
-    "deadline": "2026-04-20",
-    "category": "Arts & Culture",
-    "description": "Supporting creative businesses including design, arts, media, and cultural enterprises.",
-    "provider": "Arts NB",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["Creative", "Professional Services"]
-    },
-    "requirements": [
-      "Creative or cultural business",
-      "Artistic or cultural project",
-      "Community engagement plan",
-      "Portfolio submission"
-    ],
-    "applicationUrl": "https://artsnb.ca/funding"
-  },
-  {
-    "id": "grant-14",
-    "name": "Indigenous Business Grant",
-    "amount": 35000,
-    "deadline": "2026-05-10",
-    "category": "Indigenous",
-    "description": "Supporting Indigenous-owned businesses and entrepreneurs across all industries.",
-    "provider": "Indigenous Business Initiative",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["All"]
-    },
-    "requirements": [
-      "Indigenous ownership (51%+)",
-      "Business plan required",
-      "Community benefit statement",
-      "Cultural sustainability component"
-    ],
-    "applicationUrl": "https://ised-isde.canada.ca/indigenous"
-  },
-  {
-    "id": "grant-15",
-    "name": "Accessibility Improvement Grant",
-    "amount": 25000,
-    "deadline": "2026-06-01",
-    "category": "Accessibility",
-    "description": "Funding for businesses making facilities and services more accessible to people with disabilities.",
-    "provider": "Accessibility Standards Canada",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["All"]
-    },
-    "requirements": [
-      "Accessibility improvement project",
-      "Facility modification plan",
-      "Compliance with accessibility standards",
-      "Accessibility audit completed"
-    ],
-    "applicationUrl": "https://accessible.canada.ca/grants"
-  },
-  {
-    "id": "grant-16",
-    "name": "Cybersecurity Enhancement Program",
-    "amount": 32000,
-    "deadline": "2026-03-20",
-    "category": "Technology",
-    "description": "Supporting businesses in improving cybersecurity infrastructure and data protection measures.",
-    "provider": "Canadian Centre for Cyber Security",
-    "eligibility": {
-      "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["Technology", "Professional Services", "Retail"]
-    },
-    "requirements": [
-      "Cybersecurity assessment",
-      "Security improvement plan",
-      "Employee training component",
-      "Data protection measures"
-    ],
-    "applicationUrl": "https://cyber.gc.ca/business-grants"
+    "applicationUrl": "https://onbcanada.ca"
   },
   {
     "id": "grant-17",
-    "name": "Franchise Development Grant",
-    "amount": 55000,
-    "deadline": "2026-07-30",
-    "category": "Business Expansion",
-    "description": "Supporting businesses looking to franchise their operations or expand to new locations.",
-    "provider": "Canadian Franchise Association",
+    "name": "Rural Business Development Fund (New Brunswick)",
+    "amount": 30000,
+    "deadline": "2026-12-31",
+    "category": "Rural Development",
+    "description": "Supports businesses in rural New Brunswick communities to create jobs and strengthen local economies.",
+    "provider": "Regional Development Corporation (RDC) / Opportunities NB",
     "eligibility": {
       "isNewBrunswick": true,
       "revenueUnder500k": false,
-      "employeesUnder50": true,
-      "industries": ["Retail", "Food & Beverage", "Services"]
+      "employeesUnder50": false,
+      "industries": ["All"]
     },
     "requirements": [
-      "Proven business model",
-      "Franchise development plan",
-      "Legal documentation",
-      "Multi-location potential"
+      "Business must be located in designated rural area",
+      "Must demonstrate job creation or retention",
+      "Business plan showing economic impact required",
+      "Community support letters beneficial",
+      "Must contribute to local economic diversification"
     ],
-    "applicationUrl": "https://cfa.ca/franchise-grants"
+    "applicationUrl": "https://www2.gnb.ca/content/gnb/en/departments/regional_development.html"
   },
   {
     "id": "grant-18",
-    "name": "Research & Development Tax Credit",
+    "name": "Indigenous Business Development Program (ACOA)",
+    "amount": 100000,
+    "deadline": "2026-12-31",
+    "category": "Indigenous",
+    "description": "Specialized funding for Indigenous-owned businesses and Indigenous entrepreneurs in Atlantic Canada.",
+    "provider": "Atlantic Canada Opportunities Agency (ACOA)",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Must be Indigenous-owned (First Nations, Inuit, or Métis)",
+      "At least 51% Indigenous ownership or Indigenous-led",
+      "Business must be located in Atlantic Canada",
+      "Comprehensive business plan required",
+      "Must demonstrate economic and community benefits"
+    ],
+    "applicationUrl": "https://www.canada.ca/en/atlantic-canada-opportunities/services/indigenous-business.html"
+  },
+  {
+    "id": "grant-19",
+    "name": "Manufacturing Innovation Fund (New Brunswick)",
     "amount": 60000,
-    "deadline": "2026-08-15",
-    "category": "Research",
-    "description": "Tax credits for businesses conducting research and development in innovative technologies or processes.",
+    "deadline": "2026-05-14",
+    "category": "Manufacturing",
+    "description": "Supports New Brunswick manufacturers investing in process improvements, automation, equipment upgrades, and productivity enhancements.",
+    "provider": "Opportunities NB",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Manufacturing"]
+    },
+    "requirements": [
+      "Must be an established manufacturing business in New Brunswick",
+      "Project must improve productivity or competitiveness",
+      "Detailed project plan with ROI analysis required",
+      "May require matching funds",
+      "Must demonstrate job retention or creation"
+    ],
+    "applicationUrl": "https://onbcanada.ca"
+  },
+  {
+    "id": "grant-20",
+    "name": "Futurpreneur Canada Startup Financing",
+    "amount": 20000,
+    "deadline": "2026-12-31",
+    "category": "General",
+    "description": "Provides financing, mentorship, and support to young entrepreneurs (18-39 years) launching or growing businesses across Canada.",
+    "provider": "Futurpreneur Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": true,
+      "employeesUnder50": true,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Must be between 18-39 years old",
+      "Must be a Canadian citizen or permanent resident",
+      "Business must be at startup or early growth stage",
+      "Comprehensive business plan required",
+      "Must participate in mentorship program for 2 years"
+    ],
+    "applicationUrl": "https://www.futurpreneur.ca"
+  },
+  {
+    "id": "grant-21",
+    "name": "Apprenticeship Job Creation Tax Credit (AJCTC)",
+    "amount": 2000,
+    "deadline": "2026-12-31",
+    "category": "Employment",
+    "description": "Non-refundable tax credit equal to 10% of salaries and wages paid to eligible apprentices in Red Seal trades during their first two years of apprenticeship.",
     "provider": "Canada Revenue Agency",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Construction", "Manufacturing", "Food & Beverage", "Trades"]
+    },
+    "requirements": [
+      "Must employ apprentices in prescribed Red Seal trades",
+      "Apprentice must be in first two years of registered apprenticeship contract",
+      "Apprenticeship contract registered with federal, provincial, or territorial government",
+      "Apprentice working toward certification under eligible program",
+      "Credit can be carried back 3 years or forward 20 years"
+    ],
+    "applicationUrl": "https://www.canada.ca/en/revenue-agency/services/tax/individuals/topics/about-your-tax-return/tax-return/completing-a-tax-return/deductions-credits-expenses/line-41200-investment-tax-credit/apprenticeship-job-creation-tax-credit.html"
+  },
+  {
+    "id": "grant-22",
+    "name": "BDC Growth Capital (Working Capital Loans)",
+    "amount": 2000000,
+    "deadline": "2026-12-31",
+    "category": "Business Expansion",
+    "description": "Working capital loans with flexible terms to support Canadian entrepreneurs in all sectors for operational cash flow, equipment purchases, and business expansion.",
+    "provider": "Business Development Bank of Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Must be a Canadian business in good financial standing",
+      "Business plan demonstrating growth potential required",
+      "Loans between $100,000 and $2 million available",
+      "Flexible repayment terms with payment postponement options",
+      "May require collateral or personal guarantees"
+    ],
+    "applicationUrl": "https://www.bdc.ca/en"
+  },
+  {
+    "id": "grant-23",
+    "name": "NRC IRAP Clean Technology Program",
+    "amount": 4000000,
+    "deadline": "2026-12-31",
+    "category": "Environment",
+    "description": "Supports Canadian clean technology businesses with development, demonstration, and commercialization of innovative environmental technologies that address climate change and sustainability.",
+    "provider": "National Research Council Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Environment", "Technology"]
+    },
+    "requirements": [
+      "Must be a Canadian-owned clean technology business",
+      "Technology must demonstrate significant environmental benefits",
+      "Project must be at development or demonstration stage",
+      "Must be commercializing innovative clean technologies",
+      "Covers up to 33-40% of eligible project costs"
+    ],
+    "applicationUrl": "https://nrc.canada.ca/en/support-technology-innovation"
+  },
+  {
+    "id": "grant-24",
+    "name": "Canada-NB Workforce Development Agreement",
+    "amount": 5000,
+    "deadline": "2026-12-31",
+    "category": "Training",
+    "description": "Provides funding for skills training and workforce development programs to help New Brunswick businesses upskill employees and improve competitiveness.",
+    "provider": "Government of New Brunswick / ESDC",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Training must address specific skill gaps",
+      "Must use accredited training providers",
+      "Business must demonstrate training need",
+      "May require employer contribution to training costs",
+      "Training must lead to employability improvement"
+    ],
+    "applicationUrl": "https://www2.gnb.ca/content/gnb/en/departments/post-secondary_education_training_and_labour.html"
+  },
+  {
+    "id": "grant-25",
+    "name": "Atlantic Trade and Investment Growth Agreement (ATIGA)",
+    "amount": 75000,
+    "deadline": "2026-03-31",
+    "category": "Export",
+    "description": "Supports Atlantic Canadian businesses expanding into export markets through market development activities, trade missions, and international business development.",
+    "provider": "Atlantic Canada Opportunities Agency (ACOA)",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Manufacturing", "Technology", "Professional Services", "Food & Beverage"]
+    },
+    "requirements": [
+      "Business must demonstrate export readiness",
+      "Must have viable product/service for international markets",
+      "Funds for market research, trade shows, export development",
+      "Business plan for export markets required",
+      "May require matching funds"
+    ],
+    "applicationUrl": "https://www.canada.ca/en/atlantic-canada-opportunities.html"
+  },
+  {
+    "id": "grant-26",
+    "name": "New Brunswick Small Business Investor Tax Credit",
+    "amount": 50000,
+    "deadline": "2026-12-31",
+    "category": "General",
+    "description": "Tax credit for investors who invest in eligible New Brunswick small businesses, providing businesses access to equity capital.",
+    "provider": "Government of New Brunswick",
     "eligibility": {
       "isNewBrunswick": true,
       "revenueUnder500k": false,
       "employeesUnder50": true,
-      "industries": ["Technology", "Manufacturing", "Professional Services"]
+      "industries": ["All"]
     },
     "requirements": [
-      "R&D project documentation",
-      "Scientific or technological advancement",
-      "Systematic investigation",
-      "Eligible expenditures tracking"
+      "Must be an active New Brunswick business",
+      "Business must have permanent establishment in NB",
+      "Gross assets under $25 million",
+      "At least 75% of employees based in New Brunswick",
+      "Cannot be publicly traded"
     ],
-    "applicationUrl": "https://cra-arc.gc.ca/sred"
+    "applicationUrl": "https://www2.gnb.ca/content/gnb/en/departments/finance.html"
   },
   {
-    "id": "grant-19",
-    "name": "Social Enterprise Grant",
-    "amount": 38000,
-    "deadline": "2026-05-05",
+    "id": "grant-27",
+    "name": "Canadian Intellectual Property Office (CIPO) Patent Assistance",
+    "amount": 1500,
+    "deadline": "2026-12-31",
+    "category": "Research",
+    "description": "Reduced fees and assistance for small businesses applying for patents, trademarks, and intellectual property protection in Canada.",
+    "provider": "Innovation, Science and Economic Development Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": true,
+      "employeesUnder50": true,
+      "industries": ["Technology", "Manufacturing"]
+    },
+    "requirements": [
+      "Must qualify as small entity (fewer than 50 employees)",
+      "Must be applying for Canadian patent or trademark",
+      "Eligible for reduced government fees (up to 50% discount)",
+      "Must maintain small entity status throughout application",
+      "Available for new applications and maintenance fees"
+    ],
+    "applicationUrl": "https://www.ic.gc.ca/eic/site/cipointernet-internetopic.nsf/eng/home"
+  },
+  {
+    "id": "grant-28",
+    "name": "Francophone Economic Development Fund (New Brunswick)",
+    "amount": 50000,
+    "deadline": "2026-05-30",
+    "category": "General",
+    "description": "Supports Francophone-owned businesses and businesses serving New Brunswick's Francophone communities with development and expansion projects.",
+    "provider": "Opportunities NB / Canadian Heritage",
+    "eligibility": {
+      "isNewBrunswick": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Business owned by Francophone entrepreneur OR serves Francophone market",
+      "Must demonstrate impact on Francophone economic development",
+      "Business plan required",
+      "Priority for businesses in Francophone regions of NB",
+      "May require matching funds"
+    ],
+    "applicationUrl": "https://onbcanada.ca"
+  },
+  {
+    "id": "grant-29",
+    "name": "BDC Capital Indigenous Growth Fund",
+    "amount": 100000,
+    "deadline": "2026-12-31",
+    "category": "Indigenous",
+    "description": "Provides financing and business support specifically for Indigenous entrepreneurs and Indigenous-owned businesses across Canada including New Brunswick.",
+    "provider": "Business Development Bank of Canada",
+    "eligibility": {
+      "isNewBrunswick": false,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["All"]
+    },
+    "requirements": [
+      "Must be at least 51% Indigenous-owned or Indigenous-led",
+      "Business owner must be First Nations, Inuit, or Métis",
+      "Business plan demonstrating viability required",
+      "Available for start-up and growth-stage businesses",
+      "Advisory services and mentorship included"
+    ],
+    "applicationUrl": "https://www.bdc.ca/en/financing/business-loans/indigenous-entrepreneurs"
+  },
+  {
+    "id": "grant-30",
+    "name": "Co-operative Development Initiative (New Brunswick)",
+    "amount": 30000,
+    "deadline": "2026-12-31",
     "category": "Social Impact",
-    "description": "Supporting businesses with a social mission that create positive community impact while generating revenue.",
-    "provider": "Community Futures NB",
+    "description": "Supports the creation and development of co-operative businesses in New Brunswick, including worker co-ops, consumer co-ops, and multi-stakeholder co-operatives.",
+    "provider": "Opportunities NB / Federal Co-ops",
     "eligibility": {
       "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
       "industries": ["All"]
     },
     "requirements": [
-      "Social mission statement",
-      "Community impact metrics",
-      "Sustainable revenue model",
-      "Stakeholder engagement plan"
+      "Must be a registered or developing co-operative structure",
+      "Demonstrates co-operative principles and values",
+      "Business feasibility study required",
+      "Priority for rural and underserved communities",
+      "Can fund feasibility studies, incorporation, and development"
     ],
-    "applicationUrl": "https://communityfutures.ca/social-grants"
+    "applicationUrl": "https://www2.gnb.ca/content/gnb/en/departments/regional_development.html"
   },
   {
-    "id": "grant-20",
-    "name": "Energy Efficiency Retrofit Program",
-    "amount": 42000,
-    "deadline": "2026-06-20",
-    "category": "Environment",
-    "description": "Funding for businesses upgrading to energy-efficient equipment, lighting, HVAC systems, and insulation.",
-    "provider": "NB Power",
+    "id": "grant-31",
+    "name": "Food and Beverage Innovation Fund (New Brunswick)",
+    "amount": 45000,
+    "deadline": "2026-04-15",
+    "category": "Food & Beverage",
+    "description": "Supports New Brunswick food and beverage businesses with product development, processing upgrades, food safety improvements, and market expansion.",
+    "provider": "Agriculture, Aquaculture and Fisheries NB / ACOA",
     "eligibility": {
       "isNewBrunswick": true,
-      "revenueUnder500k": true,
-      "employeesUnder50": true,
-      "industries": ["All"]
+      "revenueUnder500k": false,
+      "employeesUnder50": false,
+      "industries": ["Food & Beverage", "Agriculture"]
     },
     "requirements": [
-      "Energy audit completed",
-      "Retrofit plan approved",
-      "Energy savings targets",
-      "NB Power customer"
+      "Must be a food/beverage processing or manufacturing business",
+      "Project must improve product quality, safety, or market reach",
+      "Eligible for equipment upgrades, facility improvements",
+      "Must meet food safety and regulatory standards",
+      "May require matching investment"
     ],
-    "applicationUrl": "https://nbpower.com/efficiency-grants"
+    "applicationUrl": "https://www2.gnb.ca/content/gnb/en/departments/10.html"
   }
 ]

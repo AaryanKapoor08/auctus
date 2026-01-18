@@ -270,7 +270,7 @@ export default function ThreadDetailPage({ params }: ThreadDetailPageProps) {
                           href={`/forum/${relatedThread.id}`}
                           className="block"
                         >
-                          <div className="bg-blue-50 hover:bg-blue-100 rounded-lg p-3 transition-colors border border-blue-200">
+                          <div className="bg-gray-100 hover:bg-gray-200 rounded-lg p-3 transition-colors border border-gray-300">
                             <p className="font-medium text-gray-900 text-sm mb-1 line-clamp-2">
                               {relatedThread.title}
                             </p>

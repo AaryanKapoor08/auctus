@@ -41,7 +41,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold text-primary-600">
+            <span className="text-2xl font-bold text-gray-900">
               Auctus AI
             </span>
           </Link>
@@ -55,7 +55,7 @@ export default function Navbar() {
                 className={cn(
                   "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                   isActivePath(link.href)
-                    ? "bg-primary-50 text-primary-700"
+                    ? "bg-gray-100 text-gray-900"
                     : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 )}
               >
@@ -93,7 +93,7 @@ export default function Navbar() {
                       onClick={() => handleBusinessSwitch(business.id)}
                       className={cn(
                         "w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors duration-150",
-                        currentBusiness.id === business.id && "bg-primary-50"
+                        currentBusiness.id === business.id && "bg-gray-100"
                       )}
                     >
                       <div className="font-medium text-gray-900">
@@ -138,7 +138,7 @@ export default function Navbar() {
             <div className="flex flex-col h-full">
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <span className="text-xl font-bold text-primary-600">
+                <span className="text-xl font-bold text-gray-900">
                   Auctus AI
                 </span>
                 <button
@@ -163,7 +163,7 @@ export default function Navbar() {
                       className={cn(
                         "w-full text-left px-3 py-2 rounded-lg transition-colors duration-150",
                         currentBusiness.id === business.id
-                          ? "bg-primary-50 border-2 border-primary-500"
+                          ? "bg-gray-100 border-2 border-gray-900"
                           : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent"
                       )}
                     >
@@ -189,7 +189,7 @@ export default function Navbar() {
                       className={cn(
                         "block px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-150",
                         isActivePath(link.href)
-                          ? "bg-primary-50 text-primary-700"
+                          ? "bg-gray-100 text-gray-900"
                           : "text-gray-700 hover:bg-gray-100"
                       )}
                     >

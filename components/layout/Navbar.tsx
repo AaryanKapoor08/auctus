@@ -37,11 +37,11 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-2 sm:gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold text-gray-900">
+          <Link href="/" className="flex items-center min-w-0 flex-shrink">
+            <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 whitespace-nowrap">
               Auctus AI
             </span>
           </Link>
@@ -112,7 +112,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="md:hidden p-2.5 rounded-lg hover:bg-gray-100 transition-colors active:bg-gray-200"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (

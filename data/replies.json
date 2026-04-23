@@ -1,0 +1,362 @@
+[
+  {
+    "id": "reply-1",
+    "threadId": "thread-1",
+    "authorId": "biz-4",
+    "content": "Have you checked out Atlantic Bean Roasters? They're based in Moncton and do wholesale to several cafes in the region. Their organic single-origin selection is excellent, and they deliver weekly. Pricing is competitive too - we get our specialty flour from a supplier who also uses them. I can send you their contact if you're interested!",
+    "timestamp": "2026-01-10T15:15:00Z",
+    "helpfulCount": 5
+  },
+  {
+    "id": "reply-2",
+    "threadId": "thread-1",
+    "authorId": "biz-5",
+    "content": "I second Atlantic Bean Roasters! We don't use them ourselves (not in food service) but I've heard great things from other business owners. Also, there's a new roastery opening in Saint John that might be worth contacting - they're doing a wholesale program launch next month.",
+    "timestamp": "2026-01-10T16:30:00Z",
+    "helpfulCount": 2
+  },
+  {
+    "id": "reply-3",
+    "threadId": "thread-2",
+    "authorId": "biz-1",
+    "content": "This sounds like a great idea! Aroma Coffee House would definitely be interested. We've been wanting to do more community marketing but didn't have the budget for a big campaign. Pooling resources makes sense. When are you thinking of kicking this off?",
+    "timestamp": "2026-01-10T11:00:00Z",
+    "helpfulCount": 3
+  },
+  {
+    "id": "reply-4",
+    "threadId": "thread-2",
+    "authorId": "biz-5",
+    "content": "Count us in! Atlantic Adventures would love to participate. Summer is our busy season anyway, so the timing is perfect. We can contribute adventure/tourism angle to the campaign. Let's set up a meeting to discuss details?",
+    "timestamp": "2026-01-10T12:45:00Z",
+    "helpfulCount": 4
+  },
+  {
+    "id": "reply-5",
+    "threadId": "thread-2",
+    "authorId": "biz-6",
+    "content": "Green Thumb Garden Supply is interested too! We're planning a big spring/summer push anyway. Love the collaborative approach. We could potentially host part of the community event at our garden center if that helps.",
+    "timestamp": "2026-01-10T14:20:00Z",
+    "helpfulCount": 6
+  },
+  {
+    "id": "reply-6",
+    "threadId": "thread-3",
+    "authorId": "biz-7",
+    "content": "I'll share this with our network. We have several skilled trades professionals in our mentorship program who might know someone. Have you posted on the Maritime Trades job boards yet?",
+    "timestamp": "2026-01-09T17:30:00Z",
+    "helpfulCount": 1
+  },
+  {
+    "id": "reply-7",
+    "threadId": "thread-4",
+    "authorId": "biz-1",
+    "content": "That's a good price for a Blodgett! Wish we had space for it. If anyone's on the fence - these are workhorses, very reliable. River Valley Bakery's stuff is always well-maintained.",
+    "timestamp": "2026-01-09T10:45:00Z",
+    "helpfulCount": 2
+  },
+  {
+    "id": "reply-8",
+    "threadId": "thread-5",
+    "authorId": "biz-1",
+    "content": "I love this idea! We've been frustrated with delivery app fees too. The challenge would be coordinating timing - coffee needs to be delivered hot/fresh. But for baked goods, prepared foods, etc. this could definitely work. Would need some logistics planning but I'm interested in exploring it.",
+    "timestamp": "2026-01-08T14:15:00Z",
+    "helpfulCount": 8
+  },
+  {
+    "id": "reply-9",
+    "threadId": "thread-5",
+    "authorId": "biz-3",
+    "content": "From a marketing perspective, you could brand this as 'Fredericton Local Delivery' or something similar. Customers would love supporting a local delivery option vs the big apps. I'd be happy to help with branding/marketing if you move forward with this. Could be a cool case study for our portfolio too.",
+    "timestamp": "2026-01-08T15:30:00Z",
+    "helpfulCount": 12
+  },
+  {
+    "id": "reply-10",
+    "threadId": "thread-5",
+    "authorId": "biz-6",
+    "content": "We've been thinking about delivery for plants/garden supplies so this is interesting. Our products don't have the same timing constraints as food. Maybe start with non-perishables first to test the concept?",
+    "timestamp": "2026-01-08T16:00:00Z",
+    "helpfulCount": 5
+  },
+  {
+    "id": "reply-11",
+    "threadId": "thread-6",
+    "authorId": "biz-7",
+    "content": "Great question! I've helped several startups with grant applications. Key tips: 1) Answer every question completely - don't leave blanks. 2) Budget should be detailed and realistic. 3) Show measurable outcomes (jobs created, revenue growth, etc.). 4) Get someone to proofread - typos hurt credibility. 5) Apply early, don't wait until deadline. For a first application, doing it yourself is fine - save the grant writer fees for bigger applications ($50k+). The Tourism Recovery Fund application is straightforward if you follow their guidelines. You got this!",
+    "timestamp": "2026-01-08T13:00:00Z",
+    "helpfulCount": 9
+  },
+  {
+    "id": "reply-12",
+    "threadId": "thread-6",
+    "authorId": "biz-2",
+    "content": "We've won 3 grants in the past 4 years. Echo what TechStart said - completeness is crucial. Also, make sure your business financials are in order before applying. They will ask for tax returns, financial statements, etc. And follow up after submitting - sometimes applications get lost in the shuffle.",
+    "timestamp": "2026-01-08T14:45:00Z",
+    "helpfulCount": 6
+  },
+  {
+    "id": "reply-13",
+    "threadId": "thread-7",
+    "authorId": "biz-3",
+    "content": "Congratulations on the expansion! The mentorship program sounds excellent. We'd love to participate as mentors - we have experience with startup marketing and scaling. Will definitely attend the open house!",
+    "timestamp": "2026-01-07T16:15:00Z",
+    "helpfulCount": 4
+  },
+  {
+    "id": "reply-14",
+    "threadId": "thread-7",
+    "authorId": "biz-2",
+    "content": "This is great for the local startup ecosystem. We'd be interested in mentoring on the manufacturing/operations side if you need that expertise. Also potentially interested in the co-working space for overflow when we have contract workers.",
+    "timestamp": "2026-01-07T17:00:00Z",
+    "helpfulCount": 3
+  },
+  {
+    "id": "reply-15",
+    "threadId": "thread-8",
+    "authorId": "biz-4",
+    "content": "We use Square and love it! Super easy to set up, reliable, and the inventory management works well for our bakery. The monthly fees are reasonable and customer support is responsive. The e-commerce integration is seamless - one system for in-store and online. Highly recommend for retail.",
+    "timestamp": "2026-01-07T11:30:00Z",
+    "helpfulCount": 7
+  },
+  {
+    "id": "reply-16",
+    "threadId": "thread-8",
+    "authorId": "biz-1",
+    "content": "We're also on Square and it's been great. The analytics are really helpful for tracking sales patterns. One tip: get the contactless reader - customers love tap-to-pay. Setup took us about 2 hours total, very straightforward.",
+    "timestamp": "2026-01-07T12:00:00Z",
+    "helpfulCount": 4
+  },
+  {
+    "id": "reply-17",
+    "threadId": "thread-8",
+    "authorId": "biz-3",
+    "content": "If you're planning to go heavy on e-commerce, consider Shopify POS. It's a bit more expensive but the online store integration is incredibly powerful. We use it for a few clients and the unified inventory management is worth the premium.",
+    "timestamp": "2026-01-07T13:15:00Z",
+    "helpfulCount": 5
+  },
+  {
+    "id": "reply-18",
+    "threadId": "thread-9",
+    "authorId": "biz-6",
+    "content": "This is perfect timing! We were just talking about updating our website photos. We'd love to book a session. Do you have a portfolio we can review?",
+    "timestamp": "2026-01-06T15:00:00Z",
+    "helpfulCount": 2
+  },
+  {
+    "id": "reply-19",
+    "threadId": "thread-9",
+    "authorId": "biz-1",
+    "content": "Interested! Our current photos are from 2019 and desperately need updating. Will send you a message to discuss details.",
+    "timestamp": "2026-01-06T16:30:00Z",
+    "helpfulCount": 1
+  },
+  {
+    "id": "reply-20",
+    "threadId": "thread-10",
+    "authorId": "biz-1",
+    "content": "Not tourism, but we face similar seasonal challenges with student employees. We've had some success offering year-round part-time positions to our summer stars - even just 8-10 hours a week keeps them connected. When summer comes, they're already trained and familiar with operations. Retention improved significantly.",
+    "timestamp": "2026-01-06T11:00:00Z",
+    "helpfulCount": 8
+  },
+  {
+    "id": "reply-21",
+    "threadId": "thread-10",
+    "authorId": "biz-7",
+    "content": "Have you considered recruiting from other provinces? We know entrepreneurs who recruit from Ontario/Quebec universities and provide housing for summer. Yes, it's more complex, but you get dedicated people who stay the whole season. Just a thought!",
+    "timestamp": "2026-01-06T12:30:00Z",
+    "helpfulCount": 6
+  },
+  {
+    "id": "reply-22",
+    "threadId": "thread-11",
+    "authorId": "biz-3",
+    "content": "We'll be there! Networking events are so valuable. Would love to meet more business owners in person. Can we bring business cards?",
+    "timestamp": "2026-01-05T17:15:00Z",
+    "helpfulCount": 3
+  },
+  {
+    "id": "reply-23",
+    "threadId": "thread-11",
+    "authorId": "biz-6",
+    "content": "Count me in! This is exactly what the business community needs. Looking forward to meeting everyone. Will there be a sign-up sheet for future events?",
+    "timestamp": "2026-01-05T18:00:00Z",
+    "helpfulCount": 2
+  },
+  {
+    "id": "reply-24",
+    "threadId": "thread-11",
+    "authorId": "biz-2",
+    "content": "Great initiative! I'll try to make it. Early morning might be tough but I'll do my best. These connections are important.",
+    "timestamp": "2026-01-05T19:30:00Z",
+    "helpfulCount": 1
+  },
+  {
+    "id": "reply-25",
+    "threadId": "thread-12",
+    "authorId": "biz-3",
+    "content": "We might be able to help! Our team includes a graphic designer who specializes in brand identity. She's done great work for local businesses. I'll send you her portfolio and we can set up a consultation to discuss your vision. Budget fits our range perfectly.",
+    "timestamp": "2026-01-05T13:00:00Z",
+    "helpfulCount": 4
+  },
+  {
+    "id": "reply-26",
+    "threadId": "thread-13",
+    "authorId": "biz-4",
+    "content": "We use Shopify and it's been excellent! The learning curve is minimal, tons of support articles, and the inventory sync is reliable. We started with about 40 products and now have over 150. The app ecosystem is huge - there's an app for everything. Monthly cost varies based on your plan but we're at $79/month plus transaction fees.",
+    "timestamp": "2026-01-04T14:30:00Z",
+    "helpfulCount": 10
+  },
+  {
+    "id": "reply-27",
+    "threadId": "thread-13",
+    "authorId": "biz-3",
+    "content": "Shopify is definitely the most user-friendly for non-technical users. WooCommerce is cheaper but requires more technical know-how. For 500 products and your needs, I'd recommend Shopify. We can help with setup if you need - it's part of our service offering. Happy to chat!",
+    "timestamp": "2026-01-04T15:00:00Z",
+    "helpfulCount": 7
+  },
+  {
+    "id": "reply-28",
+    "threadId": "thread-14",
+    "authorId": "biz-4",
+    "content": "Oh this could work! River Valley Bakery would be perfect - we do savory baked goods too (quiches, savory tarts, bread). Coffee + pastries + savory items = complete meal offering. Let's talk! I think we'd complement each other well.",
+    "timestamp": "2026-01-04T11:15:00Z",
+    "helpfulCount": 6
+  },
+  {
+    "id": "reply-29",
+    "threadId": "thread-14",
+    "authorId": "biz-5",
+    "content": "Not food, but we've done shared booth arrangements at tourism festivals and it works great! Just make sure you have clear agreements on cost splitting, space division, and shared vs individual sales tracking. Worth documenting in writing even with friends!",
+    "timestamp": "2026-01-04T12:00:00Z",
+    "helpfulCount": 4
+  },
+  {
+    "id": "reply-30",
+    "threadId": "thread-15",
+    "authorId": "biz-3",
+    "content": "Congratulations on a successful first year! The 250% growth is impressive. Your point about community partnerships resonates - we've found the same thing. Small city = tight-knit business community = huge word-of-mouth potential. What was your biggest challenge in year one?",
+    "timestamp": "2026-01-03T15:30:00Z",
+    "helpfulCount": 5
+  },
+  {
+    "id": "reply-31",
+    "threadId": "thread-15",
+    "authorId": "biz-1",
+    "content": "This is inspiring! We're in year 5 now but I remember that first year grind. Your point about free events is so true - we started our networking breakfast series and it's been incredible for building relationships. Keep up the great work!",
+    "timestamp": "2026-01-03T16:00:00Z",
+    "helpfulCount": 3
+  },
+  {
+    "id": "reply-32",
+    "threadId": "thread-16",
+    "authorId": "biz-6",
+    "content": "Ours went up 22% this year. Not as bad as 35% but still painful. We're with Economical Insurance and they said it's industry-wide rate increases. Might be worth getting quotes from 2-3 brokers to compare. Sometimes you can negotiate if you bundle multiple policies.",
+    "timestamp": "2026-01-03T10:30:00Z",
+    "helpfulCount": 7
+  },
+  {
+    "id": "reply-33",
+    "threadId": "thread-16",
+    "authorId": "biz-7",
+    "content": "We've heard similar stories from our client businesses. One tip: ask your broker about claims-free discounts, safety certifications, or security system discounts. Sometimes small changes can reduce premiums. Also, increasing your deductible can lower monthly costs if you have the cash reserves to handle it.",
+    "timestamp": "2026-01-03T11:00:00Z",
+    "helpfulCount": 8
+  },
+  {
+    "id": "reply-34",
+    "threadId": "thread-17",
+    "authorId": "biz-1",
+    "content": "We don't have extra kitchen space but wanted to say congratulations on the growth! Have you checked with the Fredericton Co-op Kitchen? They might have availability or know of spaces.",
+    "timestamp": "2026-01-02T16:30:00Z",
+    "helpfulCount": 2
+  },
+  {
+    "id": "reply-35",
+    "threadId": "thread-17",
+    "authorId": "biz-5",
+    "content": "Not in food service but I've heard there's commercial kitchen space available at the old Saint Mary's school building. Might be worth investigating?",
+    "timestamp": "2026-01-02T17:15:00Z",
+    "helpfulCount": 3
+  },
+  {
+    "id": "reply-36",
+    "threadId": "thread-18",
+    "authorId": "biz-3",
+    "content": "This is literally what we do! Digital Dreams Agency specializes in social media management for local businesses. We've worked with several tourism companies actually. We're within your budget and can definitely help. I'll send you a DM with our portfolio and case studies. We'd love to chat about your needs!",
+    "timestamp": "2026-01-02T12:00:00Z",
+    "helpfulCount": 8
+  },
+  {
+    "id": "reply-37",
+    "threadId": "thread-18",
+    "authorId": "biz-7",
+    "content": "We have a freelance social media manager in our network who's excellent and specializes in tourism. She's worked with adventure companies in BC and recently moved to NB. Want me to connect you?",
+    "timestamp": "2026-01-02T13:30:00Z",
+    "helpfulCount": 5
+  },
+  {
+    "id": "reply-38",
+    "threadId": "thread-1",
+    "authorId": "biz-3",
+    "content": "Just wanted to add - if you go with Atlantic Bean Roasters, ask for samples first. They're happy to send small batches so you can test quality before committing to wholesale. That's what we recommend to our food service clients.",
+    "timestamp": "2026-01-10T18:00:00Z",
+    "helpfulCount": 3
+  },
+  {
+    "id": "reply-39",
+    "threadId": "thread-2",
+    "authorId": "biz-4",
+    "content": "River Valley Bakery wants in too! We could provide baked goods for the community event. Summer is perfect timing for us. This collaborative approach is smart - excited to see this come together!",
+    "timestamp": "2026-01-10T15:30:00Z",
+    "helpfulCount": 5
+  },
+  {
+    "id": "reply-40",
+    "threadId": "thread-6",
+    "authorId": "biz-3",
+    "content": "One more tip: take photos of EVERYTHING. Before, during, after implementation. Grant funders love visual progress reports. Makes the final reporting much easier too. Good luck with your application!",
+    "timestamp": "2026-01-08T16:15:00Z",
+    "helpfulCount": 4
+  },
+  {
+    "id": "reply-41",
+    "threadId": "thread-8",
+    "authorId": "biz-6",
+    "content": "Thanks everyone! This is super helpful. Sounds like Square is the winner. I'm going to request a demo and probably go with them. The ease of use is important since we have part-time staff who need to learn it quickly.",
+    "timestamp": "2026-01-07T16:00:00Z",
+    "helpfulCount": 2
+  },
+  {
+    "id": "reply-42",
+    "threadId": "thread-10",
+    "authorId": "biz-5",
+    "content": "These are all great suggestions! The out-of-province recruitment is interesting - we hadn't considered that. The year-round part-time idea makes a lot of sense too. Thanks for the input everyone!",
+    "timestamp": "2026-01-06T14:30:00Z",
+    "helpfulCount": 3
+  },
+  {
+    "id": "reply-43",
+    "threadId": "thread-11",
+    "authorId": "biz-1",
+    "content": "Great response everyone! We'll set up a simple RSVP system. And yes, definitely bring business cards. See you all Thursday morning!",
+    "timestamp": "2026-01-05T20:00:00Z",
+    "helpfulCount": 1
+  },
+  {
+    "id": "reply-44",
+    "threadId": "thread-13",
+    "authorId": "biz-6",
+    "content": "Okay, Shopify it is! Thanks for the recommendations. Digital Dreams, I'll reach out about setup help. Appreciate everyone's input - this community is amazing!",
+    "timestamp": "2026-01-04T17:00:00Z",
+    "helpfulCount": 4
+  },
+  {
+    "id": "reply-45",
+    "threadId": "thread-14",
+    "authorId": "biz-1",
+    "content": "Perfect! River Valley Bakery it is! I'll message you and we can work out the details. This is going to be great!",
+    "timestamp": "2026-01-04T14:00:00Z",
+    "helpfulCount": 2
+  }
+]

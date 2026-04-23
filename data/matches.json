@@ -1,0 +1,262 @@
+[
+  {
+    "businessId": "biz-1",
+    "matches": [
+      {
+        "partnerId": "biz-4",
+        "matchScore": 92,
+        "reasoning": {
+          "youNeed": ["Wholesale supplier", "Event space"],
+          "theyOffer": ["Wholesale baked goods", "Baking classes"],
+          "mutualBenefits": ["Both in food service", "Complementary products", "Shared customer base"]
+        }
+      },
+      {
+        "partnerId": "biz-3",
+        "matchScore": 85,
+        "reasoning": {
+          "youNeed": ["Marketing help"],
+          "theyOffer": ["Website development", "Social media management"],
+          "mutualBenefits": ["Local business focus", "Community engagement"]
+        }
+      },
+      {
+        "partnerId": "biz-5",
+        "matchScore": 78,
+        "reasoning": {
+          "youNeed": ["Event space"],
+          "theyOffer": ["Event coordination", "Tourism consulting"],
+          "mutualBenefits": ["Tourism synergy", "Event partnership potential"]
+        }
+      },
+      {
+        "partnerId": "biz-7",
+        "matchScore": 65,
+        "reasoning": {
+          "youNeed": ["Marketing help"],
+          "theyOffer": ["Startup mentorship", "Networking events"],
+          "mutualBenefits": ["Community building", "Business networking"]
+        }
+      }
+    ]
+  },
+  {
+    "businessId": "biz-2",
+    "matches": [
+      {
+        "partnerId": "biz-7",
+        "matchScore": 88,
+        "reasoning": {
+          "youNeed": ["Export assistance", "Government grants"],
+          "theyOffer": ["Startup mentorship", "Funding connections"],
+          "mutualBenefits": ["Growth focus", "Business development"]
+        }
+      },
+      {
+        "partnerId": "biz-3",
+        "matchScore": 82,
+        "reasoning": {
+          "youNeed": ["Government grants"],
+          "theyOffer": ["Website development", "SEO services"],
+          "mutualBenefits": ["Technology integration", "Digital presence"]
+        }
+      },
+      {
+        "partnerId": "biz-6",
+        "matchScore": 70,
+        "reasoning": {
+          "youNeed": ["Skilled welders"],
+          "theyOffer": ["Landscaping contractors"],
+          "mutualBenefits": ["Contractor network", "Local business connections"]
+        }
+      }
+    ]
+  },
+  {
+    "businessId": "biz-3",
+    "matches": [
+      {
+        "partnerId": "biz-1",
+        "matchScore": 90,
+        "reasoning": {
+          "youNeed": ["Sales leads"],
+          "theyOffer": ["Catering services", "Event hosting"],
+          "mutualBenefits": ["Marketing synergy", "Event collaboration"]
+        }
+      },
+      {
+        "partnerId": "biz-5",
+        "matchScore": 87,
+        "reasoning": {
+          "youNeed": ["Sales leads"],
+          "theyOffer": ["Tour packages", "Tourism consulting"],
+          "mutualBenefits": ["Tourism marketing", "Digital strategy"]
+        }
+      },
+      {
+        "partnerId": "biz-6",
+        "matchScore": 83,
+        "reasoning": {
+          "youNeed": ["Sales leads", "Graphic designer"],
+          "theyOffer": ["E-commerce platform needs"],
+          "mutualBenefits": ["Website development", "Digital transformation"]
+        }
+      },
+      {
+        "partnerId": "biz-7",
+        "matchScore": 79,
+        "reasoning": {
+          "youNeed": ["Office space"],
+          "theyOffer": ["Co-working space"],
+          "mutualBenefits": ["Tech community", "Collaboration opportunities"]
+        }
+      }
+    ]
+  },
+  {
+    "businessId": "biz-4",
+    "matches": [
+      {
+        "partnerId": "biz-1",
+        "matchScore": 94,
+        "reasoning": {
+          "youNeed": ["Wholesale partners"],
+          "theyOffer": ["Catering services"],
+          "mutualBenefits": ["Coffee + baked goods partnership", "Shared customer base", "Complementary products"]
+        }
+      },
+      {
+        "partnerId": "biz-5",
+        "matchScore": 76,
+        "reasoning": {
+          "youNeed": ["Wholesale partners", "Delivery service"],
+          "theyOffer": ["Event coordination"],
+          "mutualBenefits": ["Tourism event catering", "Local partnerships"]
+        }
+      },
+      {
+        "partnerId": "biz-3",
+        "matchScore": 72,
+        "reasoning": {
+          "youNeed": ["Delivery service"],
+          "theyOffer": ["Website development"],
+          "mutualBenefits": ["E-commerce setup", "Online ordering"]
+        }
+      }
+    ]
+  },
+  {
+    "businessId": "biz-5",
+    "matches": [
+      {
+        "partnerId": "biz-3",
+        "matchScore": 91,
+        "reasoning": {
+          "youNeed": ["Marketing expertise", "Booking system"],
+          "theyOffer": ["Website development", "SEO services", "Social media management"],
+          "mutualBenefits": ["Tourism marketing", "Online booking integration", "Digital presence"]
+        }
+      },
+      {
+        "partnerId": "biz-1",
+        "matchScore": 80,
+        "reasoning": {
+          "youNeed": ["Marketing expertise"],
+          "theyOffer": ["Event hosting"],
+          "mutualBenefits": ["Tourism events", "Local partnerships"]
+        }
+      },
+      {
+        "partnerId": "biz-7",
+        "matchScore": 75,
+        "reasoning": {
+          "youNeed": ["Seasonal staff"],
+          "theyOffer": ["Networking events"],
+          "mutualBenefits": ["Hiring connections", "Business community"]
+        }
+      },
+      {
+        "partnerId": "biz-4",
+        "matchScore": 68,
+        "reasoning": {
+          "youNeed": ["Seasonal staff"],
+          "theyOffer": ["Custom cakes"],
+          "mutualBenefits": ["Event catering", "Tourism packages"]
+        }
+      }
+    ]
+  },
+  {
+    "businessId": "biz-6",
+    "matches": [
+      {
+        "partnerId": "biz-3",
+        "matchScore": 89,
+        "reasoning": {
+          "youNeed": ["E-commerce platform"],
+          "theyOffer": ["Website development", "SEO services"],
+          "mutualBenefits": ["Online store setup", "Digital marketing", "E-commerce expertise"]
+        }
+      },
+      {
+        "partnerId": "biz-7",
+        "matchScore": 73,
+        "reasoning": {
+          "youNeed": ["E-commerce platform"],
+          "theyOffer": ["Startup mentorship"],
+          "mutualBenefits": ["Digital transformation guidance", "Technology advice"]
+        }
+      },
+      {
+        "partnerId": "biz-2",
+        "matchScore": 67,
+        "reasoning": {
+          "youNeed": ["Landscaping contractors", "Delivery vehicles"],
+          "theyOffer": ["Metal fabrication"],
+          "mutualBenefits": ["Custom fabrication needs", "Local suppliers"]
+        }
+      }
+    ]
+  },
+  {
+    "businessId": "biz-7",
+    "matches": [
+      {
+        "partnerId": "biz-3",
+        "matchScore": 86,
+        "reasoning": {
+          "youNeed": ["Mentor network"],
+          "theyOffer": ["Website development", "SEO services"],
+          "mutualBenefits": ["Startup ecosystem", "Tech community", "Knowledge sharing"]
+        }
+      },
+      {
+        "partnerId": "biz-2",
+        "matchScore": 84,
+        "reasoning": {
+          "youNeed": ["Mentor network"],
+          "theyOffer": ["Engineering services"],
+          "mutualBenefits": ["Manufacturing expertise", "Startup mentorship"]
+        }
+      },
+      {
+        "partnerId": "biz-1",
+        "matchScore": 78,
+        "reasoning": {
+          "youNeed": ["Funding sources"],
+          "theyOffer": ["Event hosting"],
+          "mutualBenefits": ["Networking events", "Community building"]
+        }
+      },
+      {
+        "partnerId": "biz-6",
+        "matchScore": 71,
+        "reasoning": {
+          "youNeed": ["Mentor network"],
+          "theyOffer": ["Gardening workshops"],
+          "mutualBenefits": ["Educational programs", "Community engagement"]
+        }
+      }
+    ]
+  }
+]

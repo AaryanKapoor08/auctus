@@ -1,0 +1,330 @@
+[
+  {
+    "id": "job-1",
+    "title": "Senior Web Developer",
+    "businessId": "biz-3",
+    "businessName": "Digital Dreams Agency",
+    "skills": ["React", "TypeScript", "Node.js", "Tailwind CSS", "Next.js"],
+    "jobType": "full-time",
+    "payRange": {
+      "min": 70000,
+      "max": 90000
+    },
+    "location": "Knowledge Park, Fredericton",
+    "postedDate": "3 days ago",
+    "description": "We're looking for a senior web developer to lead projects for our growing client base. You'll work with modern tech stack and have creative freedom in technical decisions.",
+    "requirements": [
+      "5+ years web development experience",
+      "Strong React/TypeScript skills",
+      "Portfolio of completed projects",
+      "Excellent communication skills"
+    ]
+  },
+  {
+    "id": "job-2",
+    "title": "Part-time Barista",
+    "businessId": "biz-1",
+    "businessName": "Aroma Coffee House",
+    "skills": ["Customer Service", "Coffee Preparation", "Cash Handling", "Food Safety"],
+    "jobType": "part-time",
+    "payRange": {
+      "min": 15,
+      "max": 18
+    },
+    "location": "Downtown Fredericton",
+    "postedDate": "1 day ago",
+    "description": "Join our friendly team! Perfect for students or anyone looking for flexible part-time work. Full training provided on espresso machines and latte art.",
+    "requirements": [
+      "Friendly and outgoing personality",
+      "Ability to work weekends",
+      "Food handler certification (or willing to obtain)",
+      "Customer service experience preferred"
+    ]
+  },
+  {
+    "id": "job-3",
+    "title": "Certified Welder",
+    "businessId": "biz-2",
+    "businessName": "Maritime Manufacturing Ltd",
+    "skills": ["MIG Welding", "TIG Welding", "Blueprint Reading", "Metal Fabrication"],
+    "jobType": "full-time",
+    "payRange": {
+      "min": 28,
+      "max": 35
+    },
+    "location": "North Fredericton Industrial Park",
+    "postedDate": "5 days ago",
+    "description": "6-month contract with potential for permanent position. Major fabrication project starting soon. Competitive pay and benefits package.",
+    "requirements": [
+      "Red Seal certification required",
+      "5+ years welding experience",
+      "Experience with MIG/TIG welding",
+      "Ability to read and interpret blueprints",
+      "Own tools preferred"
+    ]
+  },
+  {
+    "id": "job-4",
+    "title": "Social Media Manager",
+    "businessId": "biz-5",
+    "businessName": "Atlantic Adventures Tours",
+    "skills": ["Social Media Marketing", "Content Creation", "Photography", "Instagram", "Facebook"],
+    "jobType": "contract",
+    "payRange": {
+      "min": 1000,
+      "max": 1500
+    },
+    "location": "Remote (occasional in-person meetings)",
+    "postedDate": "2 days ago",
+    "description": "Manage our social media presence across Instagram, Facebook, and TikTok. Create engaging content showcasing our tours and outdoor adventures.",
+    "requirements": [
+      "Experience with tourism/outdoor industry preferred",
+      "Strong content creation skills",
+      "Knowledge of Instagram/Facebook/TikTok",
+      "Photography/video editing skills",
+      "Available for summer season (May-September)"
+    ]
+  },
+  {
+    "id": "job-5",
+    "title": "Baker - Early Morning Shift",
+    "businessId": "biz-4",
+    "businessName": "River Valley Bakery",
+    "skills": ["Baking", "Pastry", "Food Safety", "Time Management"],
+    "jobType": "full-time",
+    "payRange": {
+      "min": 18,
+      "max": 24
+    },
+    "location": "Northside Fredericton",
+    "postedDate": "1 week ago",
+    "description": "Early bird baker needed! 4am start time. Make artisan breads and European pastries. Great for someone who loves the quiet morning hours.",
+    "requirements": [
+      "Previous baking experience required",
+      "Comfortable with early morning schedule (4am-12pm)",
+      "Food handler certification",
+      "Ability to lift 50lbs",
+      "Weekend availability"
+    ]
+  },
+  {
+    "id": "job-6",
+    "title": "Tour Guide - Seasonal",
+    "businessId": "biz-5",
+    "businessName": "Atlantic Adventures Tours",
+    "skills": ["Public Speaking", "Outdoor Knowledge", "First Aid", "Customer Service"],
+    "jobType": "contract",
+    "payRange": {
+      "min": 18,
+      "max": 22
+    },
+    "location": "Historic Garrison District, Fredericton",
+    "postedDate": "4 days ago",
+    "description": "Lead kayaking, hiking, and cultural tours. May-September contract. Training provided. Perfect for outdoor enthusiasts!",
+    "requirements": [
+      "Enthusiastic and outgoing",
+      "Knowledge of NB history/nature (training provided)",
+      "First Aid certification (or willing to obtain)",
+      "Available weekends and holidays",
+      "Physical fitness required"
+    ]
+  },
+  {
+    "id": "job-7",
+    "title": "Graphic Designer",
+    "businessId": "biz-3",
+    "businessName": "Digital Dreams Agency",
+    "skills": ["Adobe Photoshop", "Illustrator", "Figma", "Branding", "UI/UX Design"],
+    "jobType": "full-time",
+    "payRange": {
+      "min": 45000,
+      "max": 60000
+    },
+    "location": "Knowledge Park, Fredericton (Hybrid)",
+    "postedDate": "6 days ago",
+    "description": "Creative graphic designer to join our growing team. Work on diverse projects from branding to web design for local businesses.",
+    "requirements": [
+      "2-3 years professional design experience",
+      "Strong portfolio required",
+      "Proficiency in Adobe Creative Suite",
+      "Experience with Figma/web design",
+      "Brand identity experience preferred"
+    ]
+  },
+  {
+    "id": "job-8",
+    "title": "Retail Sales Associate",
+    "businessId": "biz-6",
+    "businessName": "Green Thumb Garden Supply",
+    "skills": ["Customer Service", "Sales", "Product Knowledge", "Cash Register"],
+    "jobType": "part-time",
+    "payRange": {
+      "min": 15,
+      "max": 17
+    },
+    "location": "South Fredericton",
+    "postedDate": "2 days ago",
+    "description": "Help customers find the perfect plants and gardening supplies! Great for gardening enthusiasts. Flexible hours, including weekends.",
+    "requirements": [
+      "Gardening knowledge or interest",
+      "Customer service experience",
+      "Ability to lift 40lbs",
+      "Weekend availability required",
+      "Enthusiastic and friendly"
+    ]
+  },
+  {
+    "id": "job-9",
+    "title": "Business Mentor (Volunteer/Paid)",
+    "businessId": "biz-7",
+    "businessName": "TechStart Incubator",
+    "skills": ["Business Development", "Entrepreneurship", "Mentoring", "Industry Expertise"],
+    "jobType": "contract",
+    "payRange": {
+      "min": 50,
+      "max": 100
+    },
+    "location": "Knowledge Park, Fredericton",
+    "postedDate": "1 week ago",
+    "description": "Share your business expertise with startup founders. Flexible commitment - as little as 2 hours/month. Paid honorarium available.",
+    "requirements": [
+      "5+ years business ownership/management experience",
+      "Passion for helping entrepreneurs",
+      "Industry expertise (any sector)",
+      "Good communication skills",
+      "Flexible schedule"
+    ]
+  },
+  {
+    "id": "job-10",
+    "title": "Kitchen Assistant",
+    "businessId": "biz-1",
+    "businessName": "Aroma Coffee House",
+    "skills": ["Food Preparation", "Cleaning", "Organization", "Food Safety"],
+    "jobType": "part-time",
+    "payRange": {
+      "min": 15,
+      "max": 16
+    },
+    "location": "Downtown Fredericton",
+    "postedDate": "3 days ago",
+    "description": "Support our kitchen team with food prep, dishwashing, and maintaining cleanliness. Great entry-level position!",
+    "requirements": [
+      "No experience necessary - will train",
+      "Food handler certification (or willing to obtain)",
+      "Reliable and punctual",
+      "Team player",
+      "Available mornings (6am-2pm shifts)"
+    ]
+  },
+  {
+    "id": "job-11",
+    "title": "Junior Web Developer (Internship)",
+    "businessId": "biz-3",
+    "businessName": "Digital Dreams Agency",
+    "skills": ["HTML", "CSS", "JavaScript", "Git", "Problem Solving"],
+    "jobType": "internship",
+    "payRange": {
+      "min": 18,
+      "max": 22
+    },
+    "location": "Knowledge Park, Fredericton",
+    "postedDate": "1 week ago",
+    "description": "4-month paid internship for aspiring web developers. Learn modern web development in a supportive team environment. Potential for full-time hire.",
+    "requirements": [
+      "Computer science student or recent graduate",
+      "Basic HTML/CSS/JavaScript knowledge",
+      "Eager to learn",
+      "Portfolio or personal projects helpful",
+      "Available full-time for 4 months"
+    ]
+  },
+  {
+    "id": "job-12",
+    "title": "Delivery Driver",
+    "businessId": "biz-4",
+    "businessName": "River Valley Bakery",
+    "skills": ["Driving", "Customer Service", "Time Management", "Navigation"],
+    "jobType": "part-time",
+    "payRange": {
+      "min": 16,
+      "max": 18
+    },
+    "location": "Fredericton area",
+    "postedDate": "5 days ago",
+    "description": "Deliver fresh baked goods to local businesses and customers. Morning shifts (7am-12pm). Use company vehicle.",
+    "requirements": [
+      "Valid driver's license (clean record)",
+      "Reliable and punctual",
+      "Customer service skills",
+      "Knowledge of Fredericton area",
+      "Available weekday mornings"
+    ]
+  },
+  {
+    "id": "job-13",
+    "title": "Garden Center Supervisor",
+    "businessId": "biz-6",
+    "businessName": "Green Thumb Garden Supply",
+    "skills": ["Leadership", "Horticulture", "Retail Management", "Customer Service"],
+    "jobType": "full-time",
+    "payRange": {
+      "min": 42000,
+      "max": 52000
+    },
+    "location": "South Fredericton",
+    "postedDate": "1 week ago",
+    "description": "Supervise our garden center operations. Manage staff, inventory, and customer service. Perfect for someone with retail and gardening expertise.",
+    "requirements": [
+      "3+ years retail management experience",
+      "Horticulture knowledge required",
+      "Team leadership skills",
+      "Inventory management experience",
+      "Weekend availability"
+    ]
+  },
+  {
+    "id": "job-14",
+    "title": "Fabrication Apprentice",
+    "businessId": "biz-2",
+    "businessName": "Maritime Manufacturing Ltd",
+    "skills": ["Mechanical Aptitude", "Blueprint Reading", "Safety Awareness", "Physical Fitness"],
+    "jobType": "full-time",
+    "payRange": {
+      "min": 18,
+      "max": 22
+    },
+    "location": "North Fredericton Industrial Park",
+    "postedDate": "4 days ago",
+    "description": "Learn the manufacturing trade! Apprenticeship program leading to Red Seal certification. Hands-on training from experienced professionals.",
+    "requirements": [
+      "High school diploma",
+      "Interest in skilled trades",
+      "Good physical condition",
+      "Willingness to learn",
+      "Commitment to 4-year apprenticeship program"
+    ]
+  },
+  {
+    "id": "job-15",
+    "title": "Event Coordinator",
+    "businessId": "biz-5",
+    "businessName": "Atlantic Adventures Tours",
+    "skills": ["Event Planning", "Organization", "Communication", "Problem Solving"],
+    "jobType": "contract",
+    "payRange": {
+      "min": 22,
+      "max": 28
+    },
+    "location": "Historic Garrison District, Fredericton",
+    "postedDate": "6 days ago",
+    "description": "Coordinate corporate team-building events and group tours. Seasonal position (May-October). Event planning experience preferred.",
+    "requirements": [
+      "Event planning experience",
+      "Excellent organizational skills",
+      "Strong communication",
+      "Ability to multitask",
+      "Weekend availability required"
+    ]
+  }
+]

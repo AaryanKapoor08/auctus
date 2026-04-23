@@ -1,0 +1,200 @@
+[
+  {
+    "id": "thread-1",
+    "title": "Looking for a wholesale coffee bean supplier",
+    "authorId": "biz-1",
+    "category": "Ask for Help",
+    "content": "Hi everyone! I'm looking for a reliable wholesale supplier for organic coffee beans. We're a small coffee shop in downtown Fredericton and currently ordering from out of province, but the shipping costs are killing us. Does anyone have recommendations for local or regional roasters who do wholesale? Quality is our top priority - we're looking for single-origin beans with fair trade certification. Would love to support local businesses if possible!",
+    "tags": ["wholesale", "supplier", "coffee", "organic"],
+    "timestamp": "2026-01-10T14:30:00Z",
+    "views": 145,
+    "helpful": 8
+  },
+  {
+    "id": "thread-2",
+    "title": "Joint marketing campaign for local businesses - who's interested?",
+    "authorId": "biz-3",
+    "category": "Collaboration Opportunities",
+    "content": "Digital Dreams Agency is organizing a collaborative summer marketing campaign for Fredericton businesses. The idea is to pool resources and create a 'Shop Local' campaign with shared social media content, cross-promotions, and a community event. We're looking for 5-10 businesses to participate. We'll provide the creative work at cost, and everyone shares the advertising spend. This could be a great way to increase visibility while keeping costs down. Who's interested in joining?",
+    "tags": ["marketing", "collaboration", "summer", "shop-local"],
+    "timestamp": "2026-01-10T10:15:00Z",
+    "views": 203,
+    "helpful": 15
+  },
+  {
+    "id": "thread-3",
+    "title": "Urgently need experienced welder - Manufacturing project",
+    "authorId": "biz-2",
+    "category": "Hiring & Local Talent",
+    "content": "Maritime Manufacturing is looking for an experienced welder to join our team for a 6-month contract with potential for permanent employment. We have a major fabrication project starting in 2 weeks and need someone who can hit the ground running. Requirements: Red Seal certification, 5+ years experience with MIG/TIG welding, ability to read blueprints. Competitive hourly rate ($28-35/hr depending on experience) plus benefits. Please contact us directly if you know anyone qualified!",
+    "tags": ["hiring", "welding", "manufacturing", "urgent"],
+    "timestamp": "2026-01-09T16:45:00Z",
+    "views": 178,
+    "helpful": 6
+  },
+  {
+    "id": "thread-4",
+    "title": "Selling commercial oven - barely used",
+    "authorId": "biz-4",
+    "category": "Marketplace",
+    "content": "We're upgrading our equipment and have a commercial convection oven for sale. It's a Blodgett double-stack oven, only 2 years old and in excellent condition. We've outgrown our space and need to make room for a larger model. Asking $8,500 (originally paid $14,000). Perfect for a bakery, restaurant, or catering business. Can help with delivery within Fredericton. Serious inquiries only please!",
+    "tags": ["equipment", "oven", "bakery", "for-sale"],
+    "timestamp": "2026-01-09T09:20:00Z",
+    "views": 89,
+    "helpful": 3
+  },
+  {
+    "id": "thread-5",
+    "title": "Anyone interested in a shared delivery service?",
+    "authorId": "biz-4",
+    "category": "Business Ideas",
+    "content": "I've been thinking about this for a while - what if several local food businesses shared a delivery driver/service? Instead of each of us paying for individual delivery apps with their high fees, we could hire someone part-time to handle deliveries for multiple businesses. Could work for bakeries, restaurants, caterers, etc. The driver could do rounds, picking up from each business and delivering in batches. Would save us all money and give customers a 'local delivery' option. Thoughts?",
+    "tags": ["delivery", "collaboration", "food-business", "cost-saving"],
+    "timestamp": "2026-01-08T13:00:00Z",
+    "views": 256,
+    "helpful": 22
+  },
+  {
+    "id": "thread-6",
+    "title": "Grant application tips? First time applying",
+    "authorId": "biz-5",
+    "category": "Ask for Help",
+    "content": "Atlantic Adventures is applying for our first government grant (Tourism Recovery Fund) and I'm feeling overwhelmed. The application is 30 pages long! For those who've successfully won grants: what are your top tips? How detailed should the budget breakdown be? Do you hire a grant writer or do it yourself? Any common mistakes to avoid? Would really appreciate any advice from businesses who've been through this process.",
+    "tags": ["grants", "funding", "advice", "tourism"],
+    "timestamp": "2026-01-08T11:30:00Z",
+    "views": 167,
+    "helpful": 12
+  },
+  {
+    "id": "thread-7",
+    "title": "ANNOUNCEMENT: New business incubator space opening",
+    "authorId": "biz-7",
+    "category": "Announcements",
+    "content": "Exciting news for Fredericton's startup community! TechStart Incubator is opening a new 5,000 sq ft co-working space in Knowledge Park next month. We'll have 20 dedicated desks, 3 meeting rooms, a podcast studio, and high-speed internet. Monthly membership is $250/month (discounted to $150 for first 3 months). We're also launching a mentorship program connecting new entrepreneurs with experienced business owners. Open house on January 25th - everyone welcome! Free coffee and networking. Hope to see you there!",
+    "tags": ["announcement", "coworking", "incubator", "startup"],
+    "timestamp": "2026-01-07T15:00:00Z",
+    "views": 312,
+    "helpful": 28
+  },
+  {
+    "id": "thread-8",
+    "title": "Best POS system for small retail?",
+    "authorId": "biz-6",
+    "category": "Ask for Help",
+    "content": "Green Thumb Garden Supply is finally upgrading from our ancient cash register to a proper POS system. We need something that can handle inventory management, seasonal pricing changes, and integrate with our (future) e-commerce site. Budget is around $3,000-5,000 for hardware and software. What are you all using? We've been looking at Square, Lightspeed, and Shopify POS. Any recommendations or horror stories to share?",
+    "tags": ["POS", "retail", "technology", "recommendations"],
+    "timestamp": "2026-01-07T10:15:00Z",
+    "views": 134,
+    "helpful": 9
+  },
+  {
+    "id": "thread-9",
+    "title": "Photography services available - portfolio building",
+    "authorId": "biz-3",
+    "category": "Marketplace",
+    "content": "Our agency has a talented photographer who's building their commercial portfolio. We're offering professional product photography, team headshots, and business location photos at 50% off regular rates for the next month. Perfect for updating your website, social media, or marketing materials. We'll provide edited high-res digital files. This is a great opportunity to get professional photos at a fraction of the cost. Limited spots available - first come, first served!",
+    "tags": ["photography", "marketing", "services", "discount"],
+    "timestamp": "2026-01-06T14:20:00Z",
+    "views": 198,
+    "helpful": 11
+  },
+  {
+    "id": "thread-10",
+    "title": "How do you handle seasonal staffing?",
+    "authorId": "biz-5",
+    "category": "Ask for Help",
+    "content": "Tourism businesses - how do you manage the seasonal employment challenge? We need 4-5 tour guides for summer (May-September) but struggle to find and train good people every year. By the time they're trained well, the season is ending. Has anyone had success with bringing back the same staff year after year? Do you offer winter work to keep them? What incentives work? We're in a competitive market for summer workers (students have lots of options) so any creative solutions would be appreciated!",
+    "tags": ["staffing", "seasonal", "tourism", "hiring"],
+    "timestamp": "2026-01-06T09:45:00Z",
+    "views": 145,
+    "helpful": 14
+  },
+  {
+    "id": "thread-11",
+    "title": "Networking event next Thursday - Coffee & Connections",
+    "authorId": "biz-1",
+    "category": "Announcements",
+    "content": "Aroma Coffee House is hosting a monthly networking breakfast for local business owners. First event is next Thursday, Jan 16th, 7:30-9:00 AM. Free coffee and pastries, casual atmosphere, no formal presentations - just a chance to meet other entrepreneurs and share ideas. We're hoping to make this a regular monthly thing. Please RSVP so we know how much food to prepare. Everyone welcome - all industries, all business stages. Looking forward to building our local business community!",
+    "tags": ["networking", "event", "community", "breakfast"],
+    "timestamp": "2026-01-05T16:00:00Z",
+    "views": 223,
+    "helpful": 19
+  },
+  {
+    "id": "thread-12",
+    "title": "Seeking graphic designer for logo redesign",
+    "authorId": "biz-6",
+    "category": "Hiring & Local Talent",
+    "content": "We're looking to refresh our brand and need a talented graphic designer for a logo redesign and brand guidelines. This is a paid project (budget $2,000-3,000) with potential for ongoing work if it goes well. We want something modern but approachable, that represents our eco-friendly values. Must have experience with brand identity work. Local designer preferred - we'd like to meet in person to discuss the vision. Portfolio required. Please send examples of previous logo work!",
+    "tags": ["design", "branding", "logo", "freelance"],
+    "timestamp": "2026-01-05T11:30:00Z",
+    "views": 167,
+    "helpful": 7
+  },
+  {
+    "id": "thread-13",
+    "title": "E-commerce platform recommendations?",
+    "authorId": "biz-6",
+    "category": "Ask for Help",
+    "content": "We're finally taking our garden supply business online! Currently researching e-commerce platforms and feeling a bit overwhelmed by the options. We have about 500 products to list, need good inventory sync with our POS, and want something that's not too technical to manage. Budget is flexible but would prefer to stay under $200/month. Using Shopify, WooCommerce, or something else? What's been your experience? Any integrations or apps that are must-haves?",
+    "tags": ["ecommerce", "online-store", "technology", "shopify"],
+    "timestamp": "2026-01-04T13:15:00Z",
+    "views": 189,
+    "helpful": 16
+  },
+  {
+    "id": "thread-14",
+    "title": "Partnering for food festival booth?",
+    "authorId": "biz-1",
+    "category": "Collaboration Opportunities",
+    "content": "The Fredericton Food Festival is coming up in June and booth space is expensive ($1,500 for the weekend). Anyone interested in sharing a booth? I'm thinking two complementary food businesses could split the cost and cross-promote. We'd be selling coffee drinks and pastries, so we'd pair well with something savory or a different beverage. Could be a great way to reach new customers while halving the cost. Let me know if you're interested in discussing!",
+    "tags": ["event", "collaboration", "food-festival", "partnership"],
+    "timestamp": "2026-01-04T10:00:00Z",
+    "views": 142,
+    "helpful": 8
+  },
+  {
+    "id": "thread-15",
+    "title": "Success story: First year in business retrospective",
+    "authorId": "biz-7",
+    "category": "Business Ideas",
+    "content": "TechStart Incubator just completed our first year and wanted to share some lessons learned. We started with 3 client startups and now support 12. Revenue grew 250% in year one. Key lessons: 1) Community partnerships are everything - we collaborated with 8 local businesses; 2) Don't be afraid to pivot - our original model was different; 3) Free events build goodwill and leads; 4) Word of mouth is powerful in a small city like Fredericton. Happy to answer questions about starting a service business or lessons learned. Ask me anything!",
+    "tags": ["success-story", "lessons-learned", "startup", "advice"],
+    "timestamp": "2026-01-03T14:30:00Z",
+    "views": 287,
+    "helpful": 31
+  },
+  {
+    "id": "thread-16",
+    "title": "Insurance costs - are yours going up too?",
+    "authorId": "biz-2",
+    "category": "Ask for Help",
+    "content": "Just got our insurance renewal and the premium increased 35% from last year! We've had zero claims and our coverage hasn't changed. Our broker says it's industry-wide but this seems excessive. Manufacturing businesses especially - what are you seeing? Are there any local insurance brokers that specialize in small business and might get better rates? We're paying about $18,000/year now for liability and property coverage. Considering shopping around but not sure where to start.",
+    "tags": ["insurance", "costs", "business-expenses", "advice"],
+    "timestamp": "2026-01-03T09:20:00Z",
+    "views": 176,
+    "helpful": 13
+  },
+  {
+    "id": "thread-17",
+    "title": "Looking for commercial kitchen space to rent",
+    "authorId": "biz-4",
+    "category": "Marketplace",
+    "content": "River Valley Bakery is growing faster than expected (great problem to have!) and we need additional production space. Looking to rent commercial kitchen space, either full-time or shared-use arrangement. Need proper ventilation, commercial ovens, and adequate counter space. Ideally within 15 minutes of downtown Fredericton. Anyone know of available spaces or have extra capacity in their kitchen they'd be willing to rent out? We're clean, professional, and flexible on terms!",
+    "tags": ["commercial-kitchen", "rental", "space", "production"],
+    "timestamp": "2026-01-02T15:45:00Z",
+    "views": 98,
+    "helpful": 4
+  },
+  {
+    "id": "thread-18",
+    "title": "Social media manager recommendations?",
+    "authorId": "biz-5",
+    "category": "Hiring & Local Talent",
+    "content": "Atlantic Adventures needs help with social media. We're great at running tours but terrible at Instagram/Facebook/TikTok. Looking for either a freelance social media manager or an agency that specializes in tourism/outdoor businesses. Budget is $1,000-1,500/month. Need someone who can create engaging content (we'll provide photos/videos from tours), manage posting schedule, engage with followers, and run some ads. Experience with tourism industry is a big plus. Recommendations?",
+    "tags": ["social-media", "marketing", "tourism", "hiring"],
+    "timestamp": "2026-01-02T11:00:00Z",
+    "views": 154,
+    "helpful": 10
+  }
+]

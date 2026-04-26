@@ -9,13 +9,21 @@ import type { Role } from "./role";
 
 export interface Profile {
   id: string; // UUID, references Supabase auth.users(id)
-  role: Role;
+  // Nullable to handle the gap between sign-in (a profiles row is auto-created by trigger)
+  // and onboarding completion (role gets set). A profile with `role: null` has not picked
+  // a role yet — middleware redirects them to /onboarding. This matches `Session.role`.
+  role: Role | null;
   display_name: string;
   email: string;
   avatar_url: string | null;
   created_at: string; // ISO timestamp
   updated_at: string;
 }
+
+// Profile after onboarding completes. Use this in code paths that have already verified
+// `role` is non-null (e.g. anything that branches by role, or any handler downstream of
+// a route protected by `require_auth + role`-checking middleware).
+export type OnboardedProfile = Profile & { role: Role };
 
 export interface BusinessProfile {
   id: string; // FK -> Profile.id
@@ -56,8 +64,10 @@ export interface ProfessorProfile {
 }
 
 // Discriminated view that Dev B's matcher receives.
-// Dev A's queries should return one of these shapes per signed-in user.
+// Dev A's `getRoleProfile(user_id)` returns one of these shapes for an onboarded user,
+// or `null` if the user has not picked a role yet. The `base` is `OnboardedProfile`
+// because matching only runs once the role is set.
 export type RoleProfile =
-  | { role: "business"; base: Profile; details: BusinessProfile }
-  | { role: "student"; base: Profile; details: StudentProfile }
-  | { role: "professor"; base: Profile; details: ProfessorProfile };
+  | { role: "business"; base: OnboardedProfile; details: BusinessProfile }
+  | { role: "student"; base: OnboardedProfile; details: StudentProfile }
+  | { role: "professor"; base: OnboardedProfile; details: ProfessorProfile };

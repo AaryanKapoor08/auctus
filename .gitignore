@@ -19,6 +19,17 @@
 
 # production
 /build
+!/build/
+!/build/gameplan.md
+!/build/shared/
+!/build/shared/*.md
+!/build/dev-a/
+!/build/dev-a/*.md
+!/build/dev-b/
+!/build/dev-b/*.md
+!/build/contracts/
+!/build/contracts/*.ts
+!/build/contracts/*.md
 
 # misc
 .DS_Store

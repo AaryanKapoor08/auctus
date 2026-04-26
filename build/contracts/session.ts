@@ -15,11 +15,11 @@ export interface Session {
   // Add fields here only if Dev B has a real need. Each addition needs the contract change protocol.
 }
 
-// Server-side helper signature Dev A publishes from `lib/auth/session.ts`.
+// Server-side helper signature Dev A publishes from `lib/session/get-session.ts`.
 // Dev B may call this in server components and route handlers.
 export type GetSession = () => Promise<Session | null>;
 
-// Client-side hook signature Dev A publishes from `lib/auth/use-session.ts`.
+// Client-side hook signature Dev A publishes from `lib/session/use-session.ts`.
 // Dev B may call this in client components.
 export type UseSession = () => {
   session: Session | null;

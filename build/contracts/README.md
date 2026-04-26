@@ -19,7 +19,7 @@ Each type is annotated in the file with a `// STATUS:` line:
 | `role.ts` | Dev A | The single role enum used by both domains. |
 | `profile.ts` | Dev A | `Profile` and the three role-specific profile shapes. Funding matching reads these. |
 | `session.ts` | Dev A | What Dev B can read off the current session for visibility/RLS decisions. |
-| `funding.ts` | Dev B | `FundingItem`, `FundingQuery`, `FundingSummary`. The shapes Dev A consumes for dashboard/landing tiles. |
+| `funding.ts` | Dev B | `FundingItem`, `FundingQuery`, `FundingSummary`, `FundingPreferences`, and published funding/preference helper signatures. |
 | `route-policy.ts` | Dev A (registry), Dev B (registers entries) | Per-route role gating registry, so middleware (Dev A) does not need cross-domain edits when Dev B adds a route. |
 
 ## How to use

@@ -4,6 +4,23 @@
 
 ---
 
+## Status
+
+This file is **product vision** for V2. It is NOT the build plan. For execution, use:
+
+- `build/gameplan.md` — committed scope
+- `build/shared/buildflow.md` — phase tracker
+- `build/shared/ownership.md` — domain boundaries
+- `build/contracts/*.ts` — typed cross-domain interfaces (the data model below is the source for these files)
+
+**LOCKED for V2:** D1, D2, D3, D4, D6, D7. The role enum (`business`, `student`, `professor`), unified funding table, Supabase, Google OAuth, GitHub Actions scraping, cheerio.
+
+**EXPLORATORY (not locked for V2):** D5 (OpenRouter — AI chat is deferred), D8 (chatbot dynamic import — legacy chatbot stays mounted as-is).
+
+The data model section (`Profile`, `BusinessProfile`, `StudentProfile`, `ProfessorProfile`, `FundingItem`, `FundingSummary`, `FundingQuery`) is **mirrored** in `build/contracts/*.ts`. The contract files are authoritative for execution; this file is authoritative for product intent. If they ever drift, fix the drift via the contract change protocol in `build/contracts/README.md`.
+
+---
+
 ## System Overview
 
 ```

@@ -1,6 +1,6 @@
-# Reference Index — Dev B Workspace
+# Reference Index — Dev A Workspace
 
-This folder contains copied source material used to fill the Dev B Likit workspace.
+This folder contains copied source material used to fill the Dev A Likit workspace.
 It is the retained source snapshot after root planning cleanup.
 
 Use this order when you need to verify or refresh context:
@@ -15,10 +15,10 @@ Use this order when you need to verify or refresh context:
    Branching, PR, commit, migration, and blocker rules.
 5. `build/contracts/*.ts`
    Typed integration contracts. These are the execution truth for cross-domain shapes.
-6. `build/dev-b/*.md`
-   Dev B execution details.
-7. `build/dev-a/*.md`
-   Dev A handoff/progress details that Dev B may need during integration and blocker checks.
+6. `build/dev-a/*.md`
+   Dev A execution details.
+7. `build/dev-b/*.md`
+   Dev B handoff/progress details that Dev A may need during integration and blocker checks.
 8. `build/gameplan.md`, `build/productvision.md`, `build/resume_session_context.md`
    Strategic scope, locked decisions, and high-context resume notes.
 9. `CLAUDE.md`
@@ -34,8 +34,8 @@ Copied contents:
   - `resume_session_context.md`
   - `shared/`
   - `contracts/`
-  - `dev-b/`
   - `dev-a/`
+  - `dev-b/`
 - `CLAUDE.md`
 - `claude/`
   - `BuildFlow.md`
@@ -55,4 +55,4 @@ Reason these copies exist:
 - the root planning docs can be removed without losing any source material
 - the workspace can be used without leaving `codex/`
 - this reference tree is what remains useful after the root `build/`, `claude/`, and `CLAUDE.md` copies are removed
-- cross-domain rules, contracts, ETL constraints, and handoff docs are available locally for phase checks
+- cross-domain rules, contracts, and handoff docs are available locally for phase checks

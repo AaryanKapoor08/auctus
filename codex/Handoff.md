@@ -1,104 +1,61 @@
 # Auctus V2 Handoff
 
 **Last Updated:** 2026-04-30
-**Current Gate:** G3 — Shared Tooling and Infrastructure Bootstrap
-**Status:** G2 complete and merged to `develop`; G3 ready to start
+**Current Gate:** G7 — Onboarding and Profile Persistence
+**Status:** G3-G6 completed locally on `main`; continue one gate at a time from G7
 
 ## Start Here
 
-Future sessions must read, in this order:
+Read in order:
 
-1. `codex/Handoff.md` — this file.
-2. `codex/SoloProgress.md` — active gate state and proof log.
-3. `AGENTS.md` — solo agent rules, references, migration discipline.
+1. `codex/Handoff.md`
+2. `codex/SoloProgress.md`
+3. `AGENTS.md`
 
-Root implementation is the real project. `dev-a-space/`, `dev-b-space/`, and `shared-space/` remain reference archives only. Preserve Dev A/Dev B domain boundaries even though one agent is doing the work.
+Implementation is now continuing directly on `main` per user instruction. Do not spend time on PR/GitHub mechanics unless explicitly asked.
 
 ## Latest Completed Work
 
-G2 (Root Baseline and Demo Isolation) was completed on branch `g2-demo-isolation`.
-
-G2 merged through PR #5 as `e95dc4d` (`refactor(restructure): isolate legacy demo surface`). Required `App checks` passed on PR #5.
-
-Completed:
-
-- Preserved nested duplicate `auctus-frontend/` outside lint/build scope. It remains ignored by git; TypeScript now excludes it too.
-- Moved legacy routes into `app/(demo)/**`: funding, matchmaker, talent, test-cards, and test-components.
-- Moved static JSON data into `data/demo/**`.
-- Moved legacy data/context/AI helpers into `lib/demo/**`.
-- Moved AI chatbot and V1 demo cards into `components/demo/**`.
-- Moved `ThreadCard` and `ReplyCard` into `components/forum/**`.
-- Moved `StatsCard` into `components/ui/StatsCard.tsx`.
-- Added root `build/contracts/**` from the reference contract archive.
-- Added `@contracts/*` path alias in `tsconfig.json` with `baseUrl: "."`.
-- Added domain skeleton `index.ts` files under `lib/{auth,profile,forum,funding,matching,session}` and `components/{auth,profile,forum,funding}`.
-- Updated app imports so the legacy AIChatbot mounted in `app/layout.tsx` imports only from `components/demo` and `lib/demo`.
-
-## Files Changed
-
-Real-project targets:
-
-- `.gitignore`
-- `tsconfig.json`
-- `build/contracts/{README.md,role.ts,route-policy.ts,profile.ts,session.ts,funding.ts}`
-- `app/(demo)/**`
-- `app/layout.tsx`
-- `app/providers.tsx`
-- `app/dashboard/page.tsx`
-- `app/forum/**`
-- `components/demo/**`
-- `components/forum/**`
-- `components/ui/StatsCard.tsx`
-- `components/layout/Navbar.tsx`
-- `components/{auth,profile,funding}/index.ts`
-- `data/demo/**`
-- `lib/demo/**`
-- `lib/{auth,profile,forum,funding,matching,session}/index.ts`
-- `codex/SoloProgress.md`
-- `codex/Handoff.md`
-
-Deleted/moved from old locations:
-
-- `app/funding/**`, `app/matchmaker/**`, `app/talent/**`, `app/test-cards/**`, `app/test-components/**`
-- `components/AIChatbot.tsx`, `components/ChatbotWrapper.tsx`, `components/cards/**`
-- `data/*.json`
-- `lib/BusinessContext.jsx`, `lib/ai-responses.ts`, `lib/data-utils.ts`
+- G2 demo isolation was applied directly to `main` as `403503e`.
+- G3 added `lib/env.ts`, Vitest, `npm test`, `npm run test:watch`, and env/contract sanity tests as `f4fb089`.
+- G4 locked all five contracts and added lock-header test coverage as `5ca9e67`.
+- G5 added Supabase clients, sign-in/callback/sign-out, profile trigger migration, session helpers, route policies, middleware, placeholder funding policies, and tests as `7d95e83`.
+- G6 added funding schema, seed SQL, role mapping, filters, preferences, queries, funding routes/components, real funding policies, and tests as `eb5514d`.
 
 ## Verification
 
-Commands run:
+- `npm test` after G6: 5 files / 17 tests passed.
+- `npm run lint`: success with 25 legacy warnings only.
+- `npm run build`: success.
+- `supabase db push`: applied `0001_profiles_base.sql` and `0003_funding.sql`.
+- `supabase db query --linked --file supabase/seeds/funding_seed.sql`: success.
+- Seed count query: 5 `business_grant`, 5 `scholarship`, 5 `research_grant`.
 
-- `npx tsc --noEmit --pretty false` => failed first with `TS5090: Non-relative paths are not allowed when 'baseUrl' is not set`; fixed by adding `baseUrl: "."`.
-- `npx tsc --noEmit --pretty false` => failed again because direct `tsc` read stale `.next/types` entries for old route paths, nested `auctus-frontend/**` duplicate TypeScript files, and a missing `./data-utils` import in `lib/demo/ai-responses.ts`; fixed by excluding `auctus-frontend` from `tsconfig.json`, correcting demo imports, and using Next build as the authoritative final typecheck.
-- `npm run build` with temporary `lib/_check.ts` importing `@contracts/role` => success; this verified the `@contracts/*` alias. The throwaway file was removed afterward.
-- `npm run lint` => success with 25 legacy warnings and 0 errors.
-- `npm run build` => success. Build warning remains: Next inferred workspace root from an extra lockfile at `C:\Users\Jaska\package-lock.json`.
-- Dev server smoke on `http://localhost:3000`: `/funding` => 200, `/matchmaker` => 200, `/talent` => 200.
+Known build warnings:
 
-Route note: `(demo)` is a Next route group, so browser URLs remain `/funding`, `/matchmaker`, and `/talent`; `/(demo)/...` is not a real URL segment.
+- Next warns that `middleware.ts` convention is deprecated in favor of proxy.
+- Next warns about an extra lockfile at `C:\Users\Jaska\package-lock.json`.
 
-## Migration Mode
+## Manual Blockers
 
-G2 used `direct-main`: implementation landed directly in real-project root paths. No app code was edited inside `dev-a-space/`, `dev-b-space/`, or `shared-space/`.
+- Google OAuth provider setup still needs browser/dashboard proof.
+- Email OTP / magic-link deliverability still needs inbox proof.
+- Fresh-browser auth redirect proof remains blocked until OAuth/email are configured.
+- GitHub scrape workflow manual trigger proof is deferred because the user asked to stop GitHub workflow/PR work.
 
-## Open Blockers
+## Follow-Ups Already Noted
 
-No G2 blockers remain.
-
-Manual proof still needed later:
-
-- Google OAuth provider setup.
-- Email OTP / magic-link deliverability.
-- GitHub scrape workflow manual trigger proof.
+- G6 has role mapping/policy tests; deeper preference/query integration tests need a test DB harness.
+- `FundingFilters` syncs query params; saved-default UI wiring to `funding_preferences` is a focused follow-up.
+- `FundingCard` render/snapshot test is deferred to UI test setup/hardening.
 
 ## Exact Next Action
 
-Start G3 from `develop`. The next code tasks are `lib/env.ts`, Vitest + `npm test` / `npm run test:watch`, and a sanity contract import test.
+Start G7 on `main`:
 
-## Assumptions To Preserve
+1. Add onboarding role selector and per-role first-run forms.
+2. Add `0002_role_profiles.sql`.
+3. Add `lib/profile/upsert.ts` and `lib/profile/queries.ts#getRoleProfile`.
+4. Apply migration and verify with focused tests.
 
-- Real implementation belongs in root only.
-- Demo code is frozen under `app/(demo)`, `components/demo`, `lib/demo`, and `data/demo`.
-- The nested `auctus-frontend/` duplicate is preserved but excluded from lint/build and ignored by git.
-- Five contracts exist in root `build/contracts/**` but are not all locked until G4.
-- Do not start real auth/funding runtime work until G3 and G4 are closed.
+Preserve the locked role/profile fields exactly. Do not add citizenship or residency fields.

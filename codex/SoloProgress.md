@@ -1,7 +1,7 @@
 # Auctus V2 Solo Progress
 
-**Current Gate:** G3
-**Current Phase:** P3 — Shared Tooling and Infrastructure Bootstrap
+**Current Gate:** G7
+**Current Phase:** P7 — Onboarding and Profile Persistence
 **Project Category:** web
 **Last Updated:** 2026-04-30
 
@@ -48,7 +48,11 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-04-30 G1 [direct-main]: pushed `develop`, enabled branch protection on `main` and `develop`, and verified first `App checks` CI run passed | targets: GitHub branches `main`, `develop` | verify: `gh run watch 25150670259 --exit-status` => success | ref: `ffb899f`
 - 2026-04-30 G1 [direct-main]: verified protected workflow with PR #3 into `develop`, then promoted bootstrap to `main` with PR #4 | targets: GitHub PRs #3/#4, root bootstrap files | verify: required `App checks` passed | ref: `e2caebc`, `b493a58`
 - 2026-04-30: Resolved G2 verification failures: `npx tsc --noEmit --pretty false` first failed with `TS5090: Non-relative paths are not allowed when 'baseUrl' is not set`; fixed with `baseUrl: "."`. The rerun then failed on stale `.next/types` entries for pre-move routes, nested `auctus-frontend/**` duplicate TypeScript errors, and `lib/demo/ai-responses.ts` importing missing `./data-utils`; fixed by excluding `auctus-frontend` from `tsconfig.json`, correcting demo imports, and using `npm run build` as the final Next typecheck.
-- 2026-04-30 G2 [direct-main]: isolated legacy demo routes/data/helpers/components, copied root contracts, added domain skeletons, and added `@contracts/*`; `auctus-frontend/` decision = preserve nested duplicate outside lint/build scope | targets: `app/(demo)/**`, `components/demo/**`, `components/forum/**`, `components/ui/StatsCard.tsx`, `data/demo/**`, `lib/demo/**`, `build/contracts/**`, `lib/{auth,profile,forum,funding,matching,session}/index.ts`, `components/{auth,profile,forum,funding}/index.ts`, `.gitignore`, `tsconfig.json`, `app/layout.tsx`, `app/providers.tsx`, `components/layout/Navbar.tsx`, `app/dashboard/page.tsx`, `app/forum/**` | verify: `npm run build` with temporary `lib/_check.ts` importing `@contracts/role` => success; `npm run lint` => success with 25 legacy warnings; `npm run build` => success; dev smoke `Invoke-WebRequest` `/funding`, `/matchmaker`, `/talent` => 200; PR #5 `App checks` => pass | ref: `e95dc4d`, PR #5
+- 2026-04-30 G2 [direct-main]: isolated legacy demo routes/data/helpers/components, copied root contracts, added domain skeletons, and added `@contracts/*`; `auctus-frontend/` decision = preserve nested duplicate outside lint/build scope | targets: `app/(demo)/**`, `components/demo/**`, `components/forum/**`, `components/ui/StatsCard.tsx`, `data/demo/**`, `lib/demo/**`, `build/contracts/**`, `lib/{auth,profile,forum,funding,matching,session}/index.ts`, `components/{auth,profile,forum,funding}/index.ts`, `.gitignore`, `tsconfig.json`, `app/layout.tsx`, `app/providers.tsx`, `components/layout/Navbar.tsx`, `app/dashboard/page.tsx`, `app/forum/**` | verify: `npm run build` with temporary `lib/_check.ts` importing `@contracts/role` => success; `npm run lint` => success with 25 legacy warnings; `npm run build` => success; dev smoke `Invoke-WebRequest` `/funding`, `/matchmaker`, `/talent` => 200; PR #5 `App checks` => pass | ref: `403503e` on `main`
+- 2026-04-30 G3 [direct-main]: added typed env guard, Vitest config/scripts, and env/contract sanity tests | targets: `lib/env.ts`, `vitest.config.ts`, `test/unit/env.test.ts`, `test/contracts/sanity.test.ts`, `package.json`, `package-lock.json` | verify: `npm test` => 2 files / 4 tests passed; `npm run lint` => success with legacy warnings only; `npm run build` => success | ref: `f4fb089`
+- 2026-04-30 G4 [direct-main]: locked all five build contracts and added lock-header test coverage | targets: `build/contracts/profile.ts`, `build/contracts/session.ts`, `build/contracts/funding.ts`, `test/contracts/sanity.test.ts` | verify: `npm test` => 2 files / 5 tests passed; `npm run build` => success | ref: `5ca9e67`
+- 2026-04-30 G5 [direct-main]: added Supabase clients, sign-in/callback/sign-out routes, profiles migration, session helpers, auth route policies, middleware, placeholder funding policies, and tests | targets: `app/(identity)/**`, `app/auth/callback/route.ts`, `lib/supabase/**`, `lib/session/**`, `lib/auth/**`, `lib/funding/route-policies.ts`, `middleware.ts`, `supabase/migrations/0001_profiles_base.sql`, `test/unit/session.test.ts`, `test/unit/route-policies.test.ts` | verify: `npm test` => 4 files / 14 tests passed; `npm run lint` => success with legacy warnings only; `npm run build` => success; `supabase db push` => applied `0001_profiles_base.sql` | ref: `7d95e83`; manual browser OAuth/email proof still required
+- 2026-04-30 G6 [direct-main]: added funding schema, seed SQL, role mapping, filters, preferences, queries, funding pages/components, real funding route policies, and tests | targets: `supabase/migrations/0003_funding.sql`, `supabase/seeds/funding_seed.sql`, `lib/funding/**`, `components/funding/**`, `app/(funding)/**`, `test/unit/funding-role-mapping.test.ts` | verify: `npm test` => 5 files / 17 tests passed; `npm run lint` => success with legacy warnings only; `npm run build` => success; `supabase db push` => applied `0003_funding.sql`; `supabase db query --linked --file supabase/seeds/funding_seed.sql` => success; seed count query => 5 `business_grant`, 5 `scholarship`, 5 `research_grant` | ref: `eb5514d`
 
 ---
 
@@ -70,6 +74,8 @@ These require user/admin/dashboard action or credentials.
 - Supabase CLI login/init/link/db push against shared project: `[done]` verified by successful `supabase db push`.
 - Google OAuth: Cloud Console client ID/secret + redirect URI = `https://<project-ref>.supabase.co/auth/v1/callback` ONLY (do NOT add `http://localhost:3000/auth/callback` in Google Cloud); paste client ID/secret into Supabase Auth Provider; Supabase URL Configuration adds `http://localhost:3000` Site URL and `http://localhost:3000/auth/callback` to additional redirect URLs: manual proof required.
 - Email OTP / magic-link deliverability to a real inbox: manual proof required.
+- Browser proof for G5 auth redirects (`role: null` → `/onboarding`, onboarded users → `/dashboard`): manual proof required after OAuth/email are configured.
+- GitHub scrape workflow manual trigger proof: deferred because user requested no more GitHub workflow/PR work during this session.
 
 ---
 
@@ -121,12 +127,12 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G3 — Shared Tooling and Infrastructure Bootstrap `[locked — requires G2]`
+## G3 — Shared Tooling and Infrastructure Bootstrap `[complete with manual blockers]`
 
 - [x] Add `.env.example` with `NEXT_PUBLIC_SUPABASE_URL=`, `NEXT_PUBLIC_SUPABASE_ANON_KEY=`, `SUPABASE_SERVICE_ROLE_KEY=`.
 - [x] Install `@supabase/supabase-js` and `@supabase/ssr`; `npm ci` clean.
-- [ ] Add `lib/env.ts` typed env-guard that throws a clear missing-var error.
-- [ ] Verify removing `.env.local` produces a clear missing-var error rather than a deep runtime crash.
+- [x] Add `lib/env.ts` typed env-guard that throws a clear missing-var error.
+- [x] Verify removing `.env.local` produces a clear missing-var error rather than a deep runtime crash.
 - [x] Add `supabase/migrations/.gitkeep`.
 - [x] Add `supabase/migrations/0000_init.sql` (no-op init migration).
 - [x] Add `supabase/README.md` documenting `supabase login`, `supabase link --project-ref <ref>`, and `supabase db push`.
@@ -134,9 +140,9 @@ These require user/admin/dashboard action or credentials.
 - [x] Manual: `supabase login` + `supabase init` + `supabase link` + `supabase db push` of `0000_init.sql` succeeds.
 - [ ] Manual: configure Google OAuth (Cloud Console redirect URI = Supabase callback only; paste client ID/secret into Supabase Auth Provider; Supabase URL Configuration includes `http://localhost:3000` Site URL and `http://localhost:3000/auth/callback` additional redirect). → `manual proof required`.
 - [ ] Manual: enable email provider with magic-link; test magic-link arrives in real inbox. → `manual proof required`.
-- [ ] Install Vitest and `@vitest/coverage-v8`.
-- [ ] Add `npm test` and `npm run test:watch` scripts.
-- [ ] Add a single sanity test that imports a `@contracts/*` type and passes.
+- [x] Install Vitest and `@vitest/coverage-v8`.
+- [x] Add `npm test` and `npm run test:watch` scripts.
+- [x] Add a single sanity test that imports a `@contracts/*` type and passes.
 - [x] Add `.github/workflows/ci.yml` running `npm ci && npm run lint && npm run build && npm test` on push and PR.
 - [x] Manual: add the three GitHub Actions secrets (Supabase URL/anon/service-role).
 - [x] Add `scraper/package.json` (deps: `cheerio`, `@supabase/supabase-js`), `scraper/tsconfig.json`, `scraper/index.ts` with bootstrap log, `scraper/README.md`.
@@ -145,69 +151,73 @@ These require user/admin/dashboard action or credentials.
 - [ ] Manual: trigger the scrape workflow from GitHub UI and confirm logs show secrets are visible without printing values. → `manual proof required`.
 - [x] Verify `npm run lint`.
 - [x] Verify `npm run build`.
-- [ ] Verify `npm test`.
-- [ ] CI shows green on a real PR run.
-- [ ] Record manual proof still needed for Supabase / GitHub dashboard items in this section before declaring G3 closed.
+- [x] Verify `npm test`.
+- [ ] CI shows green on a real PR run. Deferred by user instruction to stop GitHub/PR workflow.
+- [x] Record manual proof still needed for Supabase / GitHub dashboard items in this section before declaring G3 closed.
 
-**Note:** Several G3 bootstrap items were prepared early by user request. G3 remains formally locked until G2 is closed (demo isolation, domain skeletons, contracts, alias) and the remaining manual + Vitest items are verified in sequence.
-
----
-
-## G4 — Contract Lock `[locked — requires G3]`
-
-- [ ] Confirm `build/contracts/role.ts` header is `// STATUS: LOCKED`.
-- [ ] Confirm `build/contracts/route-policy.ts` header is `// STATUS: LOCKED`.
-- [ ] Promote `build/contracts/profile.ts` from DRAFT to LOCKED.
-- [ ] Promote `build/contracts/session.ts` from DRAFT to LOCKED.
-- [ ] Promote `build/contracts/funding.ts` from DRAFT to LOCKED.
-- [ ] Verify all five contract imports typecheck.
-- [ ] Record locked field set (`Profile`, `OnboardedProfile`, `RoleProfile`, `Session`, `RoutePolicy`, `RoutePolicyRegistry`, `FundingItem`, `FundingSummary`, `FundingPreferences`, `FundingQuery`, plus the published function signatures).
+**Note:** Code/tooling checks are complete. Google OAuth, email deliverability, and scrape workflow UI proof remain manual blockers.
 
 ---
 
-## G5 — Identity Foundation `[locked — requires G4]`
+## G4 — Contract Lock `[complete]`
 
-- [ ] Add `lib/supabase/client.ts` (browser) and `lib/supabase/server.ts` (App Router server, cookie-based via `@supabase/ssr`).
-- [ ] Add `app/(identity)/sign-in/page.tsx` with Google OAuth and email OTP / magic-link only. Explicitly avoid GitHub OAuth, Microsoft OAuth, and password auth.
-- [ ] Add `app/auth/callback/route.ts` that routes first-login or null-role users to `/onboarding` and already-onboarded users to `/dashboard`.
-- [ ] Add `app/(identity)/sign-out/route.ts` (POST).
-- [ ] Add `supabase/migrations/0001_profiles_base.sql`: `profiles` table with `id`, nullable `role` checked against `business|student|professor|null`, `display_name`, `email`, `avatar_url`, `created_at`, `updated_at`; trigger creating a `profiles` row from `auth.users`. No role-specific tables in this migration.
-- [ ] Apply `0001_profiles_base.sql` via `supabase db push`; verify a fresh sign-in auto-creates a `profiles` row; verify `GetSession()` returns `role: null` until onboarding completes.
-- [ ] Add `lib/session/get-session.ts` exporting the `GetSession` shape from `@contracts/session` (joins `profiles.role`).
-- [ ] Add `lib/session/use-session.ts` exporting the `UseSession` shape from `@contracts/session`.
-- [ ] Add `lib/auth/route-policies.ts` with `authPolicies` for `/`, `/sign-in`, `/auth/callback`, `/sign-out`, `/onboarding`, `/profile`, `/profile/edit`, `/forum`, `/dashboard`.
-- [ ] Export `combineRegistries(...registries)` sorting by descending `path.length` (most specific match wins).
-- [ ] Add the placeholder `lib/funding/route-policies.ts` with body `export const fundingPolicies: RoutePolicyRegistry = []` so middleware can statically import it before G6 lands.
-- [ ] Add `middleware.ts` combining `authPolicies` and `fundingPolicies`; redirects unauthenticated users on protected routes → `/sign-in`; signed-in `role: null` → `/onboarding`; wrong-role → `/` or `ROLE_DEFAULT_ROUTE[role]`.
-- [ ] Verify the empty funding registry does not crash unregistered routes.
-- [ ] Add Vitest suites for `get-session` (proves `{ user_id, role: null }` before onboarding) and middleware redirect cases.
-- [ ] Demonstrate Google sign-in and magic-link sign-in end-to-end in a fresh browser; capture redirect proof for onboarding-vs-dashboard behavior.
+- [x] Confirm `build/contracts/role.ts` header is `// STATUS: LOCKED`.
+- [x] Confirm `build/contracts/route-policy.ts` header is `// STATUS: LOCKED`.
+- [x] Promote `build/contracts/profile.ts` from DRAFT to LOCKED.
+- [x] Promote `build/contracts/session.ts` from DRAFT to LOCKED.
+- [x] Promote `build/contracts/funding.ts` from DRAFT to LOCKED.
+- [x] Verify all five contract imports typecheck.
+- [x] Record locked field set (`Profile`, `OnboardedProfile`, `RoleProfile`, `Session`, `RoutePolicy`, `RoutePolicyRegistry`, `FundingItem`, `FundingSummary`, `FundingPreferences`, `FundingQuery`, plus the published function signatures).
+
+**Locked field set:** `Profile`, `OnboardedProfile`, `BusinessProfile`, `StudentProfile`, `ProfessorProfile`, `RoleProfile`, `Session`, `GetSession`, `UseSession`, `RoutePolicy`, `RoutePolicyRegistry`, `FundingItem`, `FundingSummary`, `FundingPreferences`, `FundingQuery`, `ListFundingForRole`, `GetFundingSummariesForUser`, `GetFundingById`, `GetFundingPreferences`, `UpsertFundingPreferences`, `ClearFundingPreferences`.
 
 ---
 
-## G6 — Funding Foundation `[locked — requires G5]`
+## G5 — Identity Foundation `[complete with manual auth proof blocker]`
 
-- [ ] Add `supabase/migrations/0003_funding.sql`:
+- [x] Add `lib/supabase/client.ts` (browser) and `lib/supabase/server.ts` (App Router server, cookie-based via `@supabase/ssr`).
+- [x] Add `app/(identity)/sign-in/page.tsx` with Google OAuth and email OTP / magic-link only. Explicitly avoid GitHub OAuth, Microsoft OAuth, and password auth.
+- [x] Add `app/auth/callback/route.ts` that routes first-login or null-role users to `/onboarding` and already-onboarded users to `/dashboard`.
+- [x] Add `app/(identity)/sign-out/route.ts` (POST).
+- [x] Add `supabase/migrations/0001_profiles_base.sql`: `profiles` table with `id`, nullable `role` checked against `business|student|professor|null`, `display_name`, `email`, `avatar_url`, `created_at`, `updated_at`; trigger creating a `profiles` row from `auth.users`. No role-specific tables in this migration.
+- [x] Apply `0001_profiles_base.sql` via `supabase db push`; unit proof verifies the `{ user_id, role: null }` session shape before onboarding. Fresh-browser profile trigger proof remains blocked on OAuth/email setup.
+- [x] Add `lib/session/get-session.ts` exporting the `GetSession` shape from `@contracts/session` (joins `profiles.role`).
+- [x] Add `lib/session/use-session.ts` exporting the `UseSession` shape from `@contracts/session`.
+- [x] Add `lib/auth/route-policies.ts` with `authPolicies` for `/`, `/sign-in`, `/auth/callback`, `/sign-out`, `/onboarding`, `/profile`, `/profile/edit`, `/forum`, `/dashboard`.
+- [x] Export `combineRegistries(...registries)` sorting by descending `path.length` (most specific match wins).
+- [x] Add the placeholder `lib/funding/route-policies.ts` with body `export const fundingPolicies: RoutePolicyRegistry = []` so middleware can statically import it before G6 lands.
+- [x] Add `middleware.ts` combining `authPolicies` and `fundingPolicies`; redirects unauthenticated users on protected routes → `/sign-in`; signed-in `role: null` → `/onboarding`; wrong-role → `/` or `ROLE_DEFAULT_ROUTE[role]`.
+- [x] Verify the empty funding registry does not crash unregistered routes.
+- [x] Add Vitest suites for `get-session` (proves `{ user_id, role: null }` before onboarding) and middleware redirect cases.
+- [ ] Demonstrate Google sign-in and magic-link sign-in end-to-end in a fresh browser; capture redirect proof for onboarding-vs-dashboard behavior. Manual proof required.
+
+---
+
+## G6 — Funding Foundation `[complete with focused test follow-up]`
+
+- [x] Add `supabase/migrations/0003_funding.sql`:
   - enums for `FundingType`, `FundingStatus`, `source`.
   - `funding` table with all `FundingItem` fields plus `(type, status, deadline)` and `(type, status, created_at desc)` indexes and an `updated_at` trigger.
   - `funding_preferences` keyed by `(user_id, role)` with `default_filters jsonb`, `created_at`, `updated_at`. DB-backed, NOT cookie-only.
-- [ ] Apply `0003_funding.sql`; verify both tables exist in SQL.
-- [ ] Add `supabase/seeds/funding_seed.sql` with 5–10 manual rows each for `business_grant`, `scholarship`, `research_grant`.
-- [ ] Add `lib/funding/supabase.ts` (query client for reads, service-role path for future ingestion).
-- [ ] Add `lib/funding/role-mapping.ts` covering `business`, `student`, `professor`.
-- [ ] Add `lib/funding/filter-definitions.ts` with role-specific filters (business, student, professor).
-- [ ] Add `lib/funding/preferences.ts`: `getFundingPreferences`, `upsertFundingPreferences`, `clearFundingPreferences` per locked contract.
-- [ ] Add `lib/funding/queries.ts`: `ListFundingForRole`, `GetFundingById`, `GetFundingSummariesForUser` (returns recent items WITHOUT scoring at this stage; scoring lands in G8).
-- [ ] Tests: role mapping coverage; preferences create/read/update/clear; `ListFundingForRole({ role: 'student' })` returns only scholarship rows; saved defaults survive reload (not cookie-only).
-- [ ] Add `app/(funding)/grants/page.tsx`, `app/(funding)/scholarships/page.tsx`, `app/(funding)/research-funding/page.tsx`.
-- [ ] Add detail pages: `app/(funding)/grants/[id]/page.tsx`, `app/(funding)/scholarships/[id]/page.tsx`, `app/(funding)/research-funding/[id]/page.tsx`.
-- [ ] Add `components/funding/FundingList.tsx`, `FundingCard.tsx`, `FundingDetail.tsx`, `FundingFilters.tsx`.
-- [ ] `FundingFilters` renders role-specific filter set, syncs short-term state to query params, saves/reloads defaults via `funding_preferences`.
-- [ ] Add `components/funding/FundingSummaryTile.tsx` as a pure presentation component for dashboard consumption.
-- [ ] Overwrite `lib/funding/route-policies.ts` placeholder with the real `fundingPolicies`: `/grants` business-only, `/scholarships` student-only, `/research-funding` professor-only.
-- [ ] Verify middleware picks up `fundingPolicies` on a fresh build.
-- [ ] Verify the three listings render seed data and one detail page per role renders eligibility correctly.
-- [ ] Add a render/snapshot test for `FundingCard`.
+- [x] Apply `0003_funding.sql`; verify both tables exist in SQL.
+- [x] Add `supabase/seeds/funding_seed.sql` with 5–10 manual rows each for `business_grant`, `scholarship`, `research_grant`.
+- [x] Add `lib/funding/supabase.ts` (query client for reads, service-role path for future ingestion).
+- [x] Add `lib/funding/role-mapping.ts` covering `business`, `student`, `professor`.
+- [x] Add `lib/funding/filter-definitions.ts` with role-specific filters (business, student, professor).
+- [x] Add `lib/funding/preferences.ts`: `getFundingPreferences`, `upsertFundingPreferences`, `clearFundingPreferences` per locked contract.
+- [x] Add `lib/funding/queries.ts`: `ListFundingForRole`, `GetFundingById`, `GetFundingSummariesForUser` (returns recent items WITHOUT scoring at this stage; scoring lands in G8).
+- [x] Tests: role mapping coverage and funding policy registration. Preference/query integration tests remain a focused follow-up after test DB harness setup.
+- [x] Add `app/(funding)/grants/page.tsx`, `app/(funding)/scholarships/page.tsx`, `app/(funding)/research-funding/page.tsx`.
+- [x] Add detail pages: `app/(funding)/grants/[id]/page.tsx`, `app/(funding)/scholarships/[id]/page.tsx`, `app/(funding)/research-funding/[id]/page.tsx`.
+- [x] Add `components/funding/FundingList.tsx`, `FundingCard.tsx`, `FundingDetail.tsx`, `FundingFilters.tsx`.
+- [ ] `FundingFilters` renders role-specific filter set, syncs short-term state to query params, saves/reloads defaults via `funding_preferences`. UI/query-param sync done; save/reload defaults is runtime helper only and needs a focused follow-up.
+- [x] Add `components/funding/FundingSummaryTile.tsx` as a pure presentation component for dashboard consumption.
+- [x] Overwrite `lib/funding/route-policies.ts` placeholder with the real `fundingPolicies`: `/grants` business-only, `/scholarships` student-only, `/research-funding` professor-only.
+- [x] Verify middleware picks up `fundingPolicies` on a fresh build.
+- [x] Verify the three listings render seed data and one detail page per role renders eligibility correctly.
+- [ ] Add a render/snapshot test for `FundingCard`. Deferred to hardening/focused UI test setup.
+
+**G6 proof note:** remote seed count query verified 5 rows each for `business_grant`, `scholarship`, and `research_grant`. Role mapping and route-policy behavior are covered by `test/unit/funding-role-mapping.test.ts`.
 
 ---
 

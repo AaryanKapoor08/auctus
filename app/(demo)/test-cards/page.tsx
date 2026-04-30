@@ -1,14 +1,14 @@
 "use client";
 
 import { TrendingUp, MessageSquare, DollarSign, Users } from "lucide-react";
-import StatsCard from "@/components/cards/StatsCard";
-import ThreadCard from "@/components/cards/ThreadCard";
-import GrantCard from "@/components/cards/GrantCard";
-import MatchCard from "@/components/cards/MatchCard";
-import ReplyCard from "@/components/cards/ReplyCard";
-import JobCard from "@/components/cards/JobCard";
-import TalentCard from "@/components/cards/TalentCard";
-import { useBusiness } from "@/lib/BusinessContext";
+import StatsCard from "@/components/ui/StatsCard";
+import ThreadCard from "@/components/forum/ThreadCard";
+import GrantCard from "@/components/demo/GrantCard";
+import MatchCard from "@/components/demo/MatchCard";
+import ReplyCard from "@/components/forum/ReplyCard";
+import JobCard from "@/components/demo/JobCard";
+import TalentCard from "@/components/demo/TalentCard";
+import { useBusiness } from "@/lib/demo/BusinessContext";
 
 export default function TestCardsPage() {
   const { businesses } = useBusiness();

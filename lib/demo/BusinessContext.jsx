@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState } from "react";
-import { getAllBusinesses } from "./data-utils";
+import { getAllBusinesses } from "./data";
 
 const BusinessContext = createContext();
 const initialBusinesses = getAllBusinesses();

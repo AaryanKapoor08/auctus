@@ -1,12 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useBusiness } from "@/lib/BusinessContext";
+import { useBusiness } from "@/lib/demo/BusinessContext";
 import {
   getMatchesWithBusinessDetails,
   getReciprocalMatches,
-} from "@/lib/data-utils";
-import MatchCard from "@/components/cards/MatchCard";
+} from "@/lib/demo/data";
+import MatchCard from "@/components/demo/MatchCard";
 import { Users, Info } from "lucide-react";
 import { SkeletonCard } from "@/components/ui/Skeleton";
 

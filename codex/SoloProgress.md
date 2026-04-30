@@ -1,7 +1,7 @@
 # Auctus V2 Solo Progress
 
-**Current Gate:** G2
-**Current Phase:** P2 — Root Baseline and Demo Isolation
+**Current Gate:** G3
+**Current Phase:** P3 — Shared Tooling and Infrastructure Bootstrap
 **Project Category:** web
 **Last Updated:** 2026-04-30
 
@@ -47,6 +47,8 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-04-30: Installed Supabase CLI via Scoop (`2.95.4`), authenticated with a personal access token, ran `supabase init`, linked project `kwfoxklfbrbgbmgyyfcl`, and applied `0000_init.sql` with `supabase db push`.
 - 2026-04-30 G1 [direct-main]: pushed `develop`, enabled branch protection on `main` and `develop`, and verified first `App checks` CI run passed | targets: GitHub branches `main`, `develop` | verify: `gh run watch 25150670259 --exit-status` => success | ref: `ffb899f`
 - 2026-04-30 G1 [direct-main]: verified protected workflow with PR #3 into `develop`, then promoted bootstrap to `main` with PR #4 | targets: GitHub PRs #3/#4, root bootstrap files | verify: required `App checks` passed | ref: `e2caebc`, `b493a58`
+- 2026-04-30: Resolved G2 verification failures: `npx tsc --noEmit --pretty false` first failed with `TS5090: Non-relative paths are not allowed when 'baseUrl' is not set`; fixed with `baseUrl: "."`. The rerun then failed on stale `.next/types` entries for pre-move routes, nested `auctus-frontend/**` duplicate TypeScript errors, and `lib/demo/ai-responses.ts` importing missing `./data-utils`; fixed by excluding `auctus-frontend` from `tsconfig.json`, correcting demo imports, and using `npm run build` as the final Next typecheck.
+- 2026-04-30 G2 [direct-main]: isolated legacy demo routes/data/helpers/components, copied root contracts, added domain skeletons, and added `@contracts/*`; `auctus-frontend/` decision = preserve nested duplicate outside lint/build scope | targets: `app/(demo)/**`, `components/demo/**`, `components/forum/**`, `components/ui/StatsCard.tsx`, `data/demo/**`, `lib/demo/**`, `build/contracts/**`, `lib/{auth,profile,forum,funding,matching,session}/index.ts`, `components/{auth,profile,forum,funding}/index.ts`, `.gitignore`, `tsconfig.json`, `app/layout.tsx`, `app/providers.tsx`, `components/layout/Navbar.tsx`, `app/dashboard/page.tsx`, `app/forum/**` | verify: `npm run build` with temporary `lib/_check.ts` importing `@contracts/role` => success; `npm run lint` => success with 25 legacy warnings; `npm run build` => success; dev smoke `Invoke-WebRequest` `/funding`, `/matchmaker`, `/talent` => 200 | ref: `8e9cdff`
 
 ---
 
@@ -92,28 +94,30 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G2 — Root Baseline and Demo Isolation `[in progress]`
+## G2 — Root Baseline and Demo Isolation `[complete]`
 
-- [ ] Audit nested `auctus-frontend/` duplicate folder and decide whether it is ignored, removed, or preserved outside lint scope.
+- [x] Audit nested `auctus-frontend/` duplicate folder and decide whether it is ignored, removed, or preserved outside lint scope.
 - [x] Fix lint configuration so generated output and duplicate build artifacts are not scanned.
-- [ ] Move legacy demo routes into `app/(demo)/**`: `app/funding/**`, `app/matchmaker/**`, `app/talent/**`, `app/test-cards/**`, `app/test-components/**`.
-- [ ] Move `data/*.json` into `data/demo/*.json`.
-- [ ] Move `lib/data-utils.ts` legacy demo helpers into `lib/demo/data.ts`.
-- [ ] Move `lib/BusinessContext.jsx` into `lib/demo/BusinessContext.jsx` (or `.tsx` if trivial; otherwise leave the rename for hardening).
-- [ ] Move `lib/ai-responses.ts` into `lib/demo/ai-responses.ts`.
-- [ ] Move `components/AIChatbot.tsx` and `components/ChatbotWrapper.tsx` into `components/demo/**` (the legacy AIChatbot stays mounted in `app/layout.tsx` and imports only from `components/demo/` and `lib/demo/`).
-- [ ] Move `components/cards/GrantCard.tsx`, `MatchCard.tsx`, `JobCard.tsx`, `TalentCard.tsx` into `components/demo/**`.
-- [ ] Move `components/cards/ThreadCard.tsx` and `ReplyCard.tsx` into `components/forum/**`.
-- [ ] Move `components/cards/StatsCard.tsx` into `components/ui/StatsCard.tsx`.
-- [ ] Create empty domain skeleton folders with stub `index.ts`: `lib/auth`, `lib/profile`, `lib/forum`, `lib/funding`, `lib/matching`, `lib/session`, `components/auth`, `components/profile`, `components/forum`, `components/funding`.
-- [ ] Add root `build/contracts/**` by copying the locked references from `dev-a-space/codex/references/build/contracts/{role,route-policy,profile,session,funding}.ts` and `README.md`.
-- [ ] Add `@contracts/*` path alias in `tsconfig.json` (`"@contracts/*": ["build/contracts/*"]`).
-- [ ] Verify the alias with a throwaway `lib/_check.ts` import that typechecks.
-- [ ] Verify `/(demo)/funding`, `/(demo)/matchmaker`, `/(demo)/talent` still load in dev.
+- [x] Move legacy demo routes into `app/(demo)/**`: `app/funding/**`, `app/matchmaker/**`, `app/talent/**`, `app/test-cards/**`, `app/test-components/**`.
+- [x] Move `data/*.json` into `data/demo/*.json`.
+- [x] Move `lib/data-utils.ts` legacy demo helpers into `lib/demo/data.ts`.
+- [x] Move `lib/BusinessContext.jsx` into `lib/demo/BusinessContext.jsx` (or `.tsx` if trivial; otherwise leave the rename for hardening).
+- [x] Move `lib/ai-responses.ts` into `lib/demo/ai-responses.ts`.
+- [x] Move `components/AIChatbot.tsx` and `components/ChatbotWrapper.tsx` into `components/demo/**` (the legacy AIChatbot stays mounted in `app/layout.tsx` and imports only from `components/demo/` and `lib/demo/`).
+- [x] Move `components/cards/GrantCard.tsx`, `MatchCard.tsx`, `JobCard.tsx`, `TalentCard.tsx` into `components/demo/**`.
+- [x] Move `components/cards/ThreadCard.tsx` and `ReplyCard.tsx` into `components/forum/**`.
+- [x] Move `components/cards/StatsCard.tsx` into `components/ui/StatsCard.tsx`.
+- [x] Create empty domain skeleton folders with stub `index.ts`: `lib/auth`, `lib/profile`, `lib/forum`, `lib/funding`, `lib/matching`, `lib/session`, `components/auth`, `components/profile`, `components/forum`, `components/funding`.
+- [x] Add root `build/contracts/**` by copying the locked references from `dev-a-space/codex/references/build/contracts/{role,route-policy,profile,session,funding}.ts` and `README.md`.
+- [x] Add `@contracts/*` path alias in `tsconfig.json` (`"@contracts/*": ["build/contracts/*"]`).
+- [x] Verify the alias with a throwaway `lib/_check.ts` import that typechecks.
+- [x] Verify `/(demo)/funding`, `/(demo)/matchmaker`, `/(demo)/talent` still load in dev.
 - [x] Verify `npm run lint`.
 - [x] Verify `npm run build`.
 
-**Note:** The lint/build checks were made green early because the new CI workflow runs them. Demo isolation, domain skeletons, contract import, and `@contracts/*` alias remain the substantive G2 work.
+**Decision:** preserve the nested `auctus-frontend/` duplicate folder, but keep it outside lint/build scope via ESLint and TypeScript excludes. It remains ignored by git.
+
+**Route note:** `(demo)` is a Next route group and does not appear in browser URLs. The moved demo pages were dev-smoke verified at `/funding`, `/matchmaker`, and `/talent`.
 
 ---
 

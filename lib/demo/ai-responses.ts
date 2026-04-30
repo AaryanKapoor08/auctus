@@ -12,7 +12,7 @@ import {
   getThreadsByCategory,
   getRelatedGrants,
   getRelatedThreads,
-} from "./data-utils";
+} from "./data";
 
 // AI Response Types
 export interface AIResponse {

@@ -1,14 +1,14 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
-import { useBusiness } from "@/lib/BusinessContext";
+import { useBusiness } from "@/lib/demo/BusinessContext";
 import {
   getGrantById,
   getDaysUntilDeadline,
   calculateGrantMatch,
   getSimilarGrants,
   getEligibilityBreakdown,
-} from "@/lib/data-utils";
+} from "@/lib/demo/data";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";

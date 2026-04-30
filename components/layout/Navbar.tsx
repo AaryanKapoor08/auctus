@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useBusiness } from "@/lib/BusinessContext";
-import { Business } from "@/lib/data-utils";
+import { useBusiness } from "@/lib/demo/BusinessContext";
+import { Business } from "@/lib/demo/data";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 

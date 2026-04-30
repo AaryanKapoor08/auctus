@@ -2,13 +2,13 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useBusiness } from "@/lib/BusinessContext";
+import { useBusiness } from "@/lib/demo/BusinessContext";
 import {
   getMatchedGrants,
   getDaysUntilDeadline,
   getGrantCategories,
-} from "@/lib/data-utils";
-import GrantCard from "@/components/cards/GrantCard";
+} from "@/lib/demo/data";
+import GrantCard from "@/components/demo/GrantCard";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import {

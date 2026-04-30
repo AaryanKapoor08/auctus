@@ -4,7 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import ChatbotWrapper from "@/components/ChatbotWrapper";
+import ChatbotWrapper from "@/components/demo/ChatbotWrapper";
 import { Providers } from "./providers";
 
 const geistSans = Geist({

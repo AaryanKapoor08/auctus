@@ -1,16 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useBusiness } from "@/lib/BusinessContext";
+import { useBusiness } from "@/lib/demo/BusinessContext";
 import {
   getAllJobs,
   getAllTalents,
   getAllUniqueSkills,
   type Job,
   type Talent,
-} from "@/lib/data-utils";
-import JobCard from "@/components/cards/JobCard";
-import TalentCard from "@/components/cards/TalentCard";
+} from "@/lib/demo/data";
+import JobCard from "@/components/demo/JobCard";
+import TalentCard from "@/components/demo/TalentCard";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";

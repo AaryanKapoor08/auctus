@@ -24,6 +24,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - G7 added onboarding role selector/forms, `0002_role_profiles.sql`, transactional profile onboarding RPC, profile upsert/query helpers, and tests as `4b27e4b`.
 - G8 added role-specific matching scorers, `scoreFor`, fixture-backed tests, and scored `GetFundingSummariesForUser` results as `4f819be`.
 - G9 added forum schema/RLS/RPC, persisted forum runtime and pages, auth context provider, role-aware navbar, and signed-in landing redirect as `5c4c289`.
+- Post-G9 fix pinned `turbopack.root` in `next.config.ts` so Next resolves `@/*` imports from the root project instead of the nested archived `auctus-frontend/` duplicate.
 
 ## Verification
 
@@ -33,6 +34,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - `npm test` after G9: 11 files / 34 tests passed.
 - `npm run lint` after G9: success with 20 legacy warnings only.
 - `npm run build` after G9: success.
+- `npm run build` after Turbopack root fix: success; extra lockfile/root warning is gone.
 - `supabase db push`: applied `0001_profiles_base.sql` and `0003_funding.sql`.
 - `supabase db push --include-all`: applied locked out-of-order `0002_role_profiles.sql`.
 - `supabase db push`: applied `0005_forum.sql` and `0010_rls_identity.sql`.
@@ -43,7 +45,6 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 Known build warnings:
 
 - Next warns that `middleware.ts` convention is deprecated in favor of proxy.
-- Next warns about an extra lockfile at `C:\Users\Jaska\package-lock.json`.
 
 ## Manual Blockers
 

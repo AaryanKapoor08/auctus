@@ -1,20 +1,16 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 import { getAllBusinesses } from "./data-utils";
 
 const BusinessContext = createContext();
+const initialBusinesses = getAllBusinesses();
 
 export function BusinessProvider({ children }) {
-  const [currentBusiness, setCurrentBusiness] = useState(null);
-  const [businesses, setBusinesses] = useState([]);
-
-  // Initialize businesses on mount
-  useEffect(() => {
-    const allBusinesses = getAllBusinesses();
-    setBusinesses(allBusinesses);
-    setCurrentBusiness(allBusinesses[0]); // Default to first business
-  }, []);
+  const [businesses, setBusinesses] = useState(initialBusinesses);
+  const [currentBusiness, setCurrentBusiness] = useState(
+    initialBusinesses[0] ?? null
+  );
 
   const handleSetCurrentBusiness = (id) => {
     const business = businesses.find((b) => b.id === id);

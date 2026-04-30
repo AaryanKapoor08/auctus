@@ -12,7 +12,6 @@ import {
   Clock,
   TrendingUp,
   Target,
-  Briefcase,
   Sparkles,
   ArrowRight,
   Calendar,
@@ -28,6 +27,8 @@ import {
   getAllGrants,
 } from "@/lib/data-utils";
 import Link from "next/link";
+
+const DEMO_NOW = new Date("2026-04-30T00:00:00.000Z").getTime();
 
 export default function DashboardPage() {
   const { currentBusiness } = useBusiness();
@@ -90,7 +91,7 @@ export default function DashboardPage() {
   const recentGrants = allGrants
     .filter((g) => {
       const posted = new Date(g.deadline);
-      const daysAgo = Math.floor((Date.now() - posted.getTime()) / (1000 * 60 * 60 * 24));
+      const daysAgo = Math.floor((DEMO_NOW - posted.getTime()) / (1000 * 60 * 60 * 24));
       return daysAgo <= 7;
     })
     .slice(0, 3);

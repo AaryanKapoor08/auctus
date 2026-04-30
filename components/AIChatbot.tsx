@@ -5,13 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useBusiness } from "@/lib/BusinessContext";
 import {
   getAIResponse,
-  processQuickAction,
   getPageSpecificActions,
-  AIResponse,
   Suggestion,
 } from "@/lib/ai-responses";
 import {
-  MessageCircle,
   Send,
   Sparkles,
   X,
@@ -20,7 +17,6 @@ import {
   Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import Button from "./ui/Button";
 
 interface Message {
   id: string;
@@ -30,18 +26,45 @@ interface Message {
   timestamp: Date;
 }
 
+function createWelcomeMessage(businessName = "there"): Message {
+  return {
+    id: "welcome",
+    role: "ai",
+    content: `👋 **Welcome to Auctus AI!**
+
+Hi ${businessName}! I'm your personal business advisor.
+
+I can help you with:
+• 💰 **Finding grants & funding** - Discover financial opportunities
+• 🤝 **Business partnerships** - Connect with complementary businesses
+• 💬 **Forum discussions** - Get advice from the community
+• ⏰ **Tracking deadlines** - Stay on top of opportunities
+• 📋 **Business guidance** - Registration, permits, and more
+
+What would you like to explore today?`,
+    timestamp: new Date(),
+  };
+}
+
 export default function AIChatbot() {
+  const { currentBusiness } = useBusiness();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => [
+    createWelcomeMessage(currentBusiness?.name),
+  ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   
-  const { currentBusiness } = useBusiness();
   const pathname = usePathname();
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messageIdRef = useRef(0);
+  const nextMessageId = (prefix: string) => {
+    messageIdRef.current += 1;
+    return `${prefix}-${messageIdRef.current}`;
+  };
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -55,39 +78,11 @@ export default function AIChatbot() {
     }
   }, [isOpen, isMinimized]);
 
-  // Welcome message on first open
-  useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      const businessName = currentBusiness?.name || "there";
-      const welcomeMessage = `👋 **Welcome to Auctus AI!**
-
-Hi ${businessName}! I'm your personal business advisor.
-
-I can help you with:
-• 💰 **Finding grants & funding** - Discover financial opportunities
-• 🤝 **Business partnerships** - Connect with complementary businesses
-• 💬 **Forum discussions** - Get advice from the community
-• ⏰ **Tracking deadlines** - Stay on top of opportunities
-• 📋 **Business guidance** - Registration, permits, and more
-
-What would you like to explore today?`;
-      
-      setMessages([
-        {
-          id: "welcome",
-          role: "ai",
-          content: welcomeMessage,
-          timestamp: new Date(),
-        },
-      ]);
-    }
-  }, [isOpen, currentBusiness, pathname, messages.length]);
-
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
 
     const userMessage: Message = {
-      id: `user-${Date.now()}`,
+      id: nextMessageId("user"),
       role: "user",
       content: inputValue,
       timestamp: new Date(),
@@ -105,7 +100,7 @@ What would you like to explore today?`;
       });
 
       const aiMessage: Message = {
-        id: `ai-${Date.now()}`,
+        id: nextMessageId("ai"),
         role: "ai",
         content: aiResponse.message,
         suggestions: aiResponse.suggestions,
@@ -131,7 +126,7 @@ What would you like to explore today?`;
       
       // Auto-send the query
       const userMessage: Message = {
-        id: `user-${Date.now()}`,
+        id: nextMessageId("user"),
         role: "user",
         content: query,
         timestamp: new Date(),
@@ -147,7 +142,7 @@ What would you like to explore today?`;
         });
 
         const aiMessage: Message = {
-          id: `ai-${Date.now()}`,
+          id: nextMessageId("ai"),
           role: "ai",
           content: aiResponse.message,
           suggestions: aiResponse.suggestions,

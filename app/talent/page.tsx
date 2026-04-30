@@ -19,6 +19,7 @@ import { Briefcase, User, Search, X, Plus, UserPlus } from "lucide-react";
 
 type ViewMode = "hiring" | "looking";
 type SortOption = "recent" | "pay" | "type" | "match" | "experience";
+type LookingFor = Talent["lookingFor"][number];
 
 export default function TalentPage() {
   const { currentBusiness } = useBusiness();
@@ -120,7 +121,9 @@ export default function TalentPage() {
     // Looking for filter (must match at least one)
     if (selectedLookingFor.length > 0) {
       filtered = filtered.filter((talent) =>
-        selectedLookingFor.some((type) => talent.lookingFor.includes(type as any))
+        selectedLookingFor.some((type) =>
+          talent.lookingFor.includes(type as LookingFor)
+        )
       );
     }
 

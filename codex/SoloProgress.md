@@ -1,7 +1,7 @@
 # Auctus V2 Solo Progress
 
-**Current Gate:** G11
-**Current Phase:** P11 — RLS and Dashboard Integration
+**Current Gate:** G12
+**Current Phase:** P12 — Hardening and Release QA
 **Project Category:** web
 **Last Updated:** 2026-04-30
 
@@ -58,6 +58,7 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-04-30 G9 [direct-main]: added persisted forum schema/runtime/pages, identity RLS, helpful-vote RPC, auth provider, role-aware navbar, and landing redirect | targets: `supabase/migrations/0005_forum.sql`, `supabase/migrations/0010_rls_identity.sql`, `lib/forum/**`, `app/forum/**`, `components/forum/**`, `components/layout/Navbar.tsx`, `app/page.tsx`, `app/providers.tsx`, `test/unit/forum-*.test.ts` | verify: `npm test` => 11 files / 34 tests passed; `npm run lint` => success with 20 legacy warnings only; `npm run build` => success; `supabase db push` => applied `0005_forum.sql` and `0010_rls_identity.sql`; metadata query => RLS true on profiles/role profiles/threads/replies/votes, `mark_reply_helpful` count 1, votes policies SELECT-only | ref: `5c4c289`; browser account nav/sign-out proof remains manual-auth blocked
 - 2026-04-30 review: Claude-added uncommitted G10-G12 scaffold passed local unit/lint/build/type checks, but G10 remained open because live scraper dry-run fetched 0 rows from four sources and fetch failed for two sources; selectors were documented as speculative; rate limiting was not enforced; dashboard deadline date comparison still needs a date-only fix before G11 closes.
 - 2026-04-30 G10 [direct-main]: added live-tuned ETL pipeline, source verification notes, scraper CLI/dry-run, utility/normalize/dedupe/expire/supabase stores, six official source modules, scrape metadata migration, fixture/unit tests, rate-limit delays, and real Supabase ingestion proof | targets: `scraper/**`, `supabase/migrations/0004_scrape_metadata.sql`, `test/unit/scraper-*.test.ts`, `package.json`, `package-lock.json` | verify: `npx tsx index.ts --dry-run` => 6 sources / 566 rows / 0 errors; real `npx tsx index.ts` with local Supabase env => `ised-benefits-finder` 6 inserted, `ised-supports` 14 inserted, `educanada` 7 inserted, `indigenous-bursaries` 517 fetched / 478 inserted / 39 updated, `nserc` 20 inserted, `sshrc` 2 inserted, expire 0; Supabase query => latest six `scrape_runs` all `success`, scraped funding counts 20 `business_grant`, 485 `scholarship`, 22 `research_grant`; `npm test` => 21 files / 101 tests passed; `npm run lint` => success with 20 legacy warnings only; `npm run build` => success; `npx tsc -p scraper/tsconfig.json --noEmit` => success | ref: `d97ffdb`; GitHub scrape cron/manual workflow proof remains deferred/manual
+- 2026-04-30 G11 [direct-main]: added funding RLS migration, dashboard funding summary/deadline/forum composition, date-only deadline filtering, and focused SQL/composer tests | targets: `supabase/migrations/0020_rls_funding.sql`, `app/dashboard/page.tsx`, `components/dashboard/**`, `lib/dashboard/composer.ts`, `test/unit/dashboard-composer.test.ts`, `test/unit/funding-rls-sql.test.ts` | verify: `npx supabase db push` => remote database up to date; metadata query => RLS true on `funding`, `funding_preferences`, `funding_sources`, `scrape_runs`; policy query => funding SELECT only, funding_preferences SELECT/INSERT/UPDATE/DELETE, no authenticated policies on source/run tables; `npm test -- --run test/unit/dashboard-composer.test.ts test/unit/funding-rls-sql.test.ts` => 2 files / 15 tests passed; `npm test` => 21 files / 102 tests passed; `npm run lint` => success with 20 legacy warnings only; `npm run build` => success | ref: `ef71229`; browser/two-role proof remains manual-auth blocked
 
 ---
 
@@ -310,33 +311,33 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G11 — RLS and Dashboard Integration `[locked — requires G10]`
+## G11 — RLS and Dashboard Integration `[complete with manual auth proof blocker]`
 
-**Review status:** Claude added uncommitted G11 code and tests, but this gate stays locked until G10 live ETL proof is real. Codex-doable work after G10: validate/apply `0020_rls_funding.sql`, fix date-only deadline filtering in `lib/dashboard/composer.ts`, and verify dashboard composition. Manual work: cross-role/browser proof remains blocked by OAuth/email sign-in setup.
+**Review status:** Closed locally in `ef71229`. SQL metadata and focused tests prove the funding RLS shape and dashboard composition. Browser/two-user proof remains blocked until OAuth/email sign-in works.
 
-- [ ] Confirm `0010_rls_identity.sql` is already applied (dependency for funding RLS join on `profiles.role`).
-- [ ] Add `supabase/migrations/0020_rls_funding.sql`:
+- [x] Confirm `0010_rls_identity.sql` is already applied (dependency for funding RLS join on `profiles.role`).
+- [x] Add `supabase/migrations/0020_rls_funding.sql`:
   - anonymous funding reads return no rows.
   - authenticated funding reads return only `active` rows for the current `profiles.role`.
   - `funding_preferences` reads/writes restricted to owner's own row + current role.
   - `funding_sources` and `scrape_runs` behind service-role.
   - `funding` insert/update/delete service-role only (for scraper ingestion).
-- [ ] Apply `0020_rls_funding.sql`.
-- [ ] Verify cross-role queries return nothing; anonymous queries return nothing; users cannot read/write another user's `funding_preferences`; service-role ingestion still works.
+- [x] Apply `0020_rls_funding.sql`.
+- [ ] Verify cross-role queries return nothing; anonymous queries return nothing; users cannot read/write another user's `funding_preferences`; service-role ingestion still works. SQL policy metadata and service-role ingestion are verified; live two-user/browser proof remains manual-auth blocked.
 - [ ] Run integration tests with at least two role users.
-- [ ] Compose the dashboard funding summary tile in `app/dashboard/page.tsx`:
+- [x] Compose the dashboard funding summary tile in `app/dashboard/page.tsx`:
   - read session via `getSession()`.
   - call `GetFundingSummariesForUser(session.user_id, 5)` for the summary tile.
   - import `FundingSummaryTile` from `components/funding/` as presentation only — no direct funding-table query from dashboard code.
-- [ ] Add expiring-deadlines tile:
+- [x] Add expiring-deadlines tile:
   - call `GetFundingSummariesForUser(session.user_id, N)` with a large enough limit for a 30-day filter.
   - filter results server-side for deadlines within next 30 days; sort nearest first.
   - render the populated state.
   - render exact empty-state text `No upcoming deadlines.`
   - empty-state CTA uses `ROLE_DEFAULT_ROUTE[session.role]` (`/grants` business, `/scholarships` student, `/research-funding` professor).
-- [ ] Add forum activity tile alongside profile and funding data.
+- [x] Add forum activity tile alongside profile and funding data.
 - [ ] Verify business, student, and professor dashboards render the correct summary surface and the correct populated/empty-state expiring-deadlines behavior.
-- [ ] Add or update dashboard composer test mocking the funding runtime helper.
+- [x] Add or update dashboard composer test mocking the funding runtime helper.
 
 ---
 

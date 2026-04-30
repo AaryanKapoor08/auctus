@@ -1,8 +1,8 @@
 # Auctus V2 Handoff
 
 **Last Updated:** 2026-04-30
-**Current Gate:** G11 — RLS and Dashboard Integration
-**Status:** G10 completed locally on `main` as `d97ffdb`; continue with G11, keeping later Claude G11/G12 changes under review
+**Current Gate:** G12 — Hardening and Release QA
+**Status:** G10 completed as `d97ffdb`; G11 completed as `ef71229` with browser/two-user auth proof still manual-blocked; continue with G12 hardening
 
 ## Start Here
 
@@ -25,6 +25,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - G8 added role-specific matching scorers, `scoreFor`, fixture-backed tests, and scored `GetFundingSummariesForUser` results as `4f819be`.
 - G9 added forum schema/RLS/RPC, persisted forum runtime and pages, auth context provider, role-aware navbar, and signed-in landing redirect as `5c4c289`.
 - G10 added live-tuned ETL pipeline, six official source modules, source verification notes, scraper CLI/dry-run, dedupe/expire/normalize/Supabase stores, `0004_scrape_metadata.sql`, and scraper tests as `d97ffdb`.
+- G11 added funding RLS migration, dashboard funding summary/deadline/forum tiles, date-only deadline filtering, and dashboard/RLS SQL tests as `ef71229`.
 - Post-G9 fix pinned `turbopack.root` in `next.config.ts` so Next resolves `@/*` imports from the root project instead of the nested archived `auctus-frontend/` duplicate.
 - Post-G9 fix updated `lib/env.ts` so browser code reads `NEXT_PUBLIC_*` values through static `process.env.NEXT_PUBLIC_*` references instead of dynamic key lookup.
 
@@ -46,9 +47,8 @@ Resolved from review:
 - Source rate limits are now enforced inside source scrapes via `ctx.delay`.
 - `scraper/SOURCES.md` now records live-tuned status rather than speculative selector status.
 
-Remaining review blockers for G11/G12:
+Remaining review blockers for G12:
 
-- `lib/dashboard/composer.ts` compares date-only deadlines against `asOf.getTime()`, so deadlines on the current date can be treated as already past after midnight. Compare date-only values before closing G11.
 - `.claude/settings.local.json` is machine/tool-specific and should stay untracked.
 
 ## Verification
@@ -72,6 +72,10 @@ Remaining review blockers for G11/G12:
 - G10 real scraper run: `npx tsx index.ts` from `scraper/` with local Supabase env loaded => six source summaries success; inserted/updated rows; expire 0.
 - G10 Supabase query proof: latest six `scrape_runs` all `success`; scraped funding counts are 20 `business_grant`, 485 `scholarship`, 22 `research_grant`.
 - G10 full verification: `npm test` => 21 files / 101 tests passed; `npm run lint` => success with 20 legacy warnings only; `npm run build` => success; `npx tsc -p scraper/tsconfig.json --noEmit` => success.
+- G11 migration state: `npx supabase db push` => remote database up to date.
+- G11 RLS metadata: `npx supabase db query --linked ...pg_tables...` => RLS true on `funding`, `funding_preferences`, `funding_sources`, `scrape_runs`; `pg_policies` query => funding SELECT only, funding_preferences SELECT/INSERT/UPDATE/DELETE, no source/run authenticated policies.
+- G11 focused tests: `npm test -- --run test/unit/dashboard-composer.test.ts test/unit/funding-rls-sql.test.ts` => 2 files / 15 tests passed.
+- G11 full checks: `npm test` => 21 files / 102 tests passed; `npm run lint` => success with 20 legacy warnings only; `npm run build` => success.
 
 Known build warnings:
 
@@ -91,8 +95,9 @@ Known build warnings:
 
 - Fix dashboard deadline filtering to compare date-only deadlines.
 - Keep `.claude/settings.local.json` out of commits.
-- Review/apply the uncommitted G11 funding RLS and dashboard composition changes.
-- Re-run `npm test`, `npm run lint`, `npm run build`, and relevant SQL/Supabase proof after G11 fixes.
+- Review/apply the remaining uncommitted G12 hardening/docs/data-quality changes.
+- Keep `.claude/settings.local.json`, `issues.md`, and `pendingcommits.md` out of product commits unless explicitly requested.
+- Re-run `npm test`, `npm run lint`, `npm run build`, and data-quality proof after G12 fixes.
 
 ## Follow-Ups Already Noted
 
@@ -102,11 +107,11 @@ Known build warnings:
 
 ## Exact Next Action
 
-Start G11 review/fix on `main`:
+Start G12 review/fix on `main`:
 
-1. Fix `lib/dashboard/composer.ts` date-only deadline filtering.
-2. Validate/apply `supabase/migrations/0020_rls_funding.sql` if not already applied in this workspace state.
-3. Verify funding RLS metadata and dashboard composition tests.
-4. Keep G11 separate from G12 hardening where possible.
+1. Review remaining uncommitted hardening changes: demo-provider isolation, scraper quality checks, README updates, and docs.
+2. Keep local/tool scratch files out of commits.
+3. Run data-quality checks against the shared dev DB.
+4. Re-run full verification and update `codex/SoloProgress.md` before closing G12.
 
 Do not close G12 until G11 is verified and documented.

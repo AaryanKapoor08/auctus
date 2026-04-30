@@ -1,8 +1,8 @@
 # Auctus V2 Handoff
 
 **Last Updated:** 2026-04-30
-**Current Gate:** G8 — Funding Pages and Matching
-**Status:** G3-G7 completed locally on `main`; continue one gate at a time from G8
+**Current Gate:** G9 — Forum and Shell
+**Status:** G3-G8 completed locally on `main`; continue one gate at a time from G9
 
 ## Start Here
 
@@ -22,13 +22,15 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - G5 added Supabase clients, sign-in/callback/sign-out, profile trigger migration, session helpers, route policies, middleware, placeholder funding policies, and tests as `7d95e83`.
 - G6 added funding schema, seed SQL, role mapping, filters, preferences, queries, funding routes/components, real funding policies, and tests as `eb5514d`.
 - G7 added onboarding role selector/forms, `0002_role_profiles.sql`, transactional profile onboarding RPC, profile upsert/query helpers, and tests as `4b27e4b`.
+- G8 added role-specific matching scorers, `scoreFor`, fixture-backed tests, and scored `GetFundingSummariesForUser` results as `4f819be`.
 
 ## Verification
 
 - `npm test` after G6: 5 files / 17 tests passed.
 - `npm test` after G7: 7 files / 24 tests passed.
-- `npm run lint` after G7: success with 25 legacy warnings only.
-- `npm run build` after G7: success.
+- `npm test` after G8: 9 files / 29 tests passed.
+- `npm run lint` after G8: success with 25 legacy warnings only.
+- `npm run build` after G8: success.
 - `supabase db push`: applied `0001_profiles_base.sql` and `0003_funding.sql`.
 - `supabase db push --include-all`: applied locked out-of-order `0002_role_profiles.sql`.
 - `supabase db query --linked --file supabase/seeds/funding_seed.sql`: success.
@@ -54,11 +56,11 @@ Known build warnings:
 
 ## Exact Next Action
 
-Start G8 on `main`:
+Start G9 on `main`:
 
-1. Add role-specific matching scorers in `lib/matching/**`.
-2. Add fixture-backed scorer/dispatcher tests.
-3. Wire `GetFundingSummariesForUser(user_id, limit)` through `getRoleProfile(user_id)` and `scoreFor`.
-4. Verify scored summaries for onboarded users and `match_score: null` for missing role/profile.
+1. Add `0005_forum.sql` and `0010_rls_identity.sql`.
+2. Add persisted forum queries/pages/components.
+3. Replace demo shell assumptions with role-aware providers/navbar/landing behavior.
+4. Apply migrations and verify forum/RLS/helpful-vote behavior with focused tests/proof.
 
-Preserve `ListFundingForRole()` as returning `FundingItem[]` without scores.
+Keep identity/community code in Dev A-owned folders; funding remains consumed through published runtime only.

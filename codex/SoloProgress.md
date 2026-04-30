@@ -1,7 +1,7 @@
 # Auctus V2 Solo Progress
 
-**Current Gate:** G8
-**Current Phase:** P8 — Funding Pages and Matching
+**Current Gate:** G9
+**Current Phase:** P9 — Forum and Shell
 **Project Category:** web
 **Last Updated:** 2026-04-30
 
@@ -54,6 +54,7 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-04-30 G5 [direct-main]: added Supabase clients, sign-in/callback/sign-out routes, profiles migration, session helpers, auth route policies, middleware, placeholder funding policies, and tests | targets: `app/(identity)/**`, `app/auth/callback/route.ts`, `lib/supabase/**`, `lib/session/**`, `lib/auth/**`, `lib/funding/route-policies.ts`, `middleware.ts`, `supabase/migrations/0001_profiles_base.sql`, `test/unit/session.test.ts`, `test/unit/route-policies.test.ts` | verify: `npm test` => 4 files / 14 tests passed; `npm run lint` => success with legacy warnings only; `npm run build` => success; `supabase db push` => applied `0001_profiles_base.sql` | ref: `7d95e83`; manual browser OAuth/email proof still required
 - 2026-04-30 G6 [direct-main]: added funding schema, seed SQL, role mapping, filters, preferences, queries, funding pages/components, real funding route policies, and tests | targets: `supabase/migrations/0003_funding.sql`, `supabase/seeds/funding_seed.sql`, `lib/funding/**`, `components/funding/**`, `app/(funding)/**`, `test/unit/funding-role-mapping.test.ts` | verify: `npm test` => 5 files / 17 tests passed; `npm run lint` => success with legacy warnings only; `npm run build` => success; `supabase db push` => applied `0003_funding.sql`; `supabase db query --linked --file supabase/seeds/funding_seed.sql` => success; seed count query => 5 `business_grant`, 5 `scholarship`, 5 `research_grant` | ref: `eb5514d`
 - 2026-04-30 G7 [direct-main]: added onboarding role selector/forms, role-profile migration/RPC, profile upsert/query helpers, and focused tests | targets: `app/onboarding/**`, `lib/profile/**`, `supabase/migrations/0002_role_profiles.sql`, `test/unit/profile-*.test.ts` | verify: `npm test` => 7 files / 24 tests passed; `npm run lint` => success with 25 legacy warnings only; `npm run build` => success; `supabase db push --include-all` => applied `0002_role_profiles.sql` after G6's locked `0003` migration | ref: `4b27e4b`; browser onboarding replay remains manual-auth blocked
+- 2026-04-30 G8 [direct-main]: added business/student/professor matching scorers, dispatcher, fixture coverage, and scored funding summaries via `getRoleProfile` | targets: `lib/matching/**`, `lib/funding/queries.ts`, `test/unit/matching.test.ts`, `test/unit/funding-summaries.test.ts` | verify: `npm test` => 9 files / 29 tests passed; `npm run lint` => success with 25 legacy warnings only; `npm run build` => success; fixture proof: `funding-2` perfect match sorts before `funding-1` partial match | ref: `4f819be`
 
 ---
 
@@ -241,19 +242,19 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G8 — Funding Pages and Matching `[locked — requires G7]`
+## G8 — Funding Pages and Matching `[complete]`
 
-- [ ] Add `lib/matching/business.ts` with `scoreBusinessGrant(profile, item)` weights: location 25, revenue 25, employees 20, industry 30.
-- [ ] Add `lib/matching/student.ts` with `scoreScholarship(profile, item)` weights: education level 30, field of study 25, institution 15, province 15, GPA 15. Do not weight citizenship/residency.
-- [ ] Add `lib/matching/professor.ts` with `scoreResearchGrant(profile, item)` weights: research area 30, career stage 25, council 20, institution 15, past funding 10.
-- [ ] Add `lib/matching/index.ts` with `scoreFor(roleProfile, item)` dispatching across the three scorers.
-- [ ] Build fixture sets for perfect, partial, and no-match outcomes.
-- [ ] Tests: scorers return values in 0–100; dispatch works for all three role variants.
-- [ ] Update `GetFundingSummariesForUser(user_id, limit)` to call `getRoleProfile(user_id)`, score each active item, and return `FundingSummary.match_score`.
-- [ ] Keep `ListFundingForRole()` returning `FundingItem[]` exactly per contract — do NOT add a score field to `FundingItem`.
-- [ ] Return recent rows with `match_score: null` when `getRoleProfile()` returns `null`.
-- [ ] Tests: scored summaries returned for onboarded users; `match_score` stays `null` when role/profile missing.
-- [ ] Capture one fixture-backed proof showing plausible ordering for a seeded user.
+- [x] Add `lib/matching/business.ts` with `scoreBusinessGrant(profile, item)` weights: location 25, revenue 25, employees 20, industry 30.
+- [x] Add `lib/matching/student.ts` with `scoreScholarship(profile, item)` weights: education level 30, field of study 25, institution 15, province 15, GPA 15. Do not weight citizenship/residency.
+- [x] Add `lib/matching/professor.ts` with `scoreResearchGrant(profile, item)` weights: research area 30, career stage 25, council 20, institution 15, past funding 10.
+- [x] Add `lib/matching/index.ts` with `scoreFor(roleProfile, item)` dispatching across the three scorers.
+- [x] Build fixture sets for perfect, partial, and no-match outcomes.
+- [x] Tests: scorers return values in 0–100; dispatch works for all three role variants.
+- [x] Update `GetFundingSummariesForUser(user_id, limit)` to call `getRoleProfile(user_id)`, score each active item, and return `FundingSummary.match_score`.
+- [x] Keep `ListFundingForRole()` returning `FundingItem[]` exactly per contract — do NOT add a score field to `FundingItem`.
+- [x] Return recent rows with `match_score: null` when `getRoleProfile()` returns `null`.
+- [x] Tests: scored summaries returned for onboarded users; `match_score` stays `null` when role/profile missing.
+- [x] Capture one fixture-backed proof showing plausible ordering for a seeded user.
 
 ---
 

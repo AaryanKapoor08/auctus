@@ -10,11 +10,20 @@ The goal of V2 is to support three user types from the start:
 
 ## Current Status
 
-The current repository is still in transition.
+V2 is implemented end to end on `main`:
 
-Right now, the codebase is closer to a frontend demo shell than a finished product. The V2 work introduces real authentication, real persistence, a unified funding model, a forum, and an ETL pipeline for funding data.
+- Supabase auth (Google OAuth + magic link), profiles, and role-aware middleware.
+- Per-role onboarding, persistence, and `getRoleProfile` runtime.
+- Unified funding model with role-specific listings, detail pages, filters, and DB-backed preferences.
+- Per-role match scoring wired into `GetFundingSummariesForUser`.
+- Persisted forum (threads, replies, helpful votes) with identity RLS.
+- ETL pipeline (`scraper/`) for six locked official-source modules, with normalize, dedupe, expire, run-tracking, and data-quality checks.
+- Funding-side RLS: role-aware reads, owner-and-current-role preferences, service-role-only writes/metadata.
+- Composed dashboard (funding summaries, upcoming deadlines, forum activity) consuming only the published runtime contracts.
 
-The planning and execution docs for that work live in the [`build/`](build) folder.
+The legacy demo routes are isolated under `app/(demo)/**` and stay mounted to keep the chatbot working. They are explicitly outside the V2 surface.
+
+Active planning and execution docs live in the [`build/`](build) folder. The active solo tracker is `codex/SoloProgress.md`.
 
 ## Tech Stack
 
@@ -58,6 +67,43 @@ Start the production server:
 ```bash
 npm run start
 ```
+
+Run the test suite:
+
+```bash
+npm test
+```
+
+Run the scraper bootstrap (no DB writes):
+
+```bash
+cd scraper && npm install && npx tsx index.ts --bootstrap-only
+```
+
+Run a real scrape against the linked Supabase project (requires `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in env):
+
+```bash
+cd scraper && npx tsx index.ts
+```
+
+Apply database migrations:
+
+```bash
+supabase db push
+```
+
+The migration set on `main`:
+
+| File | Purpose |
+|---|---|
+| `0000_init.sql` | bootstrap no-op |
+| `0001_profiles_base.sql` | `profiles` table + auth.user trigger |
+| `0002_role_profiles.sql` | `business_profiles`, `student_profiles`, `professor_profiles` |
+| `0003_funding.sql` | `funding`, `funding_preferences`, enums, indexes |
+| `0004_scrape_metadata.sql` | `funding_sources` (seeded with six locked sources), `scrape_runs` |
+| `0005_forum.sql` | `threads`, `replies`, `reply_helpful_votes`, `mark_reply_helpful` |
+| `0010_rls_identity.sql` | identity RLS |
+| `0020_rls_funding.sql` | funding RLS (role-aware reads, service-role writes) |
 
 ## Important Project Docs
 

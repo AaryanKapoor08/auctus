@@ -51,7 +51,7 @@ export function resolveRouteDecision(
     return { action: "redirect", location: "/sign-in" };
   }
 
-  if (authenticated && role === null && pathname !== "/onboarding") {
+  if (authenticated && role === null && !pathname.startsWith("/onboarding")) {
     return { action: "redirect", location: "/onboarding" };
   }
 

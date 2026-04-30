@@ -45,6 +45,7 @@ yarn-error.log*
 
 # local tooling
 /.codex/
+/.claude/
 /auctus-frontend/
 /codex/*.log
 

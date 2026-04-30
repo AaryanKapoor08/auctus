@@ -1,9 +1,9 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import { BusinessProvider } from "@/lib/demo/BusinessContext";
 import { ToastProvider } from "@/lib/ToastContext";
 import { useSession } from "@/lib/session/use-session";
+import type { Session } from "@contracts/session";
 
 type AuthContextValue = ReturnType<typeof useSession>;
 
@@ -16,18 +16,28 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
-function AuthProvider({ children }: { children: ReactNode }) {
-  const auth = useSession();
+function AuthProvider({
+  children,
+  initialSession,
+}: {
+  children: ReactNode;
+  initialSession: Session | null;
+}) {
+  const auth = useSession(initialSession);
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 }
 
-export function Providers({ children }: { children: ReactNode }) {
+export function Providers({
+  children,
+  initialSession = null,
+}: {
+  children: ReactNode;
+  initialSession?: Session | null;
+}) {
   return (
-    <BusinessProvider>
-      <AuthProvider>
-        <ToastProvider>{children}</ToastProvider>
-      </AuthProvider>
-    </BusinessProvider>
+    <AuthProvider initialSession={initialSession}>
+      <ToastProvider>{children}</ToastProvider>
+    </AuthProvider>
   );
 }

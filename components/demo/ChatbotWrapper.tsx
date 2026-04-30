@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { BusinessProvider } from "@/lib/demo/BusinessContext";
 
 const AIChatbot = dynamic(() => import("./AIChatbot"), {
   ssr: false,
@@ -8,5 +9,9 @@ const AIChatbot = dynamic(() => import("./AIChatbot"), {
 });
 
 export default function ChatbotWrapper() {
-  return <AIChatbot />;
+  return (
+    <BusinessProvider>
+      <AIChatbot />
+    </BusinessProvider>
+  );
 }

@@ -482,7 +482,7 @@ export function formatRelativeTime(timestamp: string): string {
   if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
   if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? "s" : ""} ago`;
-  return date.toLocaleDateString();
+  return date.toLocaleDateString("en-CA");
 }
 
 /**

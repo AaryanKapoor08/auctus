@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import ChatbotWrapper from "@/components/demo/ChatbotWrapper";
 import { Providers } from "./providers";
+import { getSession } from "@/lib/session/get-session";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,11 +23,13 @@ export const metadata: Metadata = {
   description: "Connect with grants, partners, and opportunities in Fredericton",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -34,8 +37,8 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <ErrorBoundary>
-          <Providers>
-            <Navbar />
+          <Providers initialSession={session}>
+            <Navbar initialSession={session} />
             <main className="min-h-screen">{children}</main>
             <Footer />
             <ChatbotWrapper />

@@ -10,7 +10,7 @@ import { fundingPolicies } from "@/lib/funding/route-policies";
 
 const registry = combineRegistries(authPolicies, fundingPolicies);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request,
   });

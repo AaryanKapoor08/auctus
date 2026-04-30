@@ -53,6 +53,7 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-04-30 G4 [direct-main]: locked all five build contracts and added lock-header test coverage | targets: `build/contracts/profile.ts`, `build/contracts/session.ts`, `build/contracts/funding.ts`, `test/contracts/sanity.test.ts` | verify: `npm test` => 2 files / 5 tests passed; `npm run build` => success | ref: `5ca9e67`
 - 2026-04-30 G5 [direct-main]: added Supabase clients, sign-in/callback/sign-out routes, profiles migration, session helpers, auth route policies, middleware, placeholder funding policies, and tests | targets: `app/(identity)/**`, `app/auth/callback/route.ts`, `lib/supabase/**`, `lib/session/**`, `lib/auth/**`, `lib/funding/route-policies.ts`, `middleware.ts`, `supabase/migrations/0001_profiles_base.sql`, `test/unit/session.test.ts`, `test/unit/route-policies.test.ts` | verify: `npm test` => 4 files / 14 tests passed; `npm run lint` => success with legacy warnings only; `npm run build` => success; `supabase db push` => applied `0001_profiles_base.sql` | ref: `7d95e83`; manual browser OAuth/email proof still required
 - 2026-04-30 G6 [direct-main]: added funding schema, seed SQL, role mapping, filters, preferences, queries, funding pages/components, real funding route policies, and tests | targets: `supabase/migrations/0003_funding.sql`, `supabase/seeds/funding_seed.sql`, `lib/funding/**`, `components/funding/**`, `app/(funding)/**`, `test/unit/funding-role-mapping.test.ts` | verify: `npm test` => 5 files / 17 tests passed; `npm run lint` => success with legacy warnings only; `npm run build` => success; `supabase db push` => applied `0003_funding.sql`; `supabase db query --linked --file supabase/seeds/funding_seed.sql` => success; seed count query => 5 `business_grant`, 5 `scholarship`, 5 `research_grant` | ref: `eb5514d`
+- 2026-04-30 G7 [direct-main]: added onboarding role selector/forms, role-profile migration/RPC, profile upsert/query helpers, and focused tests | targets: `app/onboarding/**`, `lib/profile/**`, `supabase/migrations/0002_role_profiles.sql`, `test/unit/profile-*.test.ts` | verify: `npm test` => 7 files / 24 tests passed; `npm run lint` => success with 25 legacy warnings only; `npm run build` => success; `supabase db push --include-all` => applied `0002_role_profiles.sql` after G6's locked `0003` migration | ref: pending commit; browser onboarding replay remains manual-auth blocked
 
 ---
 
@@ -221,22 +222,22 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G7 — Onboarding and Profile Persistence `[locked — requires G6]`
+## G7 — Onboarding and Profile Persistence `[complete with manual auth proof blocker]`
 
-- [ ] Add `app/onboarding/page.tsx` role selector.
-- [ ] Add `app/onboarding/[role]/page.tsx`.
-- [ ] Business first-run fields: `display_name`, `business_name`, `industry`, `location`, `revenue`, `employees`. Keep `description`, `year_established`, `website` OUT of first-run.
-- [ ] Student first-run fields: `display_name`, `education_level`, `field_of_study`, `institution`, `province`, `gpa`. Keep `graduation_year` OUT of first-run.
-- [ ] Professor first-run fields: `display_name`, `institution`, `department`, `research_area`, `career_stage`, `research_keywords`. Keep `h_index` OUT of first-run.
-- [ ] Do not add citizenship or residency fields anywhere — they are not in the locked contract.
-- [ ] Validation enforces only the locked required fields per role.
-- [ ] Add `supabase/migrations/0002_role_profiles.sql` with `business_profiles`, `student_profiles`, `professor_profiles` matching the locked contract field sets.
-- [ ] Apply `0002_role_profiles.sql`.
-- [ ] Add `lib/profile/upsert.ts` writing `profiles.role` AND the role-specific row in ONE transaction; reject invalid role writes.
-- [ ] Add `lib/profile/queries.ts` exporting `getRoleProfile(user_id)` returning the discriminated `RoleProfile` union or `null`.
-- [ ] Wire null-role users to `/onboarding` after auth callback resolution; onboarded users to `/dashboard`.
-- [ ] Tests: `lib/profile/upsert.test.ts` (happy path, invalid role, already-onboarded); `lib/profile/queries.test.ts` (business, student, professor, null-role).
-- [ ] Demo end-to-end: pick role → submit form → persist rows → next sign-in skips onboarding.
+- [x] Add `app/onboarding/page.tsx` role selector.
+- [x] Add `app/onboarding/[role]/page.tsx`.
+- [x] Business first-run fields: `display_name`, `business_name`, `industry`, `location`, `revenue`, `employees`. Keep `description`, `year_established`, `website` OUT of first-run.
+- [x] Student first-run fields: `display_name`, `education_level`, `field_of_study`, `institution`, `province`, `gpa`. Keep `graduation_year` OUT of first-run.
+- [x] Professor first-run fields: `display_name`, `institution`, `department`, `research_area`, `career_stage`, `research_keywords`. Keep `h_index` OUT of first-run.
+- [x] Do not add citizenship or residency fields anywhere — they are not in the locked contract.
+- [x] Validation enforces only the locked required fields per role.
+- [x] Add `supabase/migrations/0002_role_profiles.sql` with `business_profiles`, `student_profiles`, `professor_profiles` matching the locked contract field sets.
+- [x] Apply `0002_role_profiles.sql`.
+- [x] Add `lib/profile/upsert.ts` writing `profiles.role` AND the role-specific row in ONE transaction; reject invalid role writes.
+- [x] Add `lib/profile/queries.ts` exporting `getRoleProfile(user_id)` returning the discriminated `RoleProfile` union or `null`.
+- [x] Wire null-role users to `/onboarding` after auth callback resolution; onboarded users to `/dashboard`.
+- [x] Tests: `lib/profile/upsert.test.ts` (happy path, invalid role, already-onboarded); `lib/profile/queries.test.ts` (business, student, professor, null-role).
+- [ ] Demo end-to-end: pick role → submit form → persist rows → next sign-in skips onboarding. Manual proof blocked until Google OAuth/email auth proof is available.
 
 ---
 

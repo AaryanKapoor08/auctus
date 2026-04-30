@@ -1,8 +1,8 @@
 # Auctus V2 Handoff
 
 **Last Updated:** 2026-04-30
-**Current Gate:** G1 — Solo Bootstrap and Control Plane
-**Status:** in progress; branch setup complete
+**Current Gate:** G2 — Root Baseline and Demo Isolation
+**Status:** ready to start
 
 ## Start Here
 
@@ -41,6 +41,9 @@ Root repo state observed:
 - Git branch: `develop` exists locally and on origin.
 - Branch protection is enabled on `main` and `develop`: PRs required, force pushes/deletes disabled, required status check `App checks`.
 - First CI run on pushed `develop` succeeded: run `25150670259`.
+- PR #3 (`docs(shared): record branch protection setup`) merged into `develop`: `e2caebc5f874f9d50a414cac7dfd0c46189931e6`.
+- PR #4 (`Develop`) merged `develop` into `main`: `b493a5802c99c1a401938af4b4b48f5ebd034948`.
+- G1 is effectively closed. The only old-doc reference issue is that root `claude/CurrentStatus.md` is absent; use archived `dev-a-space/codex/references/claude/CurrentStatus.md` as the source.
 - Root app is still legacy/demo state. No demo isolation has been performed yet.
 - No root `build/contracts/**` yet — the locked references at `dev-a-space/codex/references/build/contracts/` need to be copied/relocated as part of G2.
 - A nested duplicate folder `auctus-frontend/` exists. ESLint now ignores `auctus-frontend/**`. The folder itself has not been removed/decided yet.
@@ -101,9 +104,7 @@ Files modified:
 
 ## Next Action
 
-Finish G1 by resolving the root `claude/CurrentStatus.md` reference decision and recording the final G1 close proof. Each closed phase records mode, target paths, verify command, and commit/PR ref in the SoloProgress Proof Log per `dev-a-space/codex/Migration.md`.
-
-Then begin G2 (Root Baseline and Demo Isolation) in this order — do not collapse these or skip ahead:
+Start G2 (Root Baseline and Demo Isolation) from a new feature branch off `develop`. Do not collapse these or skip ahead:
 
 1. Decide the fate of `auctus-frontend/`: ignore-only, remove, or move outside lint scope. Record the decision.
 2. Copy the five locked contracts and `README.md` from `dev-a-space/codex/references/build/contracts/` into root `build/contracts/`.
@@ -112,7 +113,7 @@ Then begin G2 (Root Baseline and Demo Isolation) in this order — do not collap
 5. Create empty domain skeleton folders with stub `index.ts`: `lib/auth`, `lib/profile`, `lib/forum`, `lib/funding`, `lib/matching`, `lib/session`, `components/auth`, `components/profile`, `components/forum`, `components/funding`.
 6. Reverify `npm run lint` and `npm run build`. Demo URLs `/(demo)/funding`, `/(demo)/matchmaker`, `/(demo)/talent` must still load in dev.
 
-After G2, G3 still needs: `lib/env.ts` typed env-guard with missing-var test, Vitest install + sanity contract test + `npm test`/`npm run test:watch` scripts, and the manual Supabase / OAuth / secrets proofs (see `manual.md`).
+After G2, G3 still needs: `lib/env.ts` typed env-guard with missing-var test, Vitest install + sanity contract test + `npm test`/`npm run test:watch` scripts, workflow verification, and deferred OAuth/email proof (see `manual.md`).
 
 ## Manual Proof Still Needed
 

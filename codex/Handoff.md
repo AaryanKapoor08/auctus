@@ -28,7 +28,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - G11 added funding RLS migration, dashboard funding summary/deadline/forum tiles, date-only deadline filtering, and dashboard/RLS SQL tests as `ef71229`.
 - G12 isolated demo provider usage, moved `middleware.ts` to the Next 16 `proxy.ts` convention, added scraper quality checks, refreshed docs, and completed final QA as `7c1c6de`.
 - GitHub `Scrape` workflow manual proof succeeded on `main` at `726e51c`; fresh `scrape_runs` rows were verified in Supabase.
-- Scrape workflow cron is enabled for daily `03:00 UTC` runs; first scheduled-run proof is still pending.
+- Scrape workflow cron is enabled for daily `03:00 UTC` runs as `87daa98`; first scheduled-run proof is still pending.
 - Post-G9 fix pinned `turbopack.root` in `next.config.ts` so Next resolves `@/*` imports from the root project instead of the nested archived `auctus-frontend/` duplicate.
 - Post-G9 fix updated `lib/env.ts` so browser code reads `NEXT_PUBLIC_*` values through static `process.env.NEXT_PUBLIC_*` references instead of dynamic key lookup.
 

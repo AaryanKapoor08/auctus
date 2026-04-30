@@ -1,7 +1,7 @@
 # Auctus V2 Solo Progress
 
-**Current Gate:** G7
-**Current Phase:** P7 — Onboarding and Profile Persistence
+**Current Gate:** G8
+**Current Phase:** P8 — Funding Pages and Matching
 **Project Category:** web
 **Last Updated:** 2026-04-30
 
@@ -53,7 +53,7 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-04-30 G4 [direct-main]: locked all five build contracts and added lock-header test coverage | targets: `build/contracts/profile.ts`, `build/contracts/session.ts`, `build/contracts/funding.ts`, `test/contracts/sanity.test.ts` | verify: `npm test` => 2 files / 5 tests passed; `npm run build` => success | ref: `5ca9e67`
 - 2026-04-30 G5 [direct-main]: added Supabase clients, sign-in/callback/sign-out routes, profiles migration, session helpers, auth route policies, middleware, placeholder funding policies, and tests | targets: `app/(identity)/**`, `app/auth/callback/route.ts`, `lib/supabase/**`, `lib/session/**`, `lib/auth/**`, `lib/funding/route-policies.ts`, `middleware.ts`, `supabase/migrations/0001_profiles_base.sql`, `test/unit/session.test.ts`, `test/unit/route-policies.test.ts` | verify: `npm test` => 4 files / 14 tests passed; `npm run lint` => success with legacy warnings only; `npm run build` => success; `supabase db push` => applied `0001_profiles_base.sql` | ref: `7d95e83`; manual browser OAuth/email proof still required
 - 2026-04-30 G6 [direct-main]: added funding schema, seed SQL, role mapping, filters, preferences, queries, funding pages/components, real funding route policies, and tests | targets: `supabase/migrations/0003_funding.sql`, `supabase/seeds/funding_seed.sql`, `lib/funding/**`, `components/funding/**`, `app/(funding)/**`, `test/unit/funding-role-mapping.test.ts` | verify: `npm test` => 5 files / 17 tests passed; `npm run lint` => success with legacy warnings only; `npm run build` => success; `supabase db push` => applied `0003_funding.sql`; `supabase db query --linked --file supabase/seeds/funding_seed.sql` => success; seed count query => 5 `business_grant`, 5 `scholarship`, 5 `research_grant` | ref: `eb5514d`
-- 2026-04-30 G7 [direct-main]: added onboarding role selector/forms, role-profile migration/RPC, profile upsert/query helpers, and focused tests | targets: `app/onboarding/**`, `lib/profile/**`, `supabase/migrations/0002_role_profiles.sql`, `test/unit/profile-*.test.ts` | verify: `npm test` => 7 files / 24 tests passed; `npm run lint` => success with 25 legacy warnings only; `npm run build` => success; `supabase db push --include-all` => applied `0002_role_profiles.sql` after G6's locked `0003` migration | ref: pending commit; browser onboarding replay remains manual-auth blocked
+- 2026-04-30 G7 [direct-main]: added onboarding role selector/forms, role-profile migration/RPC, profile upsert/query helpers, and focused tests | targets: `app/onboarding/**`, `lib/profile/**`, `supabase/migrations/0002_role_profiles.sql`, `test/unit/profile-*.test.ts` | verify: `npm test` => 7 files / 24 tests passed; `npm run lint` => success with 25 legacy warnings only; `npm run build` => success; `supabase db push --include-all` => applied `0002_role_profiles.sql` after G6's locked `0003` migration | ref: `4b27e4b`; browser onboarding replay remains manual-auth blocked
 
 ---
 

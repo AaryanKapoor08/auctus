@@ -45,6 +45,7 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-04-30: Created local `.env.local` with Supabase project values. File is ignored by git.
 - 2026-04-30: Set GitHub Actions secrets with GitHub CLI and verified secret names are present.
 - 2026-04-30: Installed Supabase CLI via Scoop (`2.95.4`), authenticated with a personal access token, ran `supabase init`, linked project `kwfoxklfbrbgbmgyyfcl`, and applied `0000_init.sql` with `supabase db push`.
+- 2026-04-30 G1 [direct-main]: pushed `develop`, enabled branch protection on `main` and `develop`, and verified first `App checks` CI run passed | targets: GitHub branches `main`, `develop` | verify: `gh run watch 25150670259 --exit-status` => success | ref: `ffb899f`
 
 ---
 
@@ -60,7 +61,7 @@ One line per contract change after G4 lock.
 
 These require user/admin/dashboard action or credentials.
 
-- GitHub branch protection for `main` and `develop`: manual proof required.
+- GitHub branch protection for `main` and `develop`: `[done]` PRs required, `App checks` required, force pushes/deletes disabled.
 - GitHub Actions secrets `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`: `[done]` verified by `gh secret list`.
 - Supabase project creation, credentials, and dashboard access: `[done]` local env exists; dashboard project observed.
 - Supabase CLI login/init/link/db push against shared project: `[done]` verified by successful `supabase db push`.
@@ -80,11 +81,13 @@ These require user/admin/dashboard action or credentials.
 - [x] Create root `codex/Handoff.md`.
 - [x] Decide whether root branch strategy will use local `develop` immediately or continue on `main` until user confirms GitHub protection.
 - [ ] Confirm root `claude/CurrentStatus.md` reference: file is missing from root; a copy exists at `shared-space/codex/references/claude/CurrentStatus.md`. Either copy it to root or note that the solo workflow does not need it.
-- [ ] Record migration/proof reference after first control-plane commit (mode + commit hash).
+- [x] Record migration/proof reference after first control-plane commit (mode + commit hash).
 
-**Branch strategy:** use local `develop` immediately; keep GitHub branch protection as manual proof required.
+**Branch strategy:** use `develop` as the integration branch. Branch protection is enabled on both `main` and `develop`.
 
-**Next proof target:** commit/push root control and bootstrap files when the user approves.
+**Branch strategy proof:** `develop` is pushed and protected. Future work branches from `develop` and returns through PRs. Phase releases use PRs from `develop` to `main`.
+
+**Next proof target:** resolve root `claude/CurrentStatus.md` reference decision, then begin G2.
 
 ---
 

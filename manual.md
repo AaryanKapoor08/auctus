@@ -36,4 +36,4 @@ Google OAuth setup is intentionally deferred for now.
 
 Email magic-link provider verification is still pending.
 
-Branch protection on `main` and `develop` is still pending.
+Branch protection on `main` and `develop` is done.

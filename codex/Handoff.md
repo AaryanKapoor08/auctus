@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-04-30
 **Current Gate:** G1 — Solo Bootstrap and Control Plane
-**Status:** in progress
+**Status:** in progress; branch setup complete
 
 ## Start Here
 
@@ -38,7 +38,9 @@ The old workspace files were read and analyzed:
 
 Root repo state observed:
 
-- Git branch: local `develop`, created from `main`. Not yet pushed. GitHub branch protection still pending.
+- Git branch: `develop` exists locally and on origin.
+- Branch protection is enabled on `main` and `develop`: PRs required, force pushes/deletes disabled, required status check `App checks`.
+- First CI run on pushed `develop` succeeded: run `25150670259`.
 - Root app is still legacy/demo state. No demo isolation has been performed yet.
 - No root `build/contracts/**` yet — the locked references at `dev-a-space/codex/references/build/contracts/` need to be copied/relocated as part of G2.
 - A nested duplicate folder `auctus-frontend/` exists. ESLint now ignores `auctus-frontend/**`. The folder itself has not been removed/decided yet.
@@ -99,7 +101,7 @@ Files modified:
 
 ## Next Action
 
-Finish G1 by committing the root control/bootstrap setup. Each closed phase records mode, target paths, verify command, and commit/PR ref in the SoloProgress Proof Log per `dev-a-space/codex/Migration.md`.
+Finish G1 by resolving the root `claude/CurrentStatus.md` reference decision and recording the final G1 close proof. Each closed phase records mode, target paths, verify command, and commit/PR ref in the SoloProgress Proof Log per `dev-a-space/codex/Migration.md`.
 
 Then begin G2 (Root Baseline and Demo Isolation) in this order — do not collapse these or skip ahead:
 
@@ -116,7 +118,6 @@ After G2, G3 still needs: `lib/env.ts` typed env-guard with missing-var test, Vi
 
 These cannot be completed by file edits alone (see `manual.md` for the user-facing checklist):
 
-- GitHub branch protection on `main` and `develop`.
 - Supabase project creation and credentials confirmation.
 - Google OAuth: Cloud Console redirect URI = `https://<project-ref>.supabase.co/auth/v1/callback` ONLY (do NOT add localhost there); Supabase Auth Provider config; Supabase URL Configuration sets Site URL = `http://localhost:3000` and adds `http://localhost:3000/auth/callback` to additional redirects.
 - Email OTP / magic-link deliverability to a real inbox.

@@ -1,7 +1,7 @@
 # Auctus V2 Solo Progress
 
-**Current Gate:** G1
-**Current Phase:** P1 — Solo Bootstrap and Control Plane
+**Current Gate:** G2
+**Current Phase:** P2 — Root Baseline and Demo Isolation
 **Project Category:** web
 **Last Updated:** 2026-04-30
 
@@ -46,6 +46,7 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-04-30: Set GitHub Actions secrets with GitHub CLI and verified secret names are present.
 - 2026-04-30: Installed Supabase CLI via Scoop (`2.95.4`), authenticated with a personal access token, ran `supabase init`, linked project `kwfoxklfbrbgbmgyyfcl`, and applied `0000_init.sql` with `supabase db push`.
 - 2026-04-30 G1 [direct-main]: pushed `develop`, enabled branch protection on `main` and `develop`, and verified first `App checks` CI run passed | targets: GitHub branches `main`, `develop` | verify: `gh run watch 25150670259 --exit-status` => success | ref: `ffb899f`
+- 2026-04-30 G1 [direct-main]: verified protected workflow with PR #3 into `develop`, then promoted bootstrap to `main` with PR #4 | targets: GitHub PRs #3/#4, root bootstrap files | verify: required `App checks` passed | ref: `e2caebc`, `b493a58`
 
 ---
 
@@ -70,7 +71,7 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G1 — Solo Bootstrap and Control Plane `[in progress]`
+## G1 — Solo Bootstrap and Control Plane `[complete]`
 
 - [x] Read Dev A and Dev B `AGENTS.md`.
 - [x] Read shared ownership, conventions, bootstrap, and migration rules.
@@ -80,18 +81,18 @@ These require user/admin/dashboard action or credentials.
 - [x] Create root `codex/SoloProgress.md`.
 - [x] Create root `codex/Handoff.md`.
 - [x] Decide whether root branch strategy will use local `develop` immediately or continue on `main` until user confirms GitHub protection.
-- [ ] Confirm root `claude/CurrentStatus.md` reference: file is missing from root; a copy exists at `shared-space/codex/references/claude/CurrentStatus.md`. Either copy it to root or note that the solo workflow does not need it.
+- [x] Confirm root `claude/CurrentStatus.md` reference: file is missing from root; archived copy at `shared-space/codex/references/claude/CurrentStatus.md` is sufficient for solo workflow reference.
 - [x] Record migration/proof reference after first control-plane commit (mode + commit hash).
 
 **Branch strategy:** use `develop` as the integration branch. Branch protection is enabled on both `main` and `develop`.
 
 **Branch strategy proof:** `develop` is pushed and protected. Future work branches from `develop` and returns through PRs. Phase releases use PRs from `develop` to `main`.
 
-**Next proof target:** resolve root `claude/CurrentStatus.md` reference decision, then begin G2.
+**Next proof target:** begin G2 from a feature branch off `develop`.
 
 ---
 
-## G2 — Root Baseline and Demo Isolation `[locked — requires G1]`
+## G2 — Root Baseline and Demo Isolation `[in progress]`
 
 - [ ] Audit nested `auctus-frontend/` duplicate folder and decide whether it is ignored, removed, or preserved outside lint scope.
 - [x] Fix lint configuration so generated output and duplicate build artifacts are not scanned.

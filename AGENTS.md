@@ -49,7 +49,7 @@ Every gate needs proof before it can be marked complete. For each closed gate, r
 - commit hash or PR reference
 - known blocker, if any
 
-Some gates require external dashboard/admin work and cannot be completed by file edits alone:
+Some gates require external dashboard/admin work and cannot be completed by file edits alone. If a proof is already recorded in `codex/SoloProgress.md`, do not repeat it:
 
 - GitHub branch protection
 - GitHub Actions secrets

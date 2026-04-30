@@ -1,8 +1,8 @@
 # Auctus V2 Handoff
 
 **Last Updated:** 2026-04-30
-**Current Gate:** G10 — ETL Pipeline
-**Status:** G3-G9 completed locally on `main`; continue one gate at a time from G10
+**Current Gate:** G11 — RLS and Dashboard Integration
+**Status:** G10 completed locally on `main` as `d97ffdb`; continue with G11, keeping later Claude G11/G12 changes under review
 
 ## Start Here
 
@@ -24,8 +24,32 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - G7 added onboarding role selector/forms, `0002_role_profiles.sql`, transactional profile onboarding RPC, profile upsert/query helpers, and tests as `4b27e4b`.
 - G8 added role-specific matching scorers, `scoreFor`, fixture-backed tests, and scored `GetFundingSummariesForUser` results as `4f819be`.
 - G9 added forum schema/RLS/RPC, persisted forum runtime and pages, auth context provider, role-aware navbar, and signed-in landing redirect as `5c4c289`.
+- G10 added live-tuned ETL pipeline, six official source modules, source verification notes, scraper CLI/dry-run, dedupe/expire/normalize/Supabase stores, `0004_scrape_metadata.sql`, and scraper tests as `d97ffdb`.
 - Post-G9 fix pinned `turbopack.root` in `next.config.ts` so Next resolves `@/*` imports from the root project instead of the nested archived `auctus-frontend/` duplicate.
 - Post-G9 fix updated `lib/env.ts` so browser code reads `NEXT_PUBLIC_*` values through static `process.env.NEXT_PUBLIC_*` references instead of dynamic key lookup.
+
+## Claude Work Review — 2026-04-30
+
+Claude added uncommitted files for G10-G12: scraper pipeline, scrape metadata migration, funding RLS migration, dashboard composition, data-quality checks, docs, and tests.
+
+Local checks passed:
+
+- `npm test` => 21 files / 101 tests passed.
+- `npm run lint` => success with 20 legacy demo warnings only.
+- `npm run build` => success.
+- `npx tsc -p scraper/tsconfig.json --noEmit` => success.
+
+Resolved from review:
+
+- G10 live ETL proof is now complete. `npx tsx index.ts --dry-run` returned 566 rows across six sources with 0 errors.
+- Real scraper run wrote rows and scrape_runs records to Supabase.
+- Source rate limits are now enforced inside source scrapes via `ctx.delay`.
+- `scraper/SOURCES.md` now records live-tuned status rather than speculative selector status.
+
+Remaining review blockers for G11/G12:
+
+- `lib/dashboard/composer.ts` compares date-only deadlines against `asOf.getTime()`, so deadlines on the current date can be treated as already past after midnight. Compare date-only values before closing G11.
+- `.claude/settings.local.json` is machine/tool-specific and should stay untracked.
 
 ## Verification
 
@@ -44,6 +68,10 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - Linked DB metadata proof after G9: RLS true on `profiles`, all role profile tables, `threads`, `replies`, `reply_helpful_votes`; `mark_reply_helpful` function count 1; `reply_helpful_votes` policies are SELECT-only.
 - `supabase db query --linked --file supabase/seeds/funding_seed.sql`: success.
 - Seed count query: 5 `business_grant`, 5 `scholarship`, 5 `research_grant`.
+- G10 dry-run: `npx tsx index.ts --dry-run` from `scraper/` => `ised-benefits-finder` 6, `ised-supports` 14, `educanada` 7, `indigenous-bursaries` 517, `nserc` 20, `sshrc` 2; total 566, errors 0.
+- G10 real scraper run: `npx tsx index.ts` from `scraper/` with local Supabase env loaded => six source summaries success; inserted/updated rows; expire 0.
+- G10 Supabase query proof: latest six `scrape_runs` all `success`; scraped funding counts are 20 `business_grant`, 485 `scholarship`, 22 `research_grant`.
+- G10 full verification: `npm test` => 21 files / 101 tests passed; `npm run lint` => success with 20 legacy warnings only; `npm run build` => success; `npx tsc -p scraper/tsconfig.json --noEmit` => success.
 
 Known build warnings:
 
@@ -56,6 +84,15 @@ Known build warnings:
 - Fresh-browser auth redirect proof remains blocked until OAuth/email are configured.
 - Business/student/professor navbar funding-link and sign-out browser proof remain blocked until OAuth/email are configured.
 - GitHub scrape workflow manual trigger proof is deferred because the user asked to stop GitHub workflow/PR work.
+- Live browser proof for onboarding, dashboard role surfaces, and funding RLS remains blocked until OAuth/email sign-in works.
+- Enabling and proving the GitHub scrape cron/manual workflow remains manual/deferred while GitHub workflow work is paused.
+
+## Codex-Doable Remaining Work
+
+- Fix dashboard deadline filtering to compare date-only deadlines.
+- Keep `.claude/settings.local.json` out of commits.
+- Review/apply the uncommitted G11 funding RLS and dashboard composition changes.
+- Re-run `npm test`, `npm run lint`, `npm run build`, and relevant SQL/Supabase proof after G11 fixes.
 
 ## Follow-Ups Already Noted
 
@@ -65,11 +102,11 @@ Known build warnings:
 
 ## Exact Next Action
 
-Start G10 on `main`:
+Start G11 review/fix on `main`:
 
-1. Draft ETL source verification notes for the six locked official sources.
-2. Add scraper core types/utils/normalize/dedupe/expire and `0004_scrape_metadata.sql`.
-3. Implement six source modules with verification comments and fixtures.
-4. Keep CI/GitHub workflow changes minimal; user asked not to do PR/GitHub workflow work.
+1. Fix `lib/dashboard/composer.ts` date-only deadline filtering.
+2. Validate/apply `supabase/migrations/0020_rls_funding.sql` if not already applied in this workspace state.
+3. Verify funding RLS metadata and dashboard composition tests.
+4. Keep G11 separate from G12 hardening where possible.
 
-Do not start G11 until G10 is implemented, verified, committed, pushed, and documented.
+Do not close G12 until G11 is verified and documented.

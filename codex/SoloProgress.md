@@ -1,7 +1,7 @@
 # Auctus V2 Solo Progress
 
-**Current Gate:** G10
-**Current Phase:** P10 — ETL Pipeline
+**Current Gate:** G11
+**Current Phase:** P11 — RLS and Dashboard Integration
 **Project Category:** web
 **Last Updated:** 2026-04-30
 
@@ -56,6 +56,8 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-04-30 G7 [direct-main]: added onboarding role selector/forms, role-profile migration/RPC, profile upsert/query helpers, and focused tests | targets: `app/onboarding/**`, `lib/profile/**`, `supabase/migrations/0002_role_profiles.sql`, `test/unit/profile-*.test.ts` | verify: `npm test` => 7 files / 24 tests passed; `npm run lint` => success with 25 legacy warnings only; `npm run build` => success; `supabase db push --include-all` => applied `0002_role_profiles.sql` after G6's locked `0003` migration | ref: `4b27e4b`; browser onboarding replay remains manual-auth blocked
 - 2026-04-30 G8 [direct-main]: added business/student/professor matching scorers, dispatcher, fixture coverage, and scored funding summaries via `getRoleProfile` | targets: `lib/matching/**`, `lib/funding/queries.ts`, `test/unit/matching.test.ts`, `test/unit/funding-summaries.test.ts` | verify: `npm test` => 9 files / 29 tests passed; `npm run lint` => success with 25 legacy warnings only; `npm run build` => success; fixture proof: `funding-2` perfect match sorts before `funding-1` partial match | ref: `4f819be`
 - 2026-04-30 G9 [direct-main]: added persisted forum schema/runtime/pages, identity RLS, helpful-vote RPC, auth provider, role-aware navbar, and landing redirect | targets: `supabase/migrations/0005_forum.sql`, `supabase/migrations/0010_rls_identity.sql`, `lib/forum/**`, `app/forum/**`, `components/forum/**`, `components/layout/Navbar.tsx`, `app/page.tsx`, `app/providers.tsx`, `test/unit/forum-*.test.ts` | verify: `npm test` => 11 files / 34 tests passed; `npm run lint` => success with 20 legacy warnings only; `npm run build` => success; `supabase db push` => applied `0005_forum.sql` and `0010_rls_identity.sql`; metadata query => RLS true on profiles/role profiles/threads/replies/votes, `mark_reply_helpful` count 1, votes policies SELECT-only | ref: `5c4c289`; browser account nav/sign-out proof remains manual-auth blocked
+- 2026-04-30 review: Claude-added uncommitted G10-G12 scaffold passed local unit/lint/build/type checks, but G10 remained open because live scraper dry-run fetched 0 rows from four sources and fetch failed for two sources; selectors were documented as speculative; rate limiting was not enforced; dashboard deadline date comparison still needs a date-only fix before G11 closes.
+- 2026-04-30 G10 [direct-main]: added live-tuned ETL pipeline, source verification notes, scraper CLI/dry-run, utility/normalize/dedupe/expire/supabase stores, six official source modules, scrape metadata migration, fixture/unit tests, rate-limit delays, and real Supabase ingestion proof | targets: `scraper/**`, `supabase/migrations/0004_scrape_metadata.sql`, `test/unit/scraper-*.test.ts`, `package.json`, `package-lock.json` | verify: `npx tsx index.ts --dry-run` => 6 sources / 566 rows / 0 errors; real `npx tsx index.ts` with local Supabase env => `ised-benefits-finder` 6 inserted, `ised-supports` 14 inserted, `educanada` 7 inserted, `indigenous-bursaries` 517 fetched / 478 inserted / 39 updated, `nserc` 20 inserted, `sshrc` 2 inserted, expire 0; Supabase query => latest six `scrape_runs` all `success`, scraped funding counts 20 `business_grant`, 485 `scholarship`, 22 `research_grant`; `npm test` => 21 files / 101 tests passed; `npm run lint` => success with 20 legacy warnings only; `npm run build` => success; `npx tsc -p scraper/tsconfig.json --noEmit` => success | ref: `d97ffdb`; GitHub scrape cron/manual workflow proof remains deferred/manual
 
 ---
 
@@ -79,6 +81,8 @@ These require user/admin/dashboard action or credentials.
 - Email OTP / magic-link deliverability to a real inbox: manual proof required.
 - Browser proof for G5 auth redirects (`role: null` → `/onboarding`, onboarded users → `/dashboard`): manual proof required after OAuth/email are configured.
 - GitHub scrape workflow manual trigger proof: deferred because user requested no more GitHub workflow/PR work during this session.
+- Browser proof for onboarding, dashboard role surfaces, role-specific navbar funding link, and sign-out: manual proof required after OAuth/email are configured.
+- GitHub scrape cron/manual workflow proof: manual/deferred while GitHub workflow work is paused.
 
 ---
 
@@ -283,28 +287,32 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G10 — ETL Pipeline `[locked — requires G9]`
+## G10 — ETL Pipeline `[complete with manual workflow blocker]`
 
-- [ ] Add ETL source verification notes (workspace-draft mode acceptable) covering all six locked official sources: ISED Business Benefits Finder, ISED Supports for Business, EduCanada Scholarships, Indigenous Bursaries Search Tool, NSERC Funding Opportunities, SSHRC Funding Opportunities. For each: robots.txt URL, ToS note (or absence-of-problem note), scrape cadence, listing/detail URL pattern.
-- [ ] Confirm CIHR is deferred to post-V2 ETL expansion; confirm no private aggregator appears in any ETL planning file.
-- [ ] Add `scraper/types.ts` with `ScrapedFunding` and `Scraper` interfaces.
-- [ ] Add `scraper/utils.ts` with `parseAmount`, `parseDate`, `cleanText`.
-- [ ] Add `scraper/normalize.ts` setting `source: 'scraped'`, `scraped_from`, `scraped_at`, `status: 'active'`.
-- [ ] Add `scraper/deduplicate.ts` keyed by `(name, provider, type)` with insert/update/skip behavior.
-- [ ] Add `scraper/expire.ts` moving past-deadline rows from `active` → `expired`.
-- [ ] Refactor `scraper/index.ts` to register sources via a central `SOURCES` array; per-source failures log and continue; per-source counts record fetched/inserted/updated/skipped/errors.
-- [ ] Add `supabase/migrations/0004_scrape_metadata.sql` with `funding_sources` and `scrape_runs`; apply it; verify in SQL.
-- [ ] Add ETL tests for utilities, normalization, dedupe, and failure isolation.
-- [ ] Add the six source modules; each has a leading verification comment referencing the verification notes; each rate-limits requests; each preserves `source_url`, `scraped_from`, `scraped_at`.
-- [ ] Add fixture tests for all six modules.
-- [ ] Verify a deliberate throw in one source does not stop the other five.
-- [ ] Verify a clean manual run creates at least one row per source on a clean DB and `scrape_runs` records per-source counts.
-- [ ] Demonstrate that adding a new future source requires only one new file plus one `SOURCES` line.
+**Review status:** Closed locally in `d97ffdb`. Live source tuning is complete for the six locked sources, real Supabase ingestion succeeded, and `scrape_runs` proof exists. GitHub workflow trigger/cron proof remains deferred/manual because GitHub workflow work is paused.
+
+- [x] Add ETL source verification notes (workspace-draft mode acceptable) covering all six locked official sources: ISED Business Benefits Finder, ISED Supports for Business, EduCanada Scholarships, Indigenous Bursaries Search Tool, NSERC Funding Opportunities, SSHRC Funding Opportunities. For each: robots.txt URL, ToS note (or absence-of-problem note), scrape cadence, listing/detail URL pattern.
+- [x] Confirm CIHR is deferred to post-V2 ETL expansion; confirm no private aggregator appears in any ETL planning file.
+- [x] Add `scraper/types.ts` with `ScrapedFunding` and `Scraper` interfaces.
+- [x] Add `scraper/utils.ts` with `parseAmount`, `parseDate`, `cleanText`.
+- [x] Add `scraper/normalize.ts` setting `source: 'scraped'`, `scraped_from`, `scraped_at`, `status: 'active'`.
+- [x] Add `scraper/deduplicate.ts` keyed by `(name, provider, type)` with insert/update/skip behavior.
+- [x] Add `scraper/expire.ts` moving past-deadline rows from `active` → `expired`.
+- [x] Refactor `scraper/index.ts` to register sources via a central `SOURCES` array; per-source failures log and continue; per-source counts record fetched/inserted/updated/skipped/errors.
+- [x] Add `supabase/migrations/0004_scrape_metadata.sql` with `funding_sources` and `scrape_runs`; apply it; verify in SQL.
+- [x] Add ETL tests for utilities, normalization, dedupe, and failure isolation.
+- [x] Add the six source modules; each has a leading verification comment referencing the verification notes; each rate-limits requests; each preserves `source_url`, `scraped_from`, `scraped_at`.
+- [x] Add fixture tests for all six modules.
+- [x] Verify a deliberate throw in one source does not stop the other five.
+- [x] Verify a clean manual run creates at least one row per source on a clean DB and `scrape_runs` records per-source counts.
+- [x] Demonstrate that adding a new future source requires only one new file plus one `SOURCES` line.
 - [ ] Update `.github/workflows/scrape.yml` to enable cron `0 3 * * *` only after all source verification is complete.
 
 ---
 
 ## G11 — RLS and Dashboard Integration `[locked — requires G10]`
+
+**Review status:** Claude added uncommitted G11 code and tests, but this gate stays locked until G10 live ETL proof is real. Codex-doable work after G10: validate/apply `0020_rls_funding.sql`, fix date-only deadline filtering in `lib/dashboard/composer.ts`, and verify dashboard composition. Manual work: cross-role/browser proof remains blocked by OAuth/email sign-in setup.
 
 - [ ] Confirm `0010_rls_identity.sql` is already applied (dependency for funding RLS join on `profiles.role`).
 - [ ] Add `supabase/migrations/0020_rls_funding.sql`:
@@ -333,6 +341,8 @@ These require user/admin/dashboard action or credentials.
 ---
 
 ## G12 — Hardening and Release QA `[locked — requires G11]`
+
+**Review status:** Claude added uncommitted hardening/docs/tests, but this gate stays locked until G10 and G11 close. Codex-doable work: keep `.claude/settings.local.json` untracked, verify demo-import audit, run final data-quality checks, update docs/proof logs, and commit in gate order. Manual work: final browser walkthrough and GitHub scrape workflow proof remain external/manual.
 
 - [ ] Grep active app code for imports from `lib/demo` and `components/demo` (outside `app/(demo)/**`); remove any leaks.
 - [ ] Audit remaining flows for demo-only alerts or fake persistence.

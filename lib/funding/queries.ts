@@ -8,9 +8,13 @@ import type {
 } from "@contracts/funding";
 import { createFundingReadClient } from "./supabase";
 import { getFundingTypeForRole } from "./role-mapping";
-import { getSession } from "@/lib/session/get-session";
+import { scoreFor } from "@/lib/matching";
+import { getRoleProfile } from "@/lib/profile/queries";
 
-function toFundingSummary(item: FundingItem): FundingSummary {
+function toFundingSummary(
+  item: FundingItem,
+  match_score: FundingSummary["match_score"] = null,
+): FundingSummary {
   return {
     id: item.id,
     type: item.type,
@@ -18,7 +22,7 @@ function toFundingSummary(item: FundingItem): FundingSummary {
     provider: item.provider,
     amount_max: item.amount_max,
     deadline: item.deadline,
-    match_score: null,
+    match_score,
   };
 }
 
@@ -72,17 +76,31 @@ export const GetFundingSummariesForUser: GetFundingSummariesForUserContract = as
   user_id,
   limit = 5,
 ) => {
-  const session = await getSession();
+  const roleProfile = await getRoleProfile(user_id);
 
-  if (!session || session.user_id !== user_id || !session.role) {
-    return [];
+  if (!roleProfile) {
+    const supabase = await createFundingReadClient();
+    const { data, error } = await supabase
+      .from("funding")
+      .select("*")
+      .eq("status", "active")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+
+    return ((data ?? []) as FundingItem[]).map((item) =>
+      toFundingSummary(item),
+    );
   }
 
   const items = await ListFundingForRole({
-    role: session.role,
+    role: roleProfile.role,
     status: "active",
     limit,
   });
 
-  return items.map(toFundingSummary);
+  return items
+    .map((item) => toFundingSummary(item, scoreFor(roleProfile, item)))
+    .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0));
 };

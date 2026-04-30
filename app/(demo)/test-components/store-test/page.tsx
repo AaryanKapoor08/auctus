@@ -1,7 +1,7 @@
 "use client";
 
-import { useBusiness } from "@/lib/BusinessContext";
-import { Business } from "@/lib/data-utils";
+import { useBusiness } from "@/lib/demo/BusinessContext";
+import { Business } from "@/lib/demo/data";
 import Card from "@/components/ui/Card";
 import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";

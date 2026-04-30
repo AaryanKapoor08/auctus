@@ -1,6 +1,6 @@
 "use client";
 
-import { BusinessProvider } from "@/lib/BusinessContext";
+import { BusinessProvider } from "@/lib/demo/BusinessContext";
 import { ToastProvider } from "@/lib/ToastContext";
 
 export function Providers({ children }: { children: React.ReactNode }) {

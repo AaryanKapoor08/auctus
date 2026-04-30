@@ -46,6 +46,7 @@ yarn-error.log*
 # local tooling
 /.codex/
 /auctus-frontend/
+/codex/*.log
 
 # env files (can opt-in for committing if needed)
 .env*

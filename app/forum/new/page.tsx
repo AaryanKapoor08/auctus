@@ -7,8 +7,8 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Badge from "@/components/ui/Badge";
-import { getForumCategories } from "@/lib/data-utils";
-import { useBusiness } from "@/lib/BusinessContext";
+import { getForumCategories } from "@/lib/demo/data";
+import { useBusiness } from "@/lib/demo/BusinessContext";
 
 export default function NewThreadPage() {
   const router = useRouter();

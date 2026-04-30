@@ -1,5 +1,5 @@
 import { ArrowRight, Building2 } from "lucide-react";
-import { Business } from "@/lib/data-utils";
+import { Business } from "@/lib/demo/data";
 import Badge from "@/components/ui/Badge";
 
 interface MatchCardProps {

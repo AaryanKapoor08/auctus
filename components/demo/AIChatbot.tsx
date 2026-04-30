@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useBusiness } from "@/lib/BusinessContext";
+import { useBusiness } from "@/lib/demo/BusinessContext";
 import {
   getAIResponse,
   getPageSpecificActions,
   Suggestion,
-} from "@/lib/ai-responses";
+} from "@/lib/demo/ai-responses";
 import {
   Send,
   Sparkles,

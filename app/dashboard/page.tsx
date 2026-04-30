@@ -1,7 +1,7 @@
 "use client";
 
-import { useBusiness } from "@/lib/BusinessContext";
-import StatsCard from "@/components/cards/StatsCard";
+import { useBusiness } from "@/lib/demo/BusinessContext";
+import StatsCard from "@/components/ui/StatsCard";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -25,7 +25,7 @@ import {
   getDaysUntilDeadline,
   formatRelativeTime,
   getAllGrants,
-} from "@/lib/data-utils";
+} from "@/lib/demo/data";
 import Link from "next/link";
 
 const DEMO_NOW = new Date("2026-04-30T00:00:00.000Z").getTime();

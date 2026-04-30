@@ -6,7 +6,7 @@ import { Search, Plus } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
-import ThreadCard from "@/components/cards/ThreadCard";
+import ThreadCard from "@/components/forum/ThreadCard";
 import {
   getAllThreads,
   getThreadsByCategory,
@@ -14,7 +14,7 @@ import {
   getRepliesByThreadId,
   formatRelativeTime,
   getForumCategories,
-} from "@/lib/data-utils";
+} from "@/lib/demo/data";
 
 type SortOption = "recent" | "replies" | "helpful";
 

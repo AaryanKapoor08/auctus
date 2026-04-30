@@ -6,7 +6,7 @@ import { ArrowLeft, Calendar, Eye, ThumbsUp, MessageSquare } from "lucide-react"
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
-import ReplyCard from "@/components/cards/ReplyCard";
+import ReplyCard from "@/components/forum/ReplyCard";
 import {
   getThreadById,
   getBusinessById,
@@ -14,8 +14,8 @@ import {
   formatRelativeTime,
   getRelatedGrants,
   getRelatedThreads,
-} from "@/lib/data-utils";
-import { useBusiness } from "@/lib/BusinessContext";
+} from "@/lib/demo/data";
+import { useBusiness } from "@/lib/demo/BusinessContext";
 import Link from "next/link";
 
 interface ThreadDetailPageProps {

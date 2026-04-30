@@ -14,13 +14,13 @@
  * @module data-utils
  */
 
-import businessesData from "@/data/businesses.json";
-import grantsData from "@/data/grants.json";
-import threadsData from "@/data/threads.json";
-import repliesData from "@/data/replies.json";
-import matchesData from "@/data/matches.json";
-import jobsData from "@/data/jobs.json";
-import talentsData from "@/data/talents.json";
+import businessesData from "@/data/demo/businesses.json";
+import grantsData from "@/data/demo/grants.json";
+import threadsData from "@/data/demo/threads.json";
+import repliesData from "@/data/demo/replies.json";
+import matchesData from "@/data/demo/matches.json";
+import jobsData from "@/data/demo/jobs.json";
+import talentsData from "@/data/demo/talents.json";
 
 // Type definitions
 export interface Business {

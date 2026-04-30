@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-04-30
 **Current Gate:** G3 — Shared Tooling and Infrastructure Bootstrap
-**Status:** G2 complete; G3 ready to start after G2 branch is pushed/PR is opened if required
+**Status:** G2 complete and merged to `develop`; G3 ready to start
 
 ## Start Here
 
@@ -18,7 +18,7 @@ Root implementation is the real project. `dev-a-space/`, `dev-b-space/`, and `sh
 
 G2 (Root Baseline and Demo Isolation) was completed on branch `g2-demo-isolation`.
 
-G2 implementation commit: `8e9cdff` (`refactor(restructure): isolate legacy demo surface`).
+G2 merged through PR #5 as `e95dc4d` (`refactor(restructure): isolate legacy demo surface`). Required `App checks` passed on PR #5.
 
 Completed:
 
@@ -93,9 +93,7 @@ Manual proof still needed later:
 
 ## Exact Next Action
 
-1. Commit this docs-only proof update.
-2. Push/open the G2 branch through the protected workflow as required.
-3. Start G3 only after G2 proof is recorded. G3 next code tasks are `lib/env.ts`, Vitest + `npm test` / `npm run test:watch`, and a sanity contract import test.
+Start G3 from `develop`. The next code tasks are `lib/env.ts`, Vitest + `npm test` / `npm run test:watch`, and a sanity contract import test.
 
 ## Assumptions To Preserve
 

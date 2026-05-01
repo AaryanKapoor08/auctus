@@ -196,3 +196,64 @@ export async function upsertRoleProfile(input: OnboardingInput) {
 
   if (error) throw error;
 }
+
+export async function updateRoleProfile(input: OnboardingInput) {
+  if (!isRole(input.role)) {
+    throw new Error("Invalid role");
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("Authentication required");
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profileError) throw profileError;
+
+  if (profile?.role !== input.role) {
+    throw new Error("Profile role cannot be changed here");
+  }
+
+  const { error: baseError } = await supabase
+    .from("profiles")
+    .update({ display_name: input.display_name })
+    .eq("id", user.id);
+
+  if (baseError) throw baseError;
+
+  const details = toDetails(input);
+
+  if (input.role === "business") {
+    const { error } = await supabase
+      .from("business_profiles")
+      .update(details)
+      .eq("id", user.id);
+    if (error) throw error;
+    return;
+  }
+
+  if (input.role === "student") {
+    const { error } = await supabase
+      .from("student_profiles")
+      .update(details)
+      .eq("id", user.id);
+    if (error) throw error;
+    return;
+  }
+
+  const { error } = await supabase
+    .from("professor_profiles")
+    .update(details)
+    .eq("id", user.id);
+
+  if (error) throw error;
+}

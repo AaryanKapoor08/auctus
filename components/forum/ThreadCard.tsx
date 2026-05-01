@@ -49,17 +49,17 @@ export default function ThreadCard({
       data-thread-id={id}
       onClick={onClick}
       className={cn(
-        "bg-white rounded-lg border border-gray-200 p-6 shadow-sm transition-all duration-200",
-        (href || onClick) && "cursor-pointer hover:shadow-md hover:-translate-y-0.5"
+        "h-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200",
+        (href || onClick) && "cursor-pointer hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md",
       )}
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
+      <div className="mb-3 flex items-start justify-between gap-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-gray-900 mb-2 hover:text-primary-600 transition-colors">
             {title}
           </h3>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
             <span className="font-medium">{author.name}</span>
             <span className="text-gray-400">•</span>
             {author.role ? (
@@ -77,7 +77,7 @@ export default function ThreadCard({
       </div>
 
       {/* Preview */}
-      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{preview}</p>
+      <p className="mb-4 line-clamp-2 text-sm leading-6 text-gray-600">{preview}</p>
 
       {/* Tags */}
       {tags.length > 0 && (
@@ -94,8 +94,8 @@ export default function ThreadCard({
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between border-t border-gray-100 pt-4 text-sm text-gray-500">
+        <div className="flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-1">
             <MessageSquare className="h-4 w-4" />
             <span>{replyCount} {replyCount === 1 ? 'reply' : 'replies'}</span>

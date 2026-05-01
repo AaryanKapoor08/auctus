@@ -91,3 +91,16 @@ export async function getRoleProfile(user_id: string): Promise<RoleProfile | nul
     details: data as ProfessorProfile,
   };
 }
+
+export async function getProfileMatchTags(user_id: string): Promise<string[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("profile_match_tags")
+    .select("tags")
+    .eq("user_id", user_id)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data?.tags ?? [];
+}

@@ -20,13 +20,23 @@ function createProfileQuery(role: string | null) {
 function createSupabase(role: string | null) {
   const profileQuery = createProfileQuery(role);
   const rpc = vi.fn().mockResolvedValue({ error: null });
+  const upsert = vi.fn().mockResolvedValue({ error: null });
 
   return {
     auth: {
       getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-1" } } }),
     },
-    from: vi.fn().mockReturnValue(profileQuery),
+    from: vi.fn((table: string) => {
+      if (table === "profile_match_tags") {
+        return {
+          upsert,
+        };
+      }
+
+      return profileQuery;
+    }),
     rpc,
+    upsert,
   };
 }
 
@@ -55,6 +65,7 @@ describe("profile onboarding upsert", () => {
       business_name: "Ada Labs",
       revenue: 250000,
       employees: 8,
+      match_tags: ["Business", "STEM", "Provincial"],
     });
     expect(supabase.rpc).toHaveBeenCalledWith("complete_onboarding", {
       p_role: "business",
@@ -67,6 +78,14 @@ describe("profile onboarding upsert", () => {
         employees: 8,
       },
     });
+    expect(supabase.upsert).toHaveBeenCalledWith(
+      {
+        user_id: "user-1",
+        role: "business",
+        tags: ["Business", "STEM", "Provincial"],
+      },
+      { onConflict: "user_id" },
+    );
   });
 
   it("rejects invalid role writes", async () => {
@@ -89,6 +108,7 @@ describe("profile onboarding upsert", () => {
         institution: "UNB",
         province: "NB",
         gpa: 3.8,
+        match_tags: ["Student", "Scholarship", "STEM", "Provincial"],
       }),
     ).rejects.toThrow("Profile is already onboarded");
 

@@ -9,6 +9,7 @@ import {
 const mocks = vi.hoisted(() => ({
   createFundingReadClient: vi.fn(),
   getRoleProfile: vi.fn(),
+  getProfileMatchTags: vi.fn(),
 }));
 
 vi.mock("@/lib/funding/supabase", () => ({
@@ -17,6 +18,7 @@ vi.mock("@/lib/funding/supabase", () => ({
 
 vi.mock("@/lib/profile/queries", () => ({
   getRoleProfile: mocks.getRoleProfile,
+  getProfileMatchTags: mocks.getProfileMatchTags,
 }));
 
 const baseItem: FundingItem = {
@@ -81,6 +83,7 @@ function createQuery(data: FundingItem[]) {
 describe("GetFundingSummariesForUser", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.getProfileMatchTags.mockResolvedValue([]);
   });
 
   it("returns scored and sorted summaries for onboarded users", async () => {
@@ -110,6 +113,25 @@ describe("GetFundingSummariesForUser", () => {
     ]);
     expect(summaries[0].match_score).toBe(100);
     expect(summaries[1].match_score).toBe(25);
+  });
+
+  it("uses onboarding match tags to boost relevant funding summaries", async () => {
+    mocks.getRoleProfile.mockResolvedValue(businessProfile);
+    mocks.getProfileMatchTags.mockResolvedValue(["Digital", "STEM"]);
+    mocks.createFundingReadClient.mockResolvedValue({
+      from: vi.fn(() =>
+        createQuery([
+          {
+            ...baseItem,
+            tags: ["Digital", "STEM"],
+          },
+        ]),
+      ),
+    });
+
+    const summaries = await GetFundingSummariesForUser("user-1", 1);
+
+    expect(summaries[0].match_score).toBe(45);
   });
 
   it("returns recent active rows with null scores when role profile is missing", async () => {

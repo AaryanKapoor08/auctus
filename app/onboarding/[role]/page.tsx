@@ -12,15 +12,15 @@ type PageProps = {
 const labels: Record<Role, { title: string; description: string }> = {
   business: {
     title: "Business profile",
-    description: "Create the business profile used for grant matching.",
+    description: "Answer a few funding-focused questions so grant matches start relevant.",
   },
   student: {
     title: "Student profile",
-    description: "Create the student profile used for scholarship matching.",
+    description: "Map your scholarship preferences to the tags available in Auctus.",
   },
   professor: {
     title: "Professor profile",
-    description: "Create the research profile used for grant matching.",
+    description: "Tell us which research funding tags should drive your recommendations.",
   },
 };
 
@@ -51,9 +51,26 @@ function RoleFields({ role }: { role: Role }) {
     return (
       <>
         <Input name="business_name" label="Business name" required />
-        <Input name="industry" label="Industry" />
-        <Input name="location" label="Location" />
-        <Input name="revenue" label="Annual revenue" inputMode="decimal" />
+        <SelectField name="industry" label="What best describes your funding need?">
+          <option value="">Select focus</option>
+          <option value="Technology / software">Digital or technology</option>
+          <option value="Clean energy">Clean energy or sustainability</option>
+          <option value="Export growth">Export or market expansion</option>
+          <option value="Startup validation">Startup validation</option>
+          <option value="Business growth">General growth</option>
+        </SelectField>
+        <SelectField name="funding_scope" label="Which funding scope is most relevant?">
+          <option value="">Select scope</option>
+          <option value="New Brunswick">Provincial or local</option>
+          <option value="Federal">Federal or Canada-wide</option>
+        </SelectField>
+        <SelectField name="business_stage" label="What stage is the business in?">
+          <option value="">Select stage</option>
+          <option value="Startup">Startup</option>
+          <option value="Growth">Growth or scaling</option>
+          <option value="Export">Export-ready</option>
+        </SelectField>
+        <Input name="location" label="Province" placeholder="New Brunswick" />
         <Input name="employees" label="Employees" inputMode="numeric" />
       </>
     );
@@ -70,10 +87,31 @@ function RoleFields({ role }: { role: Role }) {
           <option value="masters">Masters</option>
           <option value="phd">PhD</option>
         </SelectField>
-        <Input name="field_of_study" label="Field of study" />
+        <SelectField name="field_of_study" label="Which field should scholarships match?">
+          <option value="">Select field</option>
+          <option value="STEM">STEM</option>
+          <option value="Arts">Arts or humanities</option>
+          <option value="Health">Health</option>
+          <option value="Trades">Trades</option>
+          <option value="Leadership">Leadership or community</option>
+        </SelectField>
+        <SelectField name="province" label="Where are you studying?">
+          <option value="">Select province</option>
+          <option value="New Brunswick">New Brunswick</option>
+          <option value="Nova Scotia">Nova Scotia</option>
+          <option value="Prince Edward Island">Prince Edward Island</option>
+          <option value="Newfoundland and Labrador">Newfoundland and Labrador</option>
+          <option value="Ontario">Ontario</option>
+          <option value="Quebec">Quebec</option>
+          <option value="Western Canada">Western Canada</option>
+          <option value="Northern Canada">Northern Canada</option>
+        </SelectField>
+        <SelectField name="funding_basis" label="Which awards are most useful?">
+          <option value="">Select basis</option>
+          <option value="merit">Merit-based scholarships</option>
+          <option value="need">Need-based bursaries</option>
+        </SelectField>
         <Input name="institution" label="Institution" />
-        <Input name="province" label="Province" />
-        <Input name="gpa" label="GPA" inputMode="decimal" />
       </>
     );
   }
@@ -81,8 +119,20 @@ function RoleFields({ role }: { role: Role }) {
   return (
     <>
       <Input name="institution" label="Institution" />
-      <Input name="department" label="Department" />
-      <Input name="research_area" label="Research area" />
+      <SelectField name="research_area" label="Which research area should funding match?">
+        <option value="">Select area</option>
+        <option value="STEM">STEM or natural sciences</option>
+        <option value="social_sciences">Social sciences or humanities</option>
+        <option value="Health">Health</option>
+        <option value="Interdisciplinary">Interdisciplinary</option>
+      </SelectField>
+      <SelectField name="research_focus" label="What funding format is most relevant?">
+        <option value="">Select focus</option>
+        <option value="discovery">Discovery research</option>
+        <option value="partnership">Industry partnership</option>
+        <option value="equipment">Equipment or facilities</option>
+        <option value="interdisciplinary">Team or catalyst funding</option>
+      </SelectField>
       <SelectField name="career_stage" label="Career stage">
         <option value="">Select stage</option>
         <option value="early">Early</option>
@@ -92,8 +142,8 @@ function RoleFields({ role }: { role: Role }) {
       </SelectField>
       <Input
         name="research_keywords"
-        label="Research keywords"
-        helperText="Separate keywords with commas."
+        label="Specific keywords"
+        helperText="Optional. Separate keywords with commas."
       />
     </>
   );

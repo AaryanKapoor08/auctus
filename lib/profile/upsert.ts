@@ -13,6 +13,7 @@ export type BusinessOnboardingInput = {
   location: string | null;
   revenue: number | null;
   employees: number | null;
+  match_tags: string[];
 };
 
 export type StudentOnboardingInput = {
@@ -23,6 +24,7 @@ export type StudentOnboardingInput = {
   institution: string | null;
   province: string | null;
   gpa: number | null;
+  match_tags: string[];
 };
 
 export type ProfessorOnboardingInput = {
@@ -33,6 +35,7 @@ export type ProfessorOnboardingInput = {
   research_area: string | null;
   career_stage: ProfessorProfile["career_stage"];
   research_keywords: string[];
+  match_tags: string[];
 };
 
 export type OnboardingInput =
@@ -73,6 +76,56 @@ function optionalNumber(value: FormDataEntryValue | null) {
   return numberValue;
 }
 
+function uniqueTags(tags: Array<string | null | undefined>) {
+  return Array.from(
+    new Set(
+      tags
+        .filter((tag): tag is string => Boolean(tag))
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+    ),
+  );
+}
+
+function tagsFromText(value: string | null | undefined) {
+  const text = value?.toLowerCase() ?? "";
+  const tags: string[] = [];
+
+  if (/(technology|software|digital|computer|data|science|engineering|math|stem)/.test(text)) {
+    tags.push("STEM");
+  }
+  if (/(art|arts|design|humanities|creative|social)/.test(text)) {
+    tags.push("Arts");
+  }
+  if (/(health|medicine|nursing|kinesiology)/.test(text)) {
+    tags.push("Health");
+  }
+  if (/(trade|trades|apprentice)/.test(text)) {
+    tags.push("Trades");
+  }
+  if (/(export|international)/.test(text)) {
+    tags.push("Export", "International");
+  }
+  if (/(clean|sustainability|energy|environment)/.test(text)) {
+    tags.push("Sustainability", "STEM");
+  }
+  if (/(startup|start-up|venture)/.test(text)) {
+    tags.push("Startup");
+  }
+  if (/(growth|scale|expansion)/.test(text)) {
+    tags.push("Growth");
+  }
+
+  return tags;
+}
+
+function scopeTags(value: string | null) {
+  if (!value) return [];
+  const text = value.toLowerCase();
+  if (text === "federal" || text.includes("canada")) return ["Federal"];
+  return ["Provincial"];
+}
+
 export function parseOnboardingForm(role: string, formData: FormData): OnboardingInput {
   if (!isRole(role)) {
     throw new Error("Invalid role");
@@ -93,6 +146,12 @@ export function parseOnboardingForm(role: string, formData: FormData): Onboardin
       location: optionalText(formData.get("location")),
       revenue: optionalNumber(formData.get("revenue")),
       employees: optionalNumber(formData.get("employees")),
+      match_tags: uniqueTags([
+        "Business",
+        ...tagsFromText(optionalText(formData.get("industry"))),
+        ...tagsFromText(optionalText(formData.get("business_stage"))),
+        ...scopeTags(optionalText(formData.get("funding_scope")) ?? optionalText(formData.get("location"))),
+      ]),
     };
   }
 
@@ -110,6 +169,15 @@ export function parseOnboardingForm(role: string, formData: FormData): Onboardin
       institution: optionalText(formData.get("institution")),
       province: optionalText(formData.get("province")),
       gpa: optionalNumber(formData.get("gpa")),
+      match_tags: uniqueTags([
+        "Student",
+        "Scholarship",
+        ...tagsFromText(optionalText(formData.get("field_of_study"))),
+        ...scopeTags(optionalText(formData.get("province"))),
+        optionalText(formData.get("funding_basis")) === "need" ? "Need-based" : null,
+        optionalText(formData.get("funding_basis")) === "merit" ? "Merit-based" : null,
+        education_level === "masters" || education_level === "phd" ? "Graduate" : null,
+      ]),
     };
   }
 
@@ -129,6 +197,22 @@ export function parseOnboardingForm(role: string, formData: FormData): Onboardin
       .split(",")
       .map((keyword) => keyword.trim())
       .filter(Boolean),
+    match_tags: uniqueTags([
+      "Professor",
+      "Research",
+      ...tagsFromText(optionalText(formData.get("research_area"))),
+      ...tagsFromText(optionalText(formData.get("research_focus"))),
+      optionalText(formData.get("research_focus")) === "discovery" ? "Discovery" : null,
+      optionalText(formData.get("research_focus")) === "partnership" ? "Partnership" : null,
+      optionalText(formData.get("research_focus")) === "equipment" ? "Equipment" : null,
+      optionalText(formData.get("research_focus")) === "interdisciplinary"
+        ? "Interdisciplinary"
+        : null,
+      optionalText(formData.get("research_area")) === "social_sciences"
+        ? "Social Sciences"
+        : null,
+      "Federal",
+    ]),
   };
 }
 
@@ -160,6 +244,25 @@ function toDetails(input: OnboardingInput) {
     career_stage: input.career_stage,
     research_keywords: input.research_keywords,
   };
+}
+
+async function upsertProfileMatchTags(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  user_id: string,
+  input: OnboardingInput,
+) {
+  const { error } = await supabase
+    .from("profile_match_tags")
+    .upsert(
+      {
+        user_id,
+        role: input.role,
+        tags: input.match_tags,
+      },
+      { onConflict: "user_id" },
+    );
+
+  if (error) throw error;
 }
 
 export async function upsertRoleProfile(input: OnboardingInput) {
@@ -195,6 +298,8 @@ export async function upsertRoleProfile(input: OnboardingInput) {
   });
 
   if (error) throw error;
+
+  await upsertProfileMatchTags(supabase, user.id, input);
 }
 
 export async function updateRoleProfile(input: OnboardingInput) {
@@ -238,6 +343,7 @@ export async function updateRoleProfile(input: OnboardingInput) {
       .update(details)
       .eq("id", user.id);
     if (error) throw error;
+    await upsertProfileMatchTags(supabase, user.id, input);
     return;
   }
 
@@ -247,6 +353,7 @@ export async function updateRoleProfile(input: OnboardingInput) {
       .update(details)
       .eq("id", user.id);
     if (error) throw error;
+    await upsertProfileMatchTags(supabase, user.id, input);
     return;
   }
 
@@ -256,4 +363,5 @@ export async function updateRoleProfile(input: OnboardingInput) {
     .eq("id", user.id);
 
   if (error) throw error;
+  await upsertProfileMatchTags(supabase, user.id, input);
 }

@@ -9,7 +9,7 @@ import type {
 import { createFundingReadClient } from "./supabase";
 import { getFundingTypeForRole } from "./role-mapping";
 import { scoreFor } from "@/lib/matching";
-import { getRoleProfile } from "@/lib/profile/queries";
+import { getProfileMatchTags, getRoleProfile } from "@/lib/profile/queries";
 
 function toFundingSummary(
   item: FundingItem,
@@ -99,8 +99,9 @@ export const GetFundingSummariesForUser: GetFundingSummariesForUserContract = as
     status: "active",
     limit,
   });
+  const profileTags = await getProfileMatchTags(user_id);
 
   return items
-    .map((item) => toFundingSummary(item, scoreFor(roleProfile, item)))
+    .map((item) => toFundingSummary(item, scoreFor(roleProfile, item, profileTags)))
     .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0));
 };

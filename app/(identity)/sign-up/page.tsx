@@ -1,15 +1,15 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session/get-session";
+import { createClient } from "@/lib/supabase/server";
 
 function getAuthCallbackUrl() {
   return `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback`;
 }
 
-async function signInWithGoogle() {
+async function signUpWithGoogle() {
   "use server";
 
   const supabase = await createClient();
@@ -21,53 +21,62 @@ async function signInWithGoogle() {
   });
 
   if (error || !data.url) {
-    redirect("/sign-in?error=oauth");
+    redirect("/sign-up?error=oauth");
   }
 
   redirect(data.url);
 }
 
-async function signInWithEmail(formData: FormData) {
+async function signUpWithEmail(formData: FormData) {
   "use server";
 
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirm_password") ?? "");
 
   if (!email) {
-    redirect("/sign-in?error=email");
+    redirect("/sign-up?error=email");
   }
 
   if (!password) {
-    redirect("/sign-in?error=password");
+    redirect("/sign-up?error=password");
+  }
+
+  if (password !== confirmPassword) {
+    redirect("/sign-up?error=password_mismatch");
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
   });
 
   if (error) {
-    redirect("/sign-in?error=credentials");
+    const message = error.message.toLowerCase();
+    if (message.includes("already") || message.includes("registered")) {
+      redirect("/sign-up?error=registered");
+    }
+
+    redirect("/sign-up?error=signup");
   }
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  if (data.user && data.user.identities?.length === 0) {
+    redirect("/sign-up?error=registered");
+  }
 
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .maybeSingle();
+  if (!data.session) {
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-    if (!profile?.role) {
-      redirect("/onboarding");
+    if (signInError) {
+      redirect("/sign-in?notice=check_email");
     }
   }
 
-  redirect("/dashboard");
+  redirect("/onboarding");
 }
 
 function getErrorMessage(error?: string) {
@@ -75,28 +84,20 @@ function getErrorMessage(error?: string) {
 
   const messages: Record<string, string> = {
     email: "Enter your email address.",
-    password: "Enter your password.",
-    credentials: "Email or password is incorrect.",
-    oauth: "Google sign-in could not be started. Try again.",
-    link_expired: "That sign-in link expired or could not be verified. Try signing in again.",
+    password: "Enter a password.",
+    password_mismatch: "Passwords do not match.",
     registered: "That email is already registered. Sign in instead.",
+    oauth: "Google sign-up could not be started. Try again.",
+    signup: "Account creation failed. Try again.",
   };
 
-  return messages[error] ?? "Sign-in failed. Try again.";
+  return messages[error] ?? "Account creation failed. Try again.";
 }
 
-function getNoticeMessage(notice?: string) {
-  if (notice === "check_email") {
-    return "Check your email to confirm your account, then sign in.";
-  }
-
-  return null;
-}
-
-export default async function SignInPage({
+export default async function SignUpPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; notice?: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const session = await getSession();
   if (session?.role) {
@@ -108,15 +109,15 @@ export default async function SignInPage({
 
   const params = await searchParams;
   const errorMessage = getErrorMessage(params.error);
-  const noticeMessage = getNoticeMessage(params.notice);
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-16">
       <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Sign in</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Create your account</h1>
           <p className="mt-2 text-sm text-gray-600">
-            Use Google or your email and password to access your account.
+            Set up Auctus, then answer a few questions so your dashboard can show
+            relevant funding.
           </p>
         </div>
 
@@ -125,13 +126,8 @@ export default async function SignInPage({
             {errorMessage}
           </div>
         )}
-        {noticeMessage && (
-          <div className="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-            {noticeMessage}
-          </div>
-        )}
 
-        <form action={signInWithGoogle}>
+        <form action={signUpWithGoogle}>
           <Button type="submit" variant="primary" className="w-full">
             Continue with Google
           </Button>
@@ -139,13 +135,11 @@ export default async function SignInPage({
 
         <div className="my-6 flex items-center gap-3">
           <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-medium uppercase text-gray-500">
-            or
-          </span>
+          <span className="text-xs font-medium uppercase text-gray-500">or</span>
           <div className="h-px flex-1 bg-gray-200" />
         </div>
 
-        <form action={signInWithEmail} className="space-y-4">
+        <form action={signUpWithEmail} className="space-y-4">
           <Input
             label="Email"
             name="email"
@@ -158,19 +152,27 @@ export default async function SignInPage({
             label="Password"
             name="password"
             type="password"
-            autoComplete="current-password"
+            autoComplete="new-password"
             required
-            placeholder="Enter your password"
+            placeholder="Create a password"
+          />
+          <Input
+            label="Confirm password"
+            name="confirm_password"
+            type="password"
+            autoComplete="new-password"
+            required
+            placeholder="Repeat your password"
           />
           <Button type="submit" variant="outline" className="w-full">
-            Sign in with email
+            Create account
           </Button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
-          New to Auctus?{" "}
-          <Link href="/sign-up" className="font-medium text-gray-900 hover:underline">
-            Create an account
+          Already have an account?{" "}
+          <Link href="/sign-in" className="font-medium text-gray-900 hover:underline">
+            Sign in
           </Link>
         </p>
       </div>

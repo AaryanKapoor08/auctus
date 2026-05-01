@@ -72,7 +72,7 @@ export default async function Home() {
               Let AI guide your growth journey.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/sign-in">
+              <Link href="/sign-up">
                 <Button size="lg" variant="primary">
                   Get Started
                 </Button>
@@ -213,7 +213,7 @@ export default async function Home() {
           <p className="text-xl text-gray-600 mb-8">
             Join Fredericton's premier business growth platform today.
           </p>
-          <Link href="/sign-in">
+          <Link href="/sign-up">
             <Button size="lg" variant="secondary">
               Get Started Now
             </Button>

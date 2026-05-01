@@ -74,8 +74,8 @@ export default function Navbar({ initialSession }: { initialSession?: Session | 
               </form>
             ) : (
               !loading && (
-                <Link href="/sign-in">
-                  <Button size="sm">Sign in</Button>
+                <Link href="/sign-up">
+                  <Button size="sm">Sign up</Button>
                 </Link>
               )
             )}
@@ -120,6 +120,15 @@ export default function Navbar({ initialSession }: { initialSession?: Session | 
                 Sign out
               </Button>
             </form>
+          )}
+          {!loading && !session && (
+            <Link
+              href="/sign-up"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="mt-3 block"
+            >
+              <Button className="w-full">Sign up</Button>
+            </Link>
           )}
         </div>
       )}

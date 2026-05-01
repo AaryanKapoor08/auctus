@@ -8,6 +8,7 @@ export type RouteDecision =
 export const authPolicies: RoutePolicyRegistry = [
   { path: "/auth/callback", allowed_roles: null, require_auth: false },
   { path: "/sign-in", allowed_roles: null, require_auth: false },
+  { path: "/sign-up", allowed_roles: null, require_auth: false },
   { path: "/sign-out", allowed_roles: null, require_auth: true },
   { path: "/onboarding", allowed_roles: null, require_auth: true },
   { path: "/profile/edit", allowed_roles: null, require_auth: true },

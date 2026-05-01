@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-05-01
 **Current Gate:** G12 — Hardening and Release QA
-**Status:** G10-G12 completed locally on `main`; issues 5, 6, 11, 14, 16, 17, 18, 19, 20, and 21 resolved locally with separate commits
+**Status:** G10-G12 completed on `main`; issues 5, 6, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; post-feedback funding render/filter fix pushed as `81291eb`
 
 ## Start Here
 
@@ -42,7 +42,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
   - Issue 17 restored funding cards/filter-chip layout as `566ee2f`.
   - Issue 18 restored dashboard visual hierarchy as `a8399e3`.
   - Issue 19 restored forum search/category-chip/thread-card layout as `be3ce5a`.
-- Post-issue feedback fix in working tree: funding pages now load role funding once and filter client-side with multi-select category checkboxes, deadline filtering, sorting, profile-derived default tags, and URL state updates without server navigation; dashboard now fetches matched funding once instead of twice and limits dashboard forum fetches to 5 threads; navbar now treats signed-in null-role users as onboarding users instead of guests and avoids duplicate `/dashboard` nav keys.
+- Post-issue feedback fix pushed as `81291eb`: funding pages now load role funding once and filter client-side with multi-select category checkboxes, deadline filtering, sorting, profile-derived default tags, and URL state updates without server navigation; dashboard now fetches matched funding once instead of twice and limits dashboard forum fetches to 5 threads; navbar now treats signed-in null-role users as onboarding users instead of guests and avoids duplicate `/dashboard` nav keys.
 
 ## Claude Work Review — 2026-04-30
 

@@ -50,7 +50,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - Role navbar correction on 2026-05-04: signed-in onboarded users now see only their role's funding link in the navbar (`business` => Grants, `student` => Scholarships, `professor` => Research) while guest/null-role discovery links remain broad.
 - Client session refresh fix on 2026-05-04: `useSession` now reloads the profile role on route changes so onboarding/profile role updates update the navbar without requiring a manual browser refresh.
 - Manual Step 5 preflight proof on 2026-05-04: `.env.local` has required Supabase keys without printing secret values, Supabase URL matches project `kwfoxklfbrbgbmgyyfcl`, `NEXT_PUBLIC_SITE_URL` is unset so app fallback is `http://localhost:3000`, and local server is reachable.
-- Manual/browser hardening commit on 2026-05-04 landed as `2b047c7`.
+- Manual/browser hardening commit on 2026-05-04 landed as `425d360`.
 
 ## Claude Work Review — 2026-04-30
 

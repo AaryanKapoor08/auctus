@@ -8,11 +8,18 @@ import Button from "@/components/ui/Button";
 import { useAuth } from "@/app/providers";
 import { cn } from "@/lib/utils";
 import type { Session } from "@contracts/session";
+import { ROLE_DEFAULT_ROUTE, type Role } from "@contracts/role";
 import { createClient } from "@/lib/supabase/client";
 
 type NavProfile = {
   display_name: string | null;
   avatar_url: string | null;
+};
+
+const ROLE_FUNDING_LINK: Record<Role, { name: string; href: string }> = {
+  business: { name: "Grants", href: ROLE_DEFAULT_ROUTE.business },
+  student: { name: "Scholarships", href: ROLE_DEFAULT_ROUTE.student },
+  professor: { name: "Research", href: ROLE_DEFAULT_ROUTE.professor },
 };
 
 function navForSession(session: Session | null) {
@@ -40,9 +47,7 @@ function navForSession(session: Session | null) {
     { name: "Home", href: "/" },
     { name: "Dashboard", href: "/dashboard" },
     { name: "Forum", href: "/forum" },
-    { name: "Grants", href: "/grants" },
-    { name: "Scholarships", href: "/scholarships" },
-    { name: "Research", href: "/research-funding" },
+    ROLE_FUNDING_LINK[session.role],
   ];
 }
 

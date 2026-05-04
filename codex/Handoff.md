@@ -46,6 +46,11 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - Funding filter hardening on 2026-05-04 landed as `cd375f0`: expanded role filters into grouped facets, changed browser filtering to OR within a selected facet and AND across facets, added scraper canonical tag normalization for future ETL rows, and applied `0022`/`0023` linked-DB backfills so live rows use canonical tags instead of raw source tags.
 - Public discovery flow on 2026-05-04 landed as `bcbb5a8`: removed the signed-in redirect from `/`, changed Auctus AI/Home to always target `/`, opened `/grants`, `/scholarships`, `/research-funding`, and their detail pages to guests/all signed-in roles, added soft sign-in/customization CTAs, and applied `0024_public_funding_reads.sql` so active funding rows are readable by `anon` and `authenticated`.
 - Landing-page refinement on 2026-05-04 landed as `9eb7dc5`: restored the fuller public discovery landing page after design review, keeping exact live counts, a role track panel, opportunity previews, and browse-first personalization CTAs.
+- Manual auth proof started on 2026-05-04: `manual.md` was overwritten with dashboard/browser setup steps; Google OAuth client creation was observed, but the client secret appeared in a screenshot and should be treated as exposed/rotated before production use.
+- Role navbar correction on 2026-05-04: signed-in onboarded users now see only their role's funding link in the navbar (`business` => Grants, `student` => Scholarships, `professor` => Research) while guest/null-role discovery links remain broad.
+- Client session refresh fix on 2026-05-04: `useSession` now reloads the profile role on route changes so onboarding/profile role updates update the navbar without requiring a manual browser refresh.
+- Manual Step 5 preflight proof on 2026-05-04: `.env.local` has required Supabase keys without printing secret values, Supabase URL matches project `kwfoxklfbrbgbmgyyfcl`, `NEXT_PUBLIC_SITE_URL` is unset so app fallback is `http://localhost:3000`, and local server is reachable.
+- Manual/browser hardening commit on 2026-05-04 landed as `2b047c7`.
 
 ## Claude Work Review — 2026-04-30
 
@@ -105,6 +110,9 @@ Remaining review/admin blockers:
 - Funding filter rebuild on 2026-05-04: `npx supabase db push --include-all --yes` applied `0022_canonical_funding_filters.sql` and `0023_research_social_sciences_tags.sql`. Live tag proof after backfill: business filters cover 25 Federal, 21 Innovation, 15 Financing, 14 Advisory, 13 Digital, 12 Growth; student filters cover 478 Indigenous, 341 Merit-based, 152 Need-based, 64 Provincial, 42 Education, 40 STEM, 31 Graduate; professor filters cover 20 NSERC/STEM, 13 Partnership, 7 Training, 6 International, 4 SSHRC, 4 Social Sciences. Focused tests initially hit sandbox `spawn EPERM`; escalated rerun passed 5 files / 16 tests. Final checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 24 files / 114 tests passed; `npx tsc -p scraper/tsconfig.json --noEmit` => success.
 - Public discovery proof on 2026-05-04: research inputs checked Grants.gov public faceted search + saved-search account pattern, Scholarships.com guest browse + personalized registration pattern, and Instrumentl match/tracker signed-in value pattern. `npx supabase db push --include-all --yes` applied `0024_public_funding_reads.sql`; policy query showed only `funding active public select` with roles `{anon,authenticated}` and `status = active`; HTTP smoke against local dev server returned 200 for `/`, `/grants`, `/scholarships`, and `/research-funding`; `npm run lint` => success with 20 legacy demo warnings only; focused route/RLS tests => 2 files / 14 tests passed; `npm test` => 24 files / 116 tests passed; `npm run build` => success.
 - Landing refinement checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success.
+- Role navbar correction checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success.
+- Client session refresh checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; focused `npm test -- --run test/unit/session.test.ts test/unit/route-policies.test.ts` initially hit sandbox `spawn EPERM`, elevated rerun => 2 files / 10 tests passed.
+- Manual Step 5 preflight checks: env-key presence script => required keys present and Supabase URL matches project; `Invoke-WebRequest http://localhost:3000` => 200; `Invoke-WebRequest /grants`, `/scholarships`, `/research-funding` => 200 each.
 
 Known build warnings:
 
@@ -137,8 +145,6 @@ Known build warnings:
 
 Next action:
 
-1. Finish auth/admin proof, starting with Google OAuth and email/password setup in Supabase.
-2. Google OAuth checklist: in Google Cloud Console set redirect URI to `https://kwfoxklfbrbgbmgyyfcl.supabase.co/auth/v1/callback`; paste client ID/secret into Supabase Auth Provider; in Supabase URL Configuration keep Site URL `http://localhost:3000` and allow `http://localhost:3000/auth/callback`.
-3. Email/password checklist: confirm Supabase email provider is enabled, decide whether local testing should disable email confirmation, then create test accounts for business/student/professor.
-4. Browser proof to capture: sign-up -> onboarding -> dashboard, sign-out -> `/`, sign-in returning user -> dashboard, Auctus AI/Home -> `/` while signed in, guest funding browse works, and student/business/professor accounts can browse all public funding tracks while dashboard remains personalized.
-5. Also check first scheduled GitHub scrape cron proof if available.
+1. Continue manual auth/browser proof at `manual.md` Step 6: Google OAuth browser proof.
+2. Browser proof to capture: sign-up -> onboarding -> dashboard, sign-out -> `/`, sign-in returning user -> dashboard, Auctus AI/Home -> `/` while signed in, guest funding browse works, and student/business/professor accounts see only their own funding track in the signed-in navbar while dashboard remains personalized.
+3. Also check first scheduled GitHub scrape cron proof if available.

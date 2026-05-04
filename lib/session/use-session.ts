@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import type { Session } from "@contracts/session";
 import { createClient } from "@/lib/supabase/client";
 
 export function useSession(initialSession: Session | null = null) {
+  const pathname = usePathname();
   const [session, setSession] = useState<Session | null>(initialSession);
   const [loading, setLoading] = useState(initialSession === null);
 
@@ -50,7 +52,7 @@ export function useSession(initialSession: Session | null = null) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [pathname]);
 
   return { session, loading };
 };

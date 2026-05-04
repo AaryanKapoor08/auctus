@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-05-04
 **Current Gate:** G12 — Hardening and Release QA
-**Status:** G10-G12 completed on `main`; issues 5, 6, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; funding filters rebuilt against live corpus with canonical backfill as `2fa359f`
+**Status:** G10-G12 completed on `main`; issues 5, 6, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; funding filters rebuilt against live corpus with canonical backfill as `cd375f0`
 
 ## Start Here
 
@@ -43,7 +43,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
   - Issue 18 restored dashboard visual hierarchy as `a8399e3`.
   - Issue 19 restored forum search/category-chip/thread-card layout as `be3ce5a`.
 - Post-issue feedback fix pushed as `81291eb`: funding pages now load role funding once and filter client-side with multi-select category checkboxes, deadline filtering, sorting, profile-derived default tags, and URL state updates without server navigation; dashboard now fetches matched funding once instead of twice and limits dashboard forum fetches to 5 threads; navbar now treats signed-in null-role users as onboarding users instead of guests and avoids duplicate `/dashboard` nav keys.
-- Funding filter hardening on 2026-05-04 landed as `2fa359f`: expanded role filters into grouped facets, changed browser filtering to OR within a selected facet and AND across facets, added scraper canonical tag normalization for future ETL rows, and applied `0022`/`0023` linked-DB backfills so live rows use canonical tags instead of raw source tags.
+- Funding filter hardening on 2026-05-04 landed as `cd375f0`: expanded role filters into grouped facets, changed browser filtering to OR within a selected facet and AND across facets, added scraper canonical tag normalization for future ETL rows, and applied `0022`/`0023` linked-DB backfills so live rows use canonical tags instead of raw source tags.
 
 ## Claude Work Review — 2026-04-30
 

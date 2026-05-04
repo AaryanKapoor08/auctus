@@ -36,6 +36,14 @@ describe("normalize", () => {
     expect(result.amount_max).toBe(baseScraped.amount_max);
     expect(result.deadline).toBe(baseScraped.deadline);
     expect(result.eligibility).toEqual(baseScraped.eligibility);
-    expect(result.tags).toEqual(baseScraped.tags);
+    expect(result.tags).toEqual([
+      "Professor",
+      "Research",
+      "Federal",
+      "NSERC",
+      "STEM",
+      "Discovery",
+    ]);
+    expect(result.category).toBe("NSERC");
   });
 });

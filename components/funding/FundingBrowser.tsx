@@ -106,6 +106,24 @@ export default function FundingBrowser({
   const filters = FUNDING_FILTERS[role];
   const categoryFilter = filters.find((filter) => filter.key === "category");
   const options = useMemo(() => categoryFilter?.options ?? [], [categoryFilter]);
+  const optionGroups = useMemo(() => {
+    const groups = new Map<string, typeof options>();
+    for (const option of options) {
+      const group = option.group ?? "Other";
+      groups.set(group, [...(groups.get(group) ?? []), option]);
+    }
+    return Array.from(groups.entries());
+  }, [options]);
+  const optionGroupByValue = useMemo(
+    () =>
+      new Map(
+        options.map((option) => [
+          normalize(option.value),
+          option.group ?? "Other",
+        ]),
+      ),
+    [options],
+  );
   const optionValues = new Set(options.map((option) => option.value));
   const profileCategories = recommendedCategories.filter((tag) =>
     optionValues.has(tag),
@@ -134,12 +152,23 @@ export default function FundingBrowser({
   }, [items, options]);
 
   const visibleItems = useMemo(() => {
-    const activeTags = selectedTags.map(normalize);
+    const activeTagsByGroup = new Map<string, string[]>();
+    for (const tag of selectedTags) {
+      const normalized = normalize(tag);
+      const group = optionGroupByValue.get(normalized) ?? normalized;
+      activeTagsByGroup.set(group, [
+        ...(activeTagsByGroup.get(group) ?? []),
+        normalized,
+      ]);
+    }
+
     const filtered = items.filter((item) => {
       const tags = itemTags(item);
       return (
         matchesSearch(item, search) &&
-        activeTags.every((tag) => tags.has(tag)) &&
+        Array.from(activeTagsByGroup.values()).every((groupTags) =>
+          groupTags.some((tag) => tags.has(tag)),
+        ) &&
         matchesDeadline(item, deadline)
       );
     });
@@ -162,7 +191,7 @@ export default function FundingBrowser({
       if (bScore !== aScore) return bScore - aScore;
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
-  }, [deadline, items, profileCategories, search, selectedTags, sort]);
+  }, [deadline, items, optionGroupByValue, profileCategories, search, selectedTags, sort]);
 
   useEffect(() => {
     const query = toQueryString({ search, selectedTags, deadline, sort });
@@ -330,44 +359,53 @@ export default function FundingBrowser({
               </button>
             </div>
           </div>
-          <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
-            {options.map((option) => {
-              const checked = selectedTags.includes(option.value);
-              const recommended = recommendedSet.has(normalize(option.value));
+          <div className="max-h-96 space-y-4 overflow-y-auto pr-1">
+            {optionGroups.map(([group, groupOptions]) => (
+              <div key={group}>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  {group}
+                </p>
+                <div className="space-y-2">
+                  {groupOptions.map((option) => {
+                    const checked = selectedTags.includes(option.value);
+                    const recommended = recommendedSet.has(normalize(option.value));
 
-              return (
-                <label
-                  key={option.value}
-                  className={cn(
-                    "flex cursor-pointer items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm transition",
-                    checked
-                      ? "border-gray-900 bg-gray-900 text-white"
-                      : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
-                  )}
-                >
-                  <span className="flex min-w-0 items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleTag(option.value)}
-                      className="rounded text-primary-600 focus:ring-primary-500"
-                    />
-                    <span className="truncate">{option.label}</span>
-                    {recommended && (
-                      <span className={cn(
-                        "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
-                        checked ? "bg-white/15 text-white" : "bg-green-50 text-green-700",
-                      )}>
-                        profile
-                      </span>
-                    )}
-                  </span>
-                  <span className={checked ? "text-gray-200" : "text-gray-400"}>
-                    {tagCounts[option.value] ?? 0}
-                  </span>
-                </label>
-              );
-            })}
+                    return (
+                      <label
+                        key={option.value}
+                        className={cn(
+                          "flex cursor-pointer items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm transition",
+                          checked
+                            ? "border-gray-900 bg-gray-900 text-white"
+                            : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
+                        )}
+                      >
+                        <span className="flex min-w-0 items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleTag(option.value)}
+                            className="rounded text-primary-600 focus:ring-primary-500"
+                          />
+                          <span className="truncate">{option.label}</span>
+                          {recommended && (
+                            <span className={cn(
+                              "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
+                              checked ? "bg-white/15 text-white" : "bg-green-50 text-green-700",
+                            )}>
+                              profile
+                            </span>
+                          )}
+                        </span>
+                        <span className={checked ? "text-gray-200" : "text-gray-400"}>
+                          {tagCounts[option.value] ?? 0}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </aside>

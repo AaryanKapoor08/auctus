@@ -1,10 +1,13 @@
 import type { FundingItem } from "../build/contracts/funding.js";
+import { canonicalFundingTags, primaryFundingCategory } from "./canonical-tags.js";
 import type { ScrapedFunding } from "./types.js";
 
 export type NormalizedFunding = Omit<FundingItem, "id" | "created_at" | "updated_at">;
 
 export function normalize(scraped: ScrapedFunding, now: Date = new Date()): NormalizedFunding {
   const scrapedAt = now.toISOString();
+  const tags = canonicalFundingTags(scraped);
+
   return {
     type: scraped.type,
     name: scraped.name,
@@ -17,8 +20,8 @@ export function normalize(scraped: ScrapedFunding, now: Date = new Date()): Norm
     source_url: scraped.source_url,
     eligibility: scraped.eligibility,
     requirements: scraped.requirements,
-    category: scraped.category,
-    tags: scraped.tags,
+    category: primaryFundingCategory(scraped.type, tags) ?? scraped.category,
+    tags,
     source: "scraped",
     scraped_from: scraped.scraped_from,
     scraped_at: scrapedAt,

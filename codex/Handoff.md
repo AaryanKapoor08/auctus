@@ -1,8 +1,8 @@
 # Auctus V2 Handoff
 
-**Last Updated:** 2026-05-01
+**Last Updated:** 2026-05-04
 **Current Gate:** G12 — Hardening and Release QA
-**Status:** G10-G12 completed on `main`; issues 5, 6, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; post-feedback funding render/filter fix pushed as `81291eb`
+**Status:** G10-G12 completed on `main`; issues 5, 6, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; funding filters rebuilt against live corpus with canonical backfill as `2fa359f`
 
 ## Start Here
 
@@ -43,6 +43,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
   - Issue 18 restored dashboard visual hierarchy as `a8399e3`.
   - Issue 19 restored forum search/category-chip/thread-card layout as `be3ce5a`.
 - Post-issue feedback fix pushed as `81291eb`: funding pages now load role funding once and filter client-side with multi-select category checkboxes, deadline filtering, sorting, profile-derived default tags, and URL state updates without server navigation; dashboard now fetches matched funding once instead of twice and limits dashboard forum fetches to 5 threads; navbar now treats signed-in null-role users as onboarding users instead of guests and avoids duplicate `/dashboard` nav keys.
+- Funding filter hardening on 2026-05-04 landed as `2fa359f`: expanded role filters into grouped facets, changed browser filtering to OR within a selected facet and AND across facets, added scraper canonical tag normalization for future ETL rows, and applied `0022`/`0023` linked-DB backfills so live rows use canonical tags instead of raw source tags.
 
 ## Claude Work Review — 2026-04-30
 
@@ -99,6 +100,7 @@ Remaining review/admin blockers:
 - Issue 20 migration proof: `npx supabase db push --include-all --yes` applied `0011_profile_match_tags.sql`; RLS metadata query returned `relrowsecurity = true`.
 - Issue resolution final checks: `npm test` => 22 files / 106 tests passed; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success.
 - Post-feedback funding/render checks: initial focused `npm test -- --run test/unit/funding-summaries.test.ts test/unit/dashboard-composer.test.ts` failed in sandbox with Windows `spawn EPERM` while Vite loaded config; escalated rerun passed 2 files / 14 tests. `npm run lint` => success with 20 legacy demo warnings only. `npm run build` => success. Full `npm test` => 22 files / 107 tests passed. After duplicate navbar key fix, `npm run lint` => success with 20 legacy demo warnings only; focused funding/dashboard tests => 2 files / 14 tests passed; `npm run build` => success; full `npm test` => 22 files / 107 tests passed.
+- Funding filter rebuild on 2026-05-04: `npx supabase db push --include-all --yes` applied `0022_canonical_funding_filters.sql` and `0023_research_social_sciences_tags.sql`. Live tag proof after backfill: business filters cover 25 Federal, 21 Innovation, 15 Financing, 14 Advisory, 13 Digital, 12 Growth; student filters cover 478 Indigenous, 341 Merit-based, 152 Need-based, 64 Provincial, 42 Education, 40 STEM, 31 Graduate; professor filters cover 20 NSERC/STEM, 13 Partnership, 7 Training, 6 International, 4 SSHRC, 4 Social Sciences. Focused tests initially hit sandbox `spawn EPERM`; escalated rerun passed 5 files / 16 tests. Final checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 24 files / 114 tests passed; `npx tsc -p scraper/tsconfig.json --noEmit` => success.
 
 Known build warnings:
 
@@ -118,7 +120,7 @@ Known build warnings:
 
 - Public grant browsing remains future scope from `issues.md`.
 - Keep `issues.md` and `pendingcommits.md` out of product commits unless explicitly requested.
-- Browser-check funding pages after the new client-side browser change: confirm profile tags preselect from onboarding, multiple filters narrow results, and filter clicks no longer show a full-page server render delay.
+- Browser-check funding pages after the canonical filter rebuild: confirm grouped facets show sensible counts, multiple selections broaden within the same facet and narrow across different facets, profile tags preselect from onboarding, and filter clicks do not trigger full-page server navigation.
 - Dev server note: existing Next dev server is running at `http://localhost:3000` with PID `25604`; a new `npm run dev` attempt correctly reported that server as already running.
 
 ## Follow-Ups Already Noted
@@ -132,5 +134,5 @@ Known build warnings:
 Next action:
 
 1. Handle manual/admin proof: first scheduled GitHub scrape cron run, Google OAuth, email/password auth, and browser auth/onboarding/dashboard walkthrough.
-2. Browser-check the new email/password sign-up and sign-in flows against the Supabase Auth provider settings.
+2. Browser-check the new email/password sign-up and sign-in flows against the Supabase Auth provider settings, then manually smoke the rebuilt funding filters for student/business/professor accounts.
 3. Then pick future-scope product follow-ups from `issues.md` if desired.

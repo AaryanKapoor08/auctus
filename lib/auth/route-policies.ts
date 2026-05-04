@@ -52,7 +52,13 @@ export function resolveRouteDecision(
     return { action: "redirect", location: "/sign-in" };
   }
 
-  if (authenticated && role === null && !pathname.startsWith("/onboarding")) {
+  if (
+    authenticated &&
+    role === null &&
+    policy.require_auth &&
+    !pathname.startsWith("/onboarding") &&
+    !pathname.startsWith("/sign-out")
+  ) {
     return { action: "redirect", location: "/onboarding" };
   }
 

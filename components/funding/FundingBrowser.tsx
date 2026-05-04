@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Calendar, Search, SlidersHorizontal, X } from "lucide-react";
+import Link from "next/link";
 import type { FundingItem } from "@contracts/funding";
 import type { Role } from "@contracts/role";
 import { FUNDING_FILTERS } from "@/lib/funding/filter-definitions";
@@ -93,6 +94,7 @@ export default function FundingBrowser({
   initialDeadline = "all",
   initialSort = "relevance",
   recommendedCategories = [],
+  showPersonalizationPrompt = false,
 }: {
   role: Role;
   items: FundingItem[];
@@ -102,6 +104,7 @@ export default function FundingBrowser({
   initialDeadline?: DeadlineFilter;
   initialSort?: SortOption;
   recommendedCategories?: string[];
+  showPersonalizationPrompt?: boolean;
 }) {
   const filters = FUNDING_FILTERS[role];
   const categoryFilter = filters.find((filter) => filter.key === "category");
@@ -411,6 +414,35 @@ export default function FundingBrowser({
       </aside>
 
       <section>
+        {showPersonalizationPrompt && (
+          <div className="mb-5 rounded-lg border border-primary-100 bg-primary-50 px-4 py-3 shadow-sm">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">
+                  Browse everything now. Sign in when you want better matches.
+                </p>
+                <p className="mt-1 text-sm text-gray-700">
+                  Create a profile to preselect filters, personalize rankings, and keep funding aligned to your role.
+                </p>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Link
+                  href="/sign-in"
+                  className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+                >
+                  Customize
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-gray-600">
             Showing <span className="font-semibold text-gray-900">{visibleItems.length}</span>{" "}

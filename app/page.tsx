@@ -1,57 +1,76 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
-import { Sparkles, DollarSign, MessageSquare, Target, Briefcase } from "lucide-react";
+import FundingCard from "@/components/funding/FundingCard";
+import { Sparkles, DollarSign, MessageSquare, Target, Briefcase, GraduationCap, FlaskConical } from "lucide-react";
 import { getSession } from "@/lib/session/get-session";
+import { ListFundingForRole } from "@/lib/funding/queries";
 
 export default async function Home() {
-  const session = await getSession();
-
-  if (session) {
-    redirect("/dashboard");
-  }
+  const [session, businessGrants, scholarships, researchFunding] = await Promise.all([
+    getSession(),
+    ListFundingForRole({ role: "business", limit: 3 }),
+    ListFundingForRole({ role: "student", limit: 3 }),
+    ListFundingForRole({ role: "professor", limit: 3 }),
+  ]);
 
   const features = [
     {
       icon: DollarSign,
-      title: "Grant Matching",
-      description: "AI-powered grant discovery matched to your business profile and eligibility",
+      title: "Open Funding Search",
+      description: "Browse active business grants, scholarships, and research funding before creating an account",
       color: "text-accent-600",
+    },
+    {
+      icon: GraduationCap,
+      title: "Student Awards",
+      description: "Filter scholarships by audience, field, award type, level, and deadline",
+      color: "text-primary-600",
+    },
+    {
+      icon: FlaskConical,
+      title: "Research Grants",
+      description: "Find council funding, partnerships, equipment grants, training support, and research programs",
+      color: "text-secondary-600",
     },
     {
       icon: MessageSquare,
       title: "Community Forum",
-      description: "Connect with local business owners, share advice, and find collaboration opportunities",
+      description: "Sign in to ask questions, compare opportunities, and learn from other applicants",
       color: "text-secondary-600",
     },
     {
       icon: Target,
-      title: "Business Matchmaker",
-      description: "Find strategic partners based on complementary needs and offerings",
+      title: "Personalized Matching",
+      description: "Create a profile when you want ranked results and filters based on your role",
       color: "text-primary-600",
     },
     {
       icon: Briefcase,
-      title: "Local Talent",
-      description: "Hire local talent or find opportunities in the Fredericton business community",
+      title: "Deadline Tracking",
+      description: "Your dashboard highlights upcoming deadlines once your profile is set up",
       color: "text-purple-600",
     },
     {
       icon: Sparkles,
       title: "AI Advisor",
-      description: "24/7 intelligent assistant to help navigate funding, connections, and growth strategies",
+      description: "Use Auctus to move from broad discovery to a sharper funding shortlist",
       color: "text-pink-600",
     },
   ];
 
   const stats = [
-    { label: "Active Businesses", value: "500+" },
-    { label: "Grants Matched", value: "$2.5M" },
-    { label: "Connections Made", value: "1,200+" },
-    { label: "Success Rate", value: "87%" },
+    { label: "Business Grants", value: `${businessGrants.length}+` },
+    { label: "Scholarships", value: `${scholarships.length}+` },
+    { label: "Research Funds", value: `${researchFunding.length}+` },
+    { label: "Public Browsing", value: "Open" },
   ];
+  const previewItems = [
+    ...businessGrants.map((item) => ({ item, href: `/grants/${item.id}` })),
+    ...scholarships.map((item) => ({ item, href: `/scholarships/${item.id}` })),
+    ...researchFunding.map((item) => ({ item, href: `/research-funding/${item.id}` })),
+  ].slice(0, 6);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -61,25 +80,25 @@ export default async function Home() {
         <div className="relative max-w-7xl mx-auto px-6 py-24 sm:py-32">
           <div className="text-center">
             <Badge variant="info" size="md" className="mb-6">
-              Powered by AI
+              Public funding browser
             </Badge>
             <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
-              Grow Your Business with{" "}
+              Find Funding with{" "}
               <span className="text-gray-900">Auctus AI</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Connect with grants, partners, and opportunities in Fredericton's thriving business ecosystem. 
-              Let AI guide your growth journey.
+              Browse real grants, scholarships, and research funding without signing in.
+              Create a profile when you want Auctus to personalize the results.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/sign-up">
+              <Link href="/grants">
                 <Button size="lg" variant="primary">
-                  Get Started
+                  Browse Grants
                 </Button>
               </Link>
-              <Link href="/sign-in">
+              <Link href={session ? "/dashboard" : "/sign-up"}>
                 <Button size="lg" variant="outline">
-                  Sign In
+                  {session ? "Go to Dashboard" : "Customize Matches"}
                 </Button>
               </Link>
             </div>
@@ -103,15 +122,53 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Funding Preview */}
+      <section className="max-w-7xl mx-auto px-6 py-16">
+        <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">
+              Browse real opportunities first
+            </h2>
+            <p className="mt-2 max-w-2xl text-gray-600">
+              These are active records from the funding database. Sign in only when you want profile-based ranking and saved preferences.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/grants">
+              <Button variant="outline">Business</Button>
+            </Link>
+            <Link href="/scholarships">
+              <Button variant="outline">Students</Button>
+            </Link>
+            <Link href="/research-funding">
+              <Button variant="outline">Research</Button>
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {previewItems.map(({ item, href }) => (
+            <FundingCard key={item.id} item={item} href={href} />
+          ))}
+        </div>
+
+        {!session && (
+          <div className="mt-6 rounded-lg border border-primary-100 bg-primary-50 px-5 py-4 text-sm text-gray-700">
+            <span className="font-semibold text-gray-900">Want better matches?</span>{" "}
+            Browse freely now, then sign up to let Auctus tailor filters and rankings to your profile.
+          </div>
+        )}
+      </section>
+
       {/* Features Section */}
       <section className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Everything Your Business Needs to Thrive
+            Discovery first, personalization second
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            From funding opportunities to local partnerships, Auctus AI brings together 
-            all the tools you need in one intelligent platform.
+            The app should prove value before asking for an account. Browsing stays open;
+            the signed-in layer improves relevance and workflow.
           </p>
         </div>
 
@@ -137,85 +194,18 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Trusted by Fredericton Businesses
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card>
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-lg">
-                    AC
-                  </div>
-                  <div className="ml-4">
-                    <div className="font-semibold text-gray-900">Aroma Coffee House</div>
-                    <div className="text-sm text-gray-600">Food & Beverage</div>
-                  </div>
-                </div>
-                <p className="text-gray-700 italic">
-                  "Found the perfect wholesale supplier through the matchmaker. 
-                  Also secured a $15k grant we didn't even know existed!"
-                </p>
-              </div>
-            </Card>
-
-            <Card>
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-secondary-100 rounded-full flex items-center justify-center text-secondary-600 font-bold text-lg">
-                    MM
-                  </div>
-                  <div className="ml-4">
-                    <div className="font-semibold text-gray-900">Maritime Manufacturing</div>
-                    <div className="text-sm text-gray-600">Manufacturing</div>
-                  </div>
-                </div>
-                <p className="text-gray-700 italic">
-                  "The AI advisor helped us navigate complex government funding. 
-                  We've connected with 3 new B2B clients through the platform."
-                </p>
-              </div>
-            </Card>
-
-            <Card>
-              <div className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-accent-100 rounded-full flex items-center justify-center text-accent-600 font-bold text-lg">
-                    DD
-                  </div>
-                  <div className="ml-4">
-                    <div className="font-semibold text-gray-900">Digital Dreams Agency</div>
-                    <div className="text-sm text-gray-600">Technology</div>
-                  </div>
-                </div>
-                <p className="text-gray-700 italic">
-                  "Game changer for finding local talent. The community forum alone 
-                  is worth it - so much valuable advice from experienced owners."
-                </p>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="bg-white border-t border-gray-200 py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Ready to Grow Your Business?
+            Ready for personalized matches?
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Join Fredericton's premier business growth platform today.
+            Keep browsing for free, or create a profile to rank opportunities by fit.
           </p>
-          <Link href="/sign-up">
+          <Link href={session ? "/dashboard" : "/sign-up"}>
             <Button size="lg" variant="secondary">
-              Get Started Now
+              {session ? "Open Dashboard" : "Create Profile"}
             </Button>
           </Link>
         </div>

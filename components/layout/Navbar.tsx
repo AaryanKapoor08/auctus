@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, UserCircle, X } from "lucide-react";
-import { ROLE_DEFAULT_ROUTE } from "@contracts/role";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/app/providers";
 import { cn } from "@/lib/utils";
@@ -20,6 +19,9 @@ function navForSession(session: Session | null) {
   if (!session) {
     return [
       { name: "Home", href: "/" },
+      { name: "Grants", href: "/grants" },
+      { name: "Scholarships", href: "/scholarships" },
+      { name: "Research", href: "/research-funding" },
       { name: "Sign in", href: "/sign-in" },
     ];
   }
@@ -27,14 +29,20 @@ function navForSession(session: Session | null) {
   if (!session.role) {
     return [
       { name: "Home", href: "/" },
+      { name: "Grants", href: "/grants" },
+      { name: "Scholarships", href: "/scholarships" },
+      { name: "Research", href: "/research-funding" },
       { name: "Onboarding", href: "/onboarding" },
     ];
   }
 
   return [
-    { name: "Home", href: "/dashboard" },
+    { name: "Home", href: "/" },
+    { name: "Dashboard", href: "/dashboard" },
     { name: "Forum", href: "/forum" },
-    { name: "Funding", href: ROLE_DEFAULT_ROUTE[session.role] },
+    { name: "Grants", href: "/grants" },
+    { name: "Scholarships", href: "/scholarships" },
+    { name: "Research", href: "/research-funding" },
   ];
 }
 
@@ -96,7 +104,7 @@ export default function Navbar({ initialSession }: { initialSession?: Session | 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
           <Link
-            href={session ? (session.role ? "/dashboard" : "/onboarding") : "/"}
+            href="/"
             className="flex items-center"
           >
             <span className="text-xl font-bold text-gray-900">Auctus AI</span>

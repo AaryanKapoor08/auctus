@@ -12,7 +12,7 @@ const registry: RoutePolicyRegistry = combineRegistries(
     { path: "/dashboard", allowed_roles: null, require_auth: true },
     { path: "/onboarding", allowed_roles: null, require_auth: true },
   ],
-  [{ path: "/grants", allowed_roles: ["business"], require_auth: true }],
+  [{ path: "/grants", allowed_roles: null, require_auth: false }],
 );
 
 describe("route policies", () => {
@@ -45,15 +45,20 @@ describe("route policies", () => {
     });
   });
 
-  it("redirects wrong-role users to their default route", () => {
-    expect(resolveRouteDecision("/grants", "student", true, registry)).toEqual({
-      action: "redirect",
-      location: "/scholarships",
+  it("allows public funding browsing without a session", () => {
+    expect(resolveRouteDecision("/grants", undefined, false, registry)).toEqual({
+      action: "allow",
     });
   });
 
-  it("allows matching roles", () => {
-    expect(resolveRouteDecision("/grants", "business", true, registry)).toEqual({
+  it("allows signed-in users to browse other funding categories", () => {
+    expect(resolveRouteDecision("/grants", "student", true, registry)).toEqual({
+      action: "allow",
+    });
+  });
+
+  it("allows null-role users to browse public funding before onboarding", () => {
+    expect(resolveRouteDecision("/grants", null, true, registry)).toEqual({
       action: "allow",
     });
   });

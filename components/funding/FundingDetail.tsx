@@ -3,7 +3,13 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 
-export default function FundingDetail({ item }: { item: FundingItem }) {
+export default function FundingDetail({
+  item,
+  showPersonalizationPrompt = false,
+}: {
+  item: FundingItem;
+  showPersonalizationPrompt?: boolean;
+}) {
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
       <Card className="border border-gray-200">
@@ -41,6 +47,25 @@ export default function FundingDetail({ item }: { item: FundingItem }) {
             <a href={item.application_url} target="_blank" rel="noreferrer">
               <Button variant="primary">Apply</Button>
             </a>
+          )}
+
+          {showPersonalizationPrompt && (
+            <div className="rounded-lg border border-primary-100 bg-primary-50 p-4">
+              <p className="text-sm font-semibold text-gray-900">
+                Want Auctus to sort opportunities around you?
+              </p>
+              <p className="mt-1 text-sm text-gray-700">
+                Sign in to customize filters, match funding to your profile, and keep a cleaner shortlist.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a href="/sign-in">
+                  <Button variant="outline">Sign in</Button>
+                </a>
+                <a href="/sign-up">
+                  <Button variant="primary">Customize matches</Button>
+                </a>
+              </div>
+            </div>
           )}
         </div>
       </Card>

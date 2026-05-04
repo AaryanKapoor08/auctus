@@ -4,6 +4,7 @@ import FundingBrowser, {
 } from "@/components/funding/FundingBrowser";
 import { ListFundingForRole } from "@/lib/funding/queries";
 import { getRecommendedFundingTags } from "@/lib/funding/recommended-tags";
+import { getSession } from "@/lib/session/get-session";
 
 type SearchParams = Promise<{
   search?: string;
@@ -35,9 +36,10 @@ export default async function GrantsPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const [items, recommendedTags] = await Promise.all([
+  const [items, recommendedTags, session] = await Promise.all([
     ListFundingForRole({ role: "business" }),
     getRecommendedFundingTags("business"),
+    getSession(),
   ]);
 
   return (
@@ -63,6 +65,7 @@ export default async function GrantsPage({
           initialDeadline={parseDeadline(params.deadline)}
           initialSort={parseSort(params.sort)}
           recommendedCategories={recommendedTags}
+          showPersonalizationPrompt={!session}
         />
       </div>
     </div>

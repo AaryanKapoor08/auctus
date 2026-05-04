@@ -7,6 +7,10 @@ const sql = readFileSync(
   join(root, "supabase/migrations/0020_rls_funding.sql"),
   "utf8",
 );
+const publicFundingSql = readFileSync(
+  join(root, "supabase/migrations/0024_public_funding_reads.sql"),
+  "utf8",
+);
 
 describe("0020_rls_funding.sql", () => {
   it("enables RLS on every funding-domain table", () => {
@@ -23,11 +27,20 @@ describe("0020_rls_funding.sql", () => {
     expect(sql).toContain("'research_grant'::public.funding_type");
   });
 
-  it("restricts funding select to active rows of the caller's role", () => {
+  it("initially restricts funding select to active rows of the caller's role", () => {
     expect(sql).toContain('create policy "funding role select"');
     expect(sql).toContain("status = 'active'");
     expect(sql).toContain("public.funding_type_for_role");
     expect(sql).toContain("auth.uid()");
+  });
+
+  it("opens active funding reads for public discovery in the follow-up migration", () => {
+    expect(publicFundingSql).toContain(
+      'create policy "funding active public select"',
+    );
+    expect(publicFundingSql).toContain("to anon, authenticated");
+    expect(publicFundingSql).toContain("using (status = 'active')");
+    expect(publicFundingSql).toContain('drop policy if exists "funding role select"');
   });
 
   it("does not publish authenticated insert/update/delete policies on funding", () => {

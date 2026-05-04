@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-05-04
 **Current Gate:** G12 — Hardening and Release QA
-**Status:** G10-G12 completed on `main`; issues 5, 6, 7, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; public discovery flow landed as `bcbb5a8`
+**Status:** G10-G12 completed on `main`; issues 5, 6, 7, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; public discovery flow landed as `bcbb5a8`; landing-page refinement landed as `9eb7dc5`
 
 ## Start Here
 
@@ -45,6 +45,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - Post-issue feedback fix pushed as `81291eb`: funding pages now load role funding once and filter client-side with multi-select category checkboxes, deadline filtering, sorting, profile-derived default tags, and URL state updates without server navigation; dashboard now fetches matched funding once instead of twice and limits dashboard forum fetches to 5 threads; navbar now treats signed-in null-role users as onboarding users instead of guests and avoids duplicate `/dashboard` nav keys.
 - Funding filter hardening on 2026-05-04 landed as `cd375f0`: expanded role filters into grouped facets, changed browser filtering to OR within a selected facet and AND across facets, added scraper canonical tag normalization for future ETL rows, and applied `0022`/`0023` linked-DB backfills so live rows use canonical tags instead of raw source tags.
 - Public discovery flow on 2026-05-04 landed as `bcbb5a8`: removed the signed-in redirect from `/`, changed Auctus AI/Home to always target `/`, opened `/grants`, `/scholarships`, `/research-funding`, and their detail pages to guests/all signed-in roles, added soft sign-in/customization CTAs, and applied `0024_public_funding_reads.sql` so active funding rows are readable by `anon` and `authenticated`.
+- Landing-page refinement on 2026-05-04 landed as `9eb7dc5`: restored the fuller public discovery landing page after design review, keeping exact live counts, a role track panel, opportunity previews, and browse-first personalization CTAs.
 
 ## Claude Work Review — 2026-04-30
 
@@ -103,6 +104,7 @@ Remaining review/admin blockers:
 - Post-feedback funding/render checks: initial focused `npm test -- --run test/unit/funding-summaries.test.ts test/unit/dashboard-composer.test.ts` failed in sandbox with Windows `spawn EPERM` while Vite loaded config; escalated rerun passed 2 files / 14 tests. `npm run lint` => success with 20 legacy demo warnings only. `npm run build` => success. Full `npm test` => 22 files / 107 tests passed. After duplicate navbar key fix, `npm run lint` => success with 20 legacy demo warnings only; focused funding/dashboard tests => 2 files / 14 tests passed; `npm run build` => success; full `npm test` => 22 files / 107 tests passed.
 - Funding filter rebuild on 2026-05-04: `npx supabase db push --include-all --yes` applied `0022_canonical_funding_filters.sql` and `0023_research_social_sciences_tags.sql`. Live tag proof after backfill: business filters cover 25 Federal, 21 Innovation, 15 Financing, 14 Advisory, 13 Digital, 12 Growth; student filters cover 478 Indigenous, 341 Merit-based, 152 Need-based, 64 Provincial, 42 Education, 40 STEM, 31 Graduate; professor filters cover 20 NSERC/STEM, 13 Partnership, 7 Training, 6 International, 4 SSHRC, 4 Social Sciences. Focused tests initially hit sandbox `spawn EPERM`; escalated rerun passed 5 files / 16 tests. Final checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 24 files / 114 tests passed; `npx tsc -p scraper/tsconfig.json --noEmit` => success.
 - Public discovery proof on 2026-05-04: research inputs checked Grants.gov public faceted search + saved-search account pattern, Scholarships.com guest browse + personalized registration pattern, and Instrumentl match/tracker signed-in value pattern. `npx supabase db push --include-all --yes` applied `0024_public_funding_reads.sql`; policy query showed only `funding active public select` with roles `{anon,authenticated}` and `status = active`; HTTP smoke against local dev server returned 200 for `/`, `/grants`, `/scholarships`, and `/research-funding`; `npm run lint` => success with 20 legacy demo warnings only; focused route/RLS tests => 2 files / 14 tests passed; `npm test` => 24 files / 116 tests passed; `npm run build` => success.
+- Landing refinement checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success.
 
 Known build warnings:
 
@@ -123,6 +125,7 @@ Known build warnings:
 - Keep `issues.md` and `pendingcommits.md` out of product commits unless explicitly requested.
 - Browser-check funding pages after the public discovery change: confirm guest browsing works in a fresh/incognito browser, signed-in users can return to `/`, and personalization CTAs appear only for guests.
 - Dev server note: existing Next dev server is running at `http://localhost:3000` with PID `25604`; a new `npm run dev` attempt correctly reported that server as already running.
+- Do not spend time redesigning the landing page unless the user asks; current landing page is the restored fuller version from `9eb7dc5`.
 
 ## Follow-Ups Already Noted
 
@@ -134,6 +137,8 @@ Known build warnings:
 
 Next action:
 
-1. Handle manual/admin proof: first scheduled GitHub scrape cron run, Google OAuth, email/password auth, and browser auth/onboarding/dashboard walkthrough.
-2. Browser-check the new email/password sign-up and sign-in flows against the Supabase Auth provider settings, then manually smoke public funding browsing for guest/student/business/professor sessions.
-3. Then pick future-scope product follow-ups from `issues.md` if desired.
+1. Finish auth/admin proof, starting with Google OAuth and email/password setup in Supabase.
+2. Google OAuth checklist: in Google Cloud Console set redirect URI to `https://kwfoxklfbrbgbmgyyfcl.supabase.co/auth/v1/callback`; paste client ID/secret into Supabase Auth Provider; in Supabase URL Configuration keep Site URL `http://localhost:3000` and allow `http://localhost:3000/auth/callback`.
+3. Email/password checklist: confirm Supabase email provider is enabled, decide whether local testing should disable email confirmation, then create test accounts for business/student/professor.
+4. Browser proof to capture: sign-up -> onboarding -> dashboard, sign-out -> `/`, sign-in returning user -> dashboard, Auctus AI/Home -> `/` while signed in, guest funding browse works, and student/business/professor accounts can browse all public funding tracks while dashboard remains personalized.
+5. Also check first scheduled GitHub scrape cron proof if available.

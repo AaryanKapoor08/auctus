@@ -239,3 +239,29 @@ export async function markReplyHelpful(replyId: string) {
 
   return data as number;
 }
+
+export async function deleteThread(threadId: string) {
+  const session = await requireSession();
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("threads")
+    .delete()
+    .eq("id", threadId)
+    .eq("author_id", session.user_id);
+
+  if (error) throw error;
+}
+
+export async function deleteReply(replyId: string) {
+  const session = await requireSession();
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("replies")
+    .delete()
+    .eq("id", replyId)
+    .eq("author_id", session.user_id);
+
+  if (error) throw error;
+}

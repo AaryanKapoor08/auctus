@@ -6,7 +6,7 @@ import {
 
 describe("PostgREST filter helpers", () => {
   it("strips PostgREST DSL syntax from user search text", () => {
-    expect(sanitizePostgrestSearch("%,status.eq.expired")).toBe(
+    expect(sanitizePostgrestSearch("%,status.eq.'expired'[]")).toBe(
       "status eq expired",
     );
   });
@@ -18,6 +18,12 @@ describe("PostgREST filter helpers", () => {
   it("builds an ilike OR filter from trusted column names", () => {
     expect(buildIlikeOrFilter(["name", "provider"], " clean energy ")).toBe(
       "name.ilike.%clean energy%,provider.ilike.%clean energy%",
+    );
+  });
+
+  it("truncates by codepoint instead of splitting surrogate pairs", () => {
+    expect(sanitizePostgrestSearch("a".repeat(127) + "💡", 128)).toBe(
+      "a".repeat(127) + "💡",
     );
   });
 });

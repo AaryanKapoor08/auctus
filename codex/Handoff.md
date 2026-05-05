@@ -1,8 +1,8 @@
 # Auctus V2 Handoff
 
-**Last Updated:** 2026-05-04
+**Last Updated:** 2026-05-05
 **Current Gate:** G12 — Hardening and Release QA
-**Status:** G10-G12 completed on `main`; issues 5, 6, 7, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; public discovery flow landed as `bcbb5a8`; landing-page refinement landed as `9eb7dc5`
+**Status:** G10-G12 completed on `main`; issues 5, 6, 7, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; dashboard redesign, forum delete controls, account deletion, and critique docs are now split into one-file commits and pushed
 
 ## Start Here
 
@@ -51,6 +51,10 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - Client session refresh fix on 2026-05-04: `useSession` now reloads the profile role on route changes so onboarding/profile role updates update the navbar without requiring a manual browser refresh.
 - Manual Step 5 preflight proof on 2026-05-04: `.env.local` has required Supabase keys without printing secret values, Supabase URL matches project `kwfoxklfbrbgbmgyyfcl`, `NEXT_PUBLIC_SITE_URL` is unset so app fallback is `http://localhost:3000`, and local server is reachable.
 - Manual/browser hardening commit on 2026-05-04 landed as `425d360`.
+- Product critique document landed as `fe5db85`.
+- Dashboard role-workspace redesign landed as `6433e6d`: `app/dashboard/page.tsx` now renders role-specific copy, richer match cards, profile context, opportunity mix, deadline outlook, and forum activity for business/student/professor.
+- Forum author deletion controls landed as one-file commits: delete mutations `b520465`, reply-card delete action `6584ac4`, and thread detail controls `a846880`.
+- Account deletion feature landed as one-file commits: confirmation helper `14ba580`, test `24ece93`, service-role admin client `9009f00`, delete server action `7e5d7da`, and profile danger zone `22b6422`. Existing DB cascades remove profile, role profile, funding preferences, profile tags, forum threads, replies, and helpful votes.
 
 ## Claude Work Review — 2026-04-30
 
@@ -113,6 +117,10 @@ Remaining review/admin blockers:
 - Role navbar correction checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success.
 - Client session refresh checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; focused `npm test -- --run test/unit/session.test.ts test/unit/route-policies.test.ts` initially hit sandbox `spawn EPERM`, elevated rerun => 2 files / 10 tests passed.
 - Manual Step 5 preflight checks: env-key presence script => required keys present and Supabase URL matches project; `Invoke-WebRequest http://localhost:3000` => 200; `Invoke-WebRequest /grants`, `/scholarships`, `/research-funding` => 200 each.
+- Dashboard redesign checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; focused `npm test -- --run test/unit/dashboard-composer.test.ts` initially hit sandbox `spawn EPERM`, elevated rerun => 1 file / 9 tests passed; `Invoke-WebRequest http://localhost:3000/dashboard` => 200.
+- Account deletion checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; focused `npm test -- --run test/unit/delete-account.test.ts` initially hit sandbox `spawn EPERM`, elevated rerun => 1 file / 1 test passed.
+- Split commit preflight on 2026-05-05: `git fetch origin main` => success; `git rev-list --left-right --count HEAD...origin/main` => `0 0` before commits; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 25 files / 117 tests passed.
+- One-file commit/push proof on 2026-05-05: pushed `fe5db85`, `6433e6d`, `b520465`, `6584ac4`, `a846880`, `14ba580`, `24ece93`, `9009f00`, `7e5d7da`, and `22b6422` to `origin/main`; push output noted branch-protection bypass for direct-main pushes.
 
 Known build warnings:
 
@@ -146,5 +154,7 @@ Known build warnings:
 Next action:
 
 1. Continue manual auth/browser proof at `manual.md` Step 6: Google OAuth browser proof.
-2. Browser proof to capture: sign-up -> onboarding -> dashboard, sign-out -> `/`, sign-in returning user -> dashboard, Auctus AI/Home -> `/` while signed in, guest funding browse works, and student/business/professor accounts see only their own funding track in the signed-in navbar while dashboard remains personalized.
-3. Also check first scheduled GitHub scrape cron proof if available.
+2. Browser-check the committed dashboard redesign for student/business/professor accounts.
+3. Browser-check the committed account deletion flow with a disposable account only; confirm wrong confirmation redirects to `/profile?error=delete_confirmation`, exact `DELETE` removes the auth user, signs out, and cascades forum/profile rows.
+4. Browser proof to capture: sign-up -> onboarding -> dashboard, sign-out -> `/`, sign-in returning user -> dashboard, Auctus AI/Home -> `/` while signed in, guest funding browse works, and student/business/professor accounts see only their own funding track in the signed-in navbar while dashboard remains personalized.
+5. Also check first scheduled GitHub scrape cron proof if available.

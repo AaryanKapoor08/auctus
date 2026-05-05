@@ -99,10 +99,12 @@ Dev B internal ownership:
 - `app/(funding)/**`
 - `components/funding/**`
 - `lib/funding/**`
+- `lib/ai/**` (funding-domain-internal; only `lib/funding/**`, `scraper/**`, and `jobs/**` may import it)
 - `lib/matching/**`
 - `scraper/**`
 - funding, scraper, and funding-RLS migrations
 - `.github/workflows/scrape.yml`
+- `.github/workflows/ai-enrichment.yml`
 
 Shared or coordinated files:
 
@@ -147,6 +149,8 @@ In G5 (Session/Middleware) the agent creates a placeholder `lib/funding/route-po
 | `0005_forum.sql` | identity (`threads` + `replies` + `reply_helpful_votes` + `mark_reply_helpful`) | G9 |
 | `0010_rls_identity.sql` | identity RLS | G9 (must land before `0020`) |
 | `0020_rls_funding.sql` | funding RLS | G11 |
+| `0025_ai_enrichment.sql` | funding AI enrichment | G13 |
+| `0026_pgvector_funding.sql` | funding semantic search, only if G16 chooses pgvector | G16 |
 
 Range ownership for any future migration: `0000–0002` and `0005–0019` identity; `0003–0004` and `0020–0029` funding. Do not free-form rename or renumber existing locked files.
 
@@ -184,6 +188,11 @@ The solo gate order in `codex/SoloProgress.md` (G1–G12) maps to the original t
 - G10 — ETL source verification docs, scraper core (types, utils, normalize, dedupe, expire), `0004_scrape_metadata.sql`, six locked source modules, scheduled workflow.
 - G11 — `0020_rls_funding.sql` (after `0010_rls_identity.sql` is applied), dashboard funding summary tile composition, expiring deadlines, forum activity tile.
 - G12 — Hardening: demo-import audits, data-quality assertions, missing tests, README/setup updates, final QA.
+- G13 — AI enrichment schema, deterministic funding content hash, typed AI validation constants, current-version enrichment readers, and funding-domain AI ownership.
+- G14 — Provider adapters, queue runtime, cost/token circuit breakers, mock dry-run, and AI workflow dispatch.
+- G15 — Funding UX enrichment surfaces with missing/review fallback.
+- G16 — Semantic search/radar decision, optional embedding storage, and AI workflow cron.
+- G17 — AI review/admin hardening, observability, release SLO, and final QA.
 
 Contracts come before cross-domain runtime consumption. Identity RLS lands before funding RLS (the funding RLS join reads `profiles.role`).
 

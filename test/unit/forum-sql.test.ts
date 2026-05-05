@@ -5,6 +5,10 @@ import { join } from "node:path";
 const root = process.cwd();
 
 describe("forum and identity RLS migrations", () => {
+  const identityRlsSql = readFileSync(
+    join(root, "supabase/migrations/0010_rls_identity.sql"),
+    "utf8",
+  );
   const profileEmailSql = readFileSync(
     join(root, "supabase/migrations/0012_restrict_profile_email_select.sql"),
     "utf8",
@@ -23,26 +27,29 @@ describe("forum and identity RLS migrations", () => {
   });
 
   it("blocks direct helpful-vote client writes while allowing forum reads and author writes", () => {
-    const sql = readFileSync(
-      join(root, "supabase/migrations/0010_rls_identity.sql"),
-      "utf8",
-    );
-
-    expect(sql).toContain("alter table public.reply_helpful_votes enable row level security");
-    expect(sql).not.toContain("on public.reply_helpful_votes\nfor insert");
-    expect(sql).toContain("threads authenticated read");
-    expect(sql).toContain("threads author insert");
-    expect(sql).toContain("replies author insert");
-    expect(sql).toContain("business profiles owner all");
-    expect(sql).toContain("student profiles owner all");
-    expect(sql).toContain("professor profiles owner all");
+    expect(identityRlsSql).toContain("alter table public.reply_helpful_votes enable row level security");
+    expect(identityRlsSql).not.toContain("on public.reply_helpful_votes\nfor insert");
+    expect(identityRlsSql).toContain("threads authenticated read");
+    expect(identityRlsSql).toContain("threads author insert");
+    expect(identityRlsSql).toContain("replies author insert");
+    expect(identityRlsSql).toContain("business profiles owner all");
+    expect(identityRlsSql).toContain("student profiles owner all");
+    expect(identityRlsSql).toContain("professor profiles owner all");
   });
 
   it("removes email from authenticated profile select privileges", () => {
+    expect(identityRlsSql).toContain("0012_restrict_profile_email_select.sql");
     expect(profileEmailSql).toContain("revoke select on public.profiles from authenticated");
+    expect(profileEmailSql).toContain("0010_rls_identity.sql");
     expect(profileEmailSql).toContain("grant select (");
     expect(profileEmailSql).not.toMatch(/grant select \([^)]*email[^)]*\) on public\.profiles to authenticated/s);
     expect(profileEmailSql).toMatch(/email,\s+avatar_url/s);
     expect(profileEmailSql).toContain("on public.profiles to service_role");
+  });
+
+  it("pins the exact authenticated profile directory columns", () => {
+    expect(profileEmailSql).toMatch(
+      /grant select \(\s+id,\s+role,\s+display_name,\s+avatar_url,\s+created_at,\s+updated_at\s+\) on public\.profiles to authenticated;/,
+    );
   });
 });

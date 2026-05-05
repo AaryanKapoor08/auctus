@@ -7,6 +7,9 @@ alter table public.replies enable row level security;
 alter table public.reply_helpful_votes enable row level security;
 
 drop policy if exists "profiles authenticated read" on public.profiles;
+-- This policy intentionally allows authenticated profile directory reads.
+-- Migration 0012_restrict_profile_email_select.sql narrows the exposed columns
+-- so email remains service-role/current-user only.
 create policy "profiles authenticated read"
 on public.profiles
 for select

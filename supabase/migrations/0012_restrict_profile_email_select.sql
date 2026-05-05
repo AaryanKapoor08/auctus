@@ -1,5 +1,7 @@
 -- Keep forum/profile identity surfaces readable while preventing arbitrary
 -- authenticated clients from selecting every user's email address.
+-- This is the column-privilege companion to 0010_rls_identity.sql's
+-- authenticated profile-directory read policy.
 
 revoke select on public.profiles from anon;
 revoke select on public.profiles from authenticated;

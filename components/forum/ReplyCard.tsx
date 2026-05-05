@@ -1,4 +1,4 @@
-import { Clock, ThumbsUp, User } from "lucide-react";
+import { Clock, ThumbsUp, Trash2, User } from "lucide-react";
 import Image from "next/image";
 import type { Role } from "@contracts/role";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,7 @@ interface ReplyCardProps {
   helpfulCount?: number;
   onHelpful?: () => void;
   helpfulAction?: () => Promise<void>;
+  deleteAction?: () => Promise<void>;
   isNested?: boolean;
 }
 
@@ -27,6 +28,7 @@ export default function ReplyCard({
   helpfulCount = 0,
   onHelpful,
   helpfulAction,
+  deleteAction,
   isNested = false,
 }: ReplyCardProps) {
   return (
@@ -120,6 +122,18 @@ export default function ReplyCard({
               {helpfulCount > 0 ? `Helpful (${helpfulCount})` : "Helpful"}
             </span>
           </button>
+        )}
+        {deleteAction && (
+          <form action={deleteAction} className="ml-auto">
+            <button
+              type="submit"
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-red-700 transition-colors duration-200 hover:bg-red-50"
+              aria-label="Delete reply"
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="font-medium">Delete</span>
+            </button>
+          </form>
         )}
       </div>
     </div>

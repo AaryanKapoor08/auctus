@@ -55,7 +55,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - Dashboard role-workspace redesign landed as `6433e6d`: `app/dashboard/page.tsx` now renders role-specific copy, richer match cards, profile context, opportunity mix, deadline outlook, and forum activity for business/student/professor.
 - Forum author deletion controls landed as one-file commits: delete mutations `b520465`, reply-card delete action `6584ac4`, and thread detail controls `a846880`.
 - Account deletion feature landed as one-file commits: confirmation helper `14ba580`, test `24ece93`, service-role admin client `9009f00`, delete server action `7e5d7da`, and profile danger zone `22b6422`. Existing DB cascades remove profile, role profile, funding preferences, profile tags, forum threads, replies, and helpful votes.
-- First critique-hardening batch on 2026-05-05 landed as `5b62265`: sanitized PostgREST search `.or()` inputs for funding/forum, added `0012_restrict_profile_email_select.sql` and applied it to the linked DB, moved profile email reads to Supabase Auth for the current user, centralized post-auth routing, added onboarding/profile-edit error banners, validated funding application links, removed the scraper insecure TLS retry, and refreshed README/root metadata. Per user direction, chatbot/demo routes were left untouched.
+- First critique-hardening batch on 2026-05-05 landed as `f078bc7`: sanitized PostgREST search `.or()` inputs for funding/forum, added `0012_restrict_profile_email_select.sql` and applied it to the linked DB, moved profile email reads to Supabase Auth for the current user, centralized post-auth routing, added onboarding/profile-edit error banners, validated funding application links, removed the scraper insecure TLS retry, and refreshed README/root metadata. Per user direction, chatbot/demo routes were left untouched.
 
 ## Claude Work Review — 2026-04-30
 
@@ -155,7 +155,7 @@ Known build warnings:
 
 Next action:
 
-1. Push `5b62265` if the user wants the critique-hardening batch on `origin/main`.
+1. Push `f078bc7` and this progress-doc commit if the user wants the critique-hardening batch on `origin/main`.
 2. Continue manual auth/browser proof at `manual.md` Step 6: Google OAuth browser proof.
 3. Browser-check the committed dashboard redesign for student/business/professor accounts.
 4. Browser-check the committed account deletion flow with a disposable account only; confirm wrong confirmation redirects to `/profile?error=delete_confirmation`, exact `DELETE` removes the auth user, signs out, and cascades forum/profile rows.

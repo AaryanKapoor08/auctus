@@ -54,9 +54,13 @@ const educationLevels = new Set([
 const careerStages = new Set(["early", "mid", "senior", "emeritus"]);
 
 function requireText(value: string, label: string) {
-  if (!value.trim()) {
+  const text = value.trim();
+
+  if (!text) {
     throw new Error(`${label} is required`);
   }
+
+  return text;
 }
 
 function optionalText(value: FormDataEntryValue | null) {
@@ -69,11 +73,29 @@ function optionalNumber(value: FormDataEntryValue | null) {
   if (text === null) return null;
 
   const numberValue = Number(text);
-  if (!Number.isFinite(numberValue)) {
-    throw new Error("Numeric fields must contain valid numbers");
+  if (!Number.isFinite(numberValue) || numberValue < 0) {
+    throw new Error("Numeric fields must contain non-negative valid numbers");
   }
 
   return numberValue;
+}
+
+function requireOptionalText(value: FormDataEntryValue | null, label: string) {
+  return requireText(optionalText(value) ?? "", label);
+}
+
+function requireEnum<T extends string>(
+  value: FormDataEntryValue | null,
+  allowedValues: Set<string>,
+  label: string,
+) {
+  const text = requireOptionalText(value, label);
+
+  if (!allowedValues.has(text)) {
+    throw new Error(`Invalid ${label.toLowerCase()}`);
+  }
+
+  return text as T;
 }
 
 function uniqueTags(tags: Array<string | null | undefined>) {
@@ -156,24 +178,30 @@ export function parseOnboardingForm(role: string, formData: FormData): Onboardin
   }
 
   if (role === "student") {
-    const education_level = optionalText(formData.get("education_level"));
-    if (education_level && !educationLevels.has(education_level)) {
-      throw new Error("Invalid education level");
-    }
+    const education_level = requireEnum<NonNullable<StudentProfile["education_level"]>>(
+      formData.get("education_level"),
+      educationLevels,
+      "Education level",
+    );
+    const field_of_study = requireOptionalText(
+      formData.get("field_of_study"),
+      "Field of study",
+    );
+    const province = requireOptionalText(formData.get("province"), "Province");
 
     return {
       role,
       display_name,
-      education_level: education_level as StudentProfile["education_level"],
-      field_of_study: optionalText(formData.get("field_of_study")),
+      education_level,
+      field_of_study,
       institution: optionalText(formData.get("institution")),
-      province: optionalText(formData.get("province")),
+      province,
       gpa: optionalNumber(formData.get("gpa")),
       match_tags: uniqueTags([
         "Student",
         "Scholarship",
-        ...tagsFromText(optionalText(formData.get("field_of_study"))),
-        ...scopeTags(optionalText(formData.get("province"))),
+        ...tagsFromText(field_of_study),
+        ...scopeTags(province),
         optionalText(formData.get("funding_basis")) === "need" ? "Need-based" : null,
         optionalText(formData.get("funding_basis")) === "merit" ? "Merit-based" : null,
         education_level === "masters" || education_level === "phd" ? "Graduate" : null,
@@ -181,18 +209,23 @@ export function parseOnboardingForm(role: string, formData: FormData): Onboardin
     };
   }
 
-  const career_stage = optionalText(formData.get("career_stage"));
-  if (career_stage && !careerStages.has(career_stage)) {
-    throw new Error("Invalid career stage");
-  }
+  const research_area = requireOptionalText(
+    formData.get("research_area"),
+    "Research area",
+  );
+  const career_stage = requireEnum<NonNullable<ProfessorProfile["career_stage"]>>(
+    formData.get("career_stage"),
+    careerStages,
+    "Career stage",
+  );
 
   return {
     role,
     display_name,
     institution: optionalText(formData.get("institution")),
     department: optionalText(formData.get("department")),
-    research_area: optionalText(formData.get("research_area")),
-    career_stage: career_stage as ProfessorProfile["career_stage"],
+    research_area,
+    career_stage,
     research_keywords: (optionalText(formData.get("research_keywords")) ?? "")
       .split(",")
       .map((keyword) => keyword.trim())
@@ -200,7 +233,7 @@ export function parseOnboardingForm(role: string, formData: FormData): Onboardin
     match_tags: uniqueTags([
       "Professor",
       "Research",
-      ...tagsFromText(optionalText(formData.get("research_area"))),
+      ...tagsFromText(research_area),
       ...tagsFromText(optionalText(formData.get("research_focus"))),
       optionalText(formData.get("research_focus")) === "discovery" ? "Discovery" : null,
       optionalText(formData.get("research_focus")) === "partnership" ? "Partnership" : null,
@@ -208,7 +241,7 @@ export function parseOnboardingForm(role: string, formData: FormData): Onboardin
       optionalText(formData.get("research_focus")) === "interdisciplinary"
         ? "Interdisciplinary"
         : null,
-      optionalText(formData.get("research_area")) === "social_sciences"
+      research_area === "social_sciences"
         ? "Social Sciences"
         : null,
       "Federal",

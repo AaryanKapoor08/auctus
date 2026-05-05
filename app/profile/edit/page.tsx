@@ -16,11 +16,13 @@ function SelectField({
   name,
   label,
   defaultValue,
+  required = false,
   children,
 }: {
   name: string;
   label: string;
   defaultValue?: string | null;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -29,6 +31,7 @@ function SelectField({
       <select
         name={name}
         defaultValue={defaultValue ?? ""}
+        required={required}
         className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
       >
         {children}
@@ -80,6 +83,7 @@ function RoleFields({
           name="education_level"
           label="Education level"
           defaultValue={student.education_level}
+          required
         >
           <option value="">Select level</option>
           <option value="high_school">High school</option>
@@ -92,9 +96,10 @@ function RoleFields({
           name="field_of_study"
           label="Field of study"
           defaultValue={student.field_of_study ?? ""}
+          required
         />
         <Input name="institution" label="Institution" defaultValue={student.institution ?? ""} />
-        <Input name="province" label="Province" defaultValue={student.province ?? ""} />
+        <Input name="province" label="Province" defaultValue={student.province ?? ""} required />
         <Input name="gpa" label="GPA" inputMode="decimal" defaultValue={student.gpa ?? ""} />
       </>
     );
@@ -109,11 +114,13 @@ function RoleFields({
         name="research_area"
         label="Research area"
         defaultValue={professor.research_area ?? ""}
+        required
       />
       <SelectField
         name="career_stage"
         label="Career stage"
         defaultValue={professor.career_stage}
+        required
       >
         <option value="">Select stage</option>
         <option value="early">Early</option>

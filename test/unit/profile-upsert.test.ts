@@ -95,6 +95,37 @@ describe("profile onboarding upsert", () => {
     expect(() => parseOnboardingForm("founder", form)).toThrow("Invalid role");
   });
 
+  it("rejects missing role-required student fields", () => {
+    const form = new FormData();
+    form.set("display_name", "Ada Student");
+    form.set("education_level", "undergrad");
+
+    expect(() => parseOnboardingForm("student", form)).toThrow(
+      "Field of study is required",
+    );
+  });
+
+  it("rejects missing professor matching fields", () => {
+    const form = new FormData();
+    form.set("display_name", "Ada Professor");
+    form.set("career_stage", "early");
+
+    expect(() => parseOnboardingForm("professor", form)).toThrow(
+      "Research area is required",
+    );
+  });
+
+  it("rejects negative numeric fields", () => {
+    const form = new FormData();
+    form.set("display_name", "Ada Founder");
+    form.set("business_name", "Ada Labs");
+    form.set("employees", "-1");
+
+    expect(() => parseOnboardingForm("business", form)).toThrow(
+      "Numeric fields must contain non-negative valid numbers",
+    );
+  });
+
   it("rejects already-onboarded profiles before the RPC write", async () => {
     const supabase = createSupabase("student");
     mocks.createClient.mockResolvedValue(supabase);

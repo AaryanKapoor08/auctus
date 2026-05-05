@@ -28,10 +28,12 @@ const labels: Record<Role, { title: string; description: string }> = {
 function SelectField({
   name,
   label,
+  required = false,
   children,
 }: {
   name: string;
   label: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -39,6 +41,7 @@ function SelectField({
       {label}
       <select
         name={name}
+        required={required}
         className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
       >
         {children}
@@ -80,7 +83,7 @@ function RoleFields({ role }: { role: Role }) {
   if (role === "student") {
     return (
       <>
-        <SelectField name="education_level" label="Education level">
+        <SelectField name="education_level" label="Education level" required>
           <option value="">Select level</option>
           <option value="high_school">High school</option>
           <option value="college">College</option>
@@ -88,7 +91,7 @@ function RoleFields({ role }: { role: Role }) {
           <option value="masters">Masters</option>
           <option value="phd">PhD</option>
         </SelectField>
-        <SelectField name="field_of_study" label="Which field should scholarships match?">
+        <SelectField name="field_of_study" label="Which field should scholarships match?" required>
           <option value="">Select field</option>
           <option value="STEM">STEM</option>
           <option value="Arts">Arts or humanities</option>
@@ -96,7 +99,7 @@ function RoleFields({ role }: { role: Role }) {
           <option value="Trades">Trades</option>
           <option value="Leadership">Leadership or community</option>
         </SelectField>
-        <SelectField name="province" label="Where are you studying?">
+        <SelectField name="province" label="Where are you studying?" required>
           <option value="">Select province</option>
           <option value="New Brunswick">New Brunswick</option>
           <option value="Nova Scotia">Nova Scotia</option>
@@ -120,7 +123,7 @@ function RoleFields({ role }: { role: Role }) {
   return (
     <>
       <Input name="institution" label="Institution" />
-      <SelectField name="research_area" label="Which research area should funding match?">
+      <SelectField name="research_area" label="Which research area should funding match?" required>
         <option value="">Select area</option>
         <option value="STEM">STEM or natural sciences</option>
         <option value="social_sciences">Social sciences or humanities</option>
@@ -134,7 +137,7 @@ function RoleFields({ role }: { role: Role }) {
         <option value="equipment">Equipment or facilities</option>
         <option value="interdisciplinary">Team or catalyst funding</option>
       </SelectField>
-      <SelectField name="career_stage" label="Career stage">
+      <SelectField name="career_stage" label="Career stage" required>
         <option value="">Select stage</option>
         <option value="early">Early</option>
         <option value="mid">Mid</option>

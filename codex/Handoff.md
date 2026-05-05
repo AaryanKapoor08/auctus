@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-05-05
 **Current Gate:** G12 — Hardening and Release QA
-**Status:** G10-G12 completed on `main`; issues 5, 6, 7, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; dashboard redesign, forum delete controls, account deletion, critique docs, and first critique-hardening batch are complete
+**Status:** G10-G12 completed on `main`; issues 5, 6, 7, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; dashboard redesign, forum delete controls, account deletion, critique docs, first critique-hardening batch, and critique follow-up split commits are complete
 
 ## Start Here
 
@@ -56,6 +56,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - Forum author deletion controls landed as one-file commits: delete mutations `b520465`, reply-card delete action `6584ac4`, and thread detail controls `a846880`.
 - Account deletion feature landed as one-file commits: confirmation helper `14ba580`, test `24ece93`, service-role admin client `9009f00`, delete server action `7e5d7da`, and profile danger zone `22b6422`. Existing DB cascades remove profile, role profile, funding preferences, profile tags, forum threads, replies, and helpful votes.
 - First critique-hardening batch on 2026-05-05 landed as `f078bc7`: sanitized PostgREST search `.or()` inputs for funding/forum, added `0012_restrict_profile_email_select.sql` and applied it to the linked DB, moved profile email reads to Supabase Auth for the current user, centralized post-auth routing, added onboarding/profile-edit error banners, validated funding application links, removed the scraper insecure TLS retry, and refreshed README/root metadata. Per user direction, chatbot/demo routes were left untouched.
+- Critique follow-up split commits landed on 2026-05-05: `b6979c3` enforces role-required onboarding/profile fields and non-negative numeric parsing; `8ca00f7` makes forum queries explicitly server-only and revalidates `/forum` + `/dashboard` after forum mutations; `ae31b9b` makes funding queries explicitly server-only, caps category filters at 12, and pins listing type scopes; `ca489b5` hardens PostgREST search sanitization and codepoint truncation; `61ea2ac` documents/tests the 0010/0012 profile email column-privilege boundary. `critique-followup.md` remains untracked input/context.
 
 ## Claude Work Review — 2026-04-30
 
@@ -123,6 +124,7 @@ Remaining review/admin blockers:
 - Split commit preflight on 2026-05-05: `git fetch origin main` => success; `git rev-list --left-right --count HEAD...origin/main` => `0 0` before commits; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 25 files / 117 tests passed.
 - One-file commit/push proof on 2026-05-05: pushed `fe5db85`, `6433e6d`, `b520465`, `6584ac4`, `a846880`, `14ba580`, `24ece93`, `9009f00`, `7e5d7da`, and `22b6422` to `origin/main`; push output noted branch-protection bypass for direct-main pushes.
 - Critique hardening checks on 2026-05-05: focused `npm test -- --run test/unit/postgrest-filters.test.ts test/unit/funding-summaries.test.ts test/unit/forum-queries.test.ts test/unit/profile-queries.test.ts test/unit/forum-sql.test.ts test/unit/session.test.ts` first hit sandbox `spawn EPERM`, elevated rerun => 6 files / 26 tests passed; `git diff --check` => no whitespace errors; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 26 files / 126 tests passed; `npx tsc -p scraper/tsconfig.json --noEmit` => success; `npx supabase db push --include-all --yes` applied `0012_restrict_profile_email_select.sql`; linked privilege query showed `authenticated` profile SELECT excludes `email`, while `service_role` retains it.
+- Critique follow-up split-commit checks on 2026-05-05: focused `npm test -- --run test/unit/profile-upsert.test.ts test/unit/forum-queries.test.ts test/unit/funding-summaries.test.ts test/unit/postgrest-filters.test.ts test/unit/forum-sql.test.ts` first hit sandbox `spawn EPERM`, elevated rerun => 5 files / 29 tests passed; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 26 files / 136 tests passed; `git diff --check` => no whitespace errors, CRLF warnings only.
 
 Known build warnings:
 
@@ -155,7 +157,7 @@ Known build warnings:
 
 Next action:
 
-1. Push `f078bc7` and this progress-doc commit if the user wants the critique-hardening batch on `origin/main`.
+1. Push `f078bc7`, `db5b89b`, and the critique follow-up split commits (`b6979c3`, `8ca00f7`, `ae31b9b`, `ca489b5`, `61ea2ac`, plus this progress-doc commit) if the user wants these batches on `origin/main`.
 2. Continue manual auth/browser proof at `manual.md` Step 6: Google OAuth browser proof.
 3. Browser-check the committed dashboard redesign for student/business/professor accounts.
 4. Browser-check the committed account deletion flow with a disposable account only; confirm wrong confirmation redirects to `/profile?error=delete_confirmation`, exact `DELETE` removes the auth user, signs out, and cascades forum/profile rows.

@@ -11,12 +11,14 @@ type ProfileRow = OnboardedProfile & {
   role: "business" | "student" | "professor" | null;
 };
 
-function toBase(profile: ProfileRow): OnboardedProfile {
+type PublicProfileRow = Omit<ProfileRow, "email">;
+
+function toBase(profile: PublicProfileRow, email: string): OnboardedProfile {
   return {
     id: profile.id,
     role: profile.role as OnboardedProfile["role"],
     display_name: profile.display_name,
-    email: profile.email,
+    email,
     avatar_url: profile.avatar_url,
     created_at: profile.created_at,
     updated_at: profile.updated_at,
@@ -25,16 +27,20 @@ function toBase(profile: ProfileRow): OnboardedProfile {
 
 export async function getRoleProfile(user_id: string): Promise<RoleProfile | null> {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("id, role, display_name, email, avatar_url, created_at, updated_at")
+    .select("id, role, display_name, avatar_url, created_at, updated_at")
     .eq("id", user_id)
     .maybeSingle();
 
   if (profileError) throw profileError;
   if (!profile?.role) return null;
 
-  const base = toBase(profile as ProfileRow);
+  const email = user?.id === user_id ? user.email ?? "" : "";
+  const base = toBase(profile as PublicProfileRow, email);
 
   if (profile.role === "business") {
     const { data, error } = await supabase

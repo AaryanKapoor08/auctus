@@ -7,6 +7,7 @@ import { isRole, type Role } from "@contracts/role";
 
 type PageProps = {
   params: Promise<{ role: string }>;
+  searchParams: Promise<{ error?: string }>;
 };
 
 const labels: Record<Role, { title: string; description: string }> = {
@@ -149,7 +150,30 @@ function RoleFields({ role }: { role: Role }) {
   );
 }
 
-export default async function OnboardingRolePage({ params }: PageProps) {
+function getFormErrorMessage(error?: string) {
+  if (!error) return null;
+
+  const messages: Record<string, string> = {
+    invalid: "Check the required fields and try again.",
+    save_failed: "We could not save your profile. Try again.",
+    auth_required: "Sign in again, then complete onboarding.",
+    already_onboarded: "This account has already completed onboarding.",
+  };
+
+  return messages[error] ?? "We could not save your profile. Try again.";
+}
+
+function getProfileFormError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (message.includes("authentication")) return "auth_required";
+  if (message.includes("already")) return "already_onboarded";
+  if (message.includes("required") || message.includes("invalid")) return "invalid";
+
+  return "save_failed";
+}
+
+export default async function OnboardingRolePage({ params, searchParams }: PageProps) {
   const { role: roleParam } = await params;
 
   if (!isRole(roleParam)) {
@@ -166,10 +190,18 @@ export default async function OnboardingRolePage({ params }: PageProps) {
   async function completeOnboarding(formData: FormData) {
     "use server";
 
-    const input = parseOnboardingForm(role, formData);
-    await upsertRoleProfile(input);
+    try {
+      const input = parseOnboardingForm(role, formData);
+      await upsertRoleProfile(input);
+    } catch (error) {
+      redirect(`/onboarding/${role}?error=${getProfileFormError(error)}`);
+    }
+
     redirect("/dashboard");
   }
+
+  const { error } = await searchParams;
+  const formError = getFormErrorMessage(error);
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
@@ -179,6 +211,11 @@ export default async function OnboardingRolePage({ params }: PageProps) {
       </div>
 
       <form action={completeOnboarding} className="rounded-lg border border-gray-200 bg-white p-6">
+        {formError && (
+          <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {formError}
+          </div>
+        )}
         <div className="grid gap-5">
           <Input name="display_name" label="Display name" required />
           <RoleFields role={role} />

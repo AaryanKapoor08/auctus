@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getPostAuthRoute } from "@/lib/session/post-auth-route";
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -39,9 +40,7 @@ export async function GET(request: NextRequest) {
     .eq("id", user.id)
     .maybeSingle();
 
-  if (!profile?.role) {
-    return NextResponse.redirect(new URL("/onboarding", request.url));
-  }
-
-  return NextResponse.redirect(new URL("/dashboard", request.url));
+  return NextResponse.redirect(
+    new URL(getPostAuthRoute(profile?.role), request.url),
+  );
 }

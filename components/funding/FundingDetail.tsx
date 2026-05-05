@@ -10,6 +10,8 @@ export default function FundingDetail({
   item: FundingItem;
   showPersonalizationPrompt?: boolean;
 }) {
+  const applicationUrl = getSafeExternalUrl(item.application_url);
+
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
       <Card className="border border-gray-200">
@@ -43,8 +45,8 @@ export default function FundingDetail({
             </ul>
           </section>
 
-          {item.application_url && (
-            <a href={item.application_url} target="_blank" rel="noreferrer">
+          {applicationUrl && (
+            <a href={applicationUrl} target="_blank" rel="noreferrer">
               <Button variant="primary">Apply</Button>
             </a>
           )}
@@ -71,4 +73,17 @@ export default function FundingDetail({
       </Card>
     </div>
   );
+}
+
+function getSafeExternalUrl(value: string | null) {
+  if (!value) return null;
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:"
+      ? url.toString()
+      : null;
+  } catch {
+    return null;
+  }
 }

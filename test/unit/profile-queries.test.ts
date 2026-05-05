@@ -28,6 +28,11 @@ function query(data: unknown) {
 
 function mockTables(tables: Record<string, unknown>) {
   mocks.createClient.mockResolvedValue({
+    auth: {
+      getUser: vi.fn().mockResolvedValue({
+        data: { user: { id: "user-1", email: "ada@example.com" } },
+      }),
+    },
     from: vi.fn((table: string) => query(tables[table])),
   });
 }
@@ -55,9 +60,32 @@ describe("getRoleProfile", () => {
 
     await expect(getRoleProfile("user-1")).resolves.toMatchObject({
       role: "business",
-      base: { role: "business" },
+      base: { role: "business", email: "ada@example.com" },
       details: { business_name: "Ada Labs" },
     });
+  });
+
+  it("does not depend on selecting profile email from the public table", async () => {
+    const select = vi.fn().mockReturnThis();
+    const eq = vi.fn().mockReturnThis();
+    const maybeSingle = vi.fn().mockResolvedValue({
+      data: { ...baseProfile, email: undefined, role: null },
+      error: null,
+    });
+    mocks.createClient.mockResolvedValue({
+      auth: {
+        getUser: vi.fn().mockResolvedValue({
+          data: { user: { id: "user-1", email: "ada@example.com" } },
+        }),
+      },
+      from: vi.fn(() => ({ select, eq, maybeSingle })),
+    });
+
+    await getRoleProfile("user-1");
+
+    expect(select).toHaveBeenCalledWith(
+      "id, role, display_name, avatar_url, created_at, updated_at",
+    );
   });
 
   it("returns student role profiles", async () => {

@@ -2,7 +2,7 @@
 
 **Last Updated:** 2026-05-05
 **Current Gate:** G12 — Hardening and Release QA
-**Status:** G10-G12 completed on `main`; issues 5, 6, 7, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; dashboard redesign, forum delete controls, account deletion, and critique docs are now split into one-file commits and pushed
+**Status:** G10-G12 completed on `main`; issues 5, 6, 7, 11, 14, 16, 17, 18, 19, 20, and 21 resolved; dashboard redesign, forum delete controls, account deletion, critique docs, and first critique-hardening batch are complete
 
 ## Start Here
 
@@ -55,6 +55,7 @@ Implementation is now continuing directly on `main` per user instruction. Do not
 - Dashboard role-workspace redesign landed as `6433e6d`: `app/dashboard/page.tsx` now renders role-specific copy, richer match cards, profile context, opportunity mix, deadline outlook, and forum activity for business/student/professor.
 - Forum author deletion controls landed as one-file commits: delete mutations `b520465`, reply-card delete action `6584ac4`, and thread detail controls `a846880`.
 - Account deletion feature landed as one-file commits: confirmation helper `14ba580`, test `24ece93`, service-role admin client `9009f00`, delete server action `7e5d7da`, and profile danger zone `22b6422`. Existing DB cascades remove profile, role profile, funding preferences, profile tags, forum threads, replies, and helpful votes.
+- First critique-hardening batch on 2026-05-05 landed as `5b62265`: sanitized PostgREST search `.or()` inputs for funding/forum, added `0012_restrict_profile_email_select.sql` and applied it to the linked DB, moved profile email reads to Supabase Auth for the current user, centralized post-auth routing, added onboarding/profile-edit error banners, validated funding application links, removed the scraper insecure TLS retry, and refreshed README/root metadata. Per user direction, chatbot/demo routes were left untouched.
 
 ## Claude Work Review — 2026-04-30
 
@@ -121,6 +122,7 @@ Remaining review/admin blockers:
 - Account deletion checks: `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; focused `npm test -- --run test/unit/delete-account.test.ts` initially hit sandbox `spawn EPERM`, elevated rerun => 1 file / 1 test passed.
 - Split commit preflight on 2026-05-05: `git fetch origin main` => success; `git rev-list --left-right --count HEAD...origin/main` => `0 0` before commits; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 25 files / 117 tests passed.
 - One-file commit/push proof on 2026-05-05: pushed `fe5db85`, `6433e6d`, `b520465`, `6584ac4`, `a846880`, `14ba580`, `24ece93`, `9009f00`, `7e5d7da`, and `22b6422` to `origin/main`; push output noted branch-protection bypass for direct-main pushes.
+- Critique hardening checks on 2026-05-05: focused `npm test -- --run test/unit/postgrest-filters.test.ts test/unit/funding-summaries.test.ts test/unit/forum-queries.test.ts test/unit/profile-queries.test.ts test/unit/forum-sql.test.ts test/unit/session.test.ts` first hit sandbox `spawn EPERM`, elevated rerun => 6 files / 26 tests passed; `git diff --check` => no whitespace errors; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 26 files / 126 tests passed; `npx tsc -p scraper/tsconfig.json --noEmit` => success; `npx supabase db push --include-all --yes` applied `0012_restrict_profile_email_select.sql`; linked privilege query showed `authenticated` profile SELECT excludes `email`, while `service_role` retains it.
 
 Known build warnings:
 
@@ -153,8 +155,9 @@ Known build warnings:
 
 Next action:
 
-1. Continue manual auth/browser proof at `manual.md` Step 6: Google OAuth browser proof.
-2. Browser-check the committed dashboard redesign for student/business/professor accounts.
-3. Browser-check the committed account deletion flow with a disposable account only; confirm wrong confirmation redirects to `/profile?error=delete_confirmation`, exact `DELETE` removes the auth user, signs out, and cascades forum/profile rows.
-4. Browser proof to capture: sign-up -> onboarding -> dashboard, sign-out -> `/`, sign-in returning user -> dashboard, Auctus AI/Home -> `/` while signed in, guest funding browse works, and student/business/professor accounts see only their own funding track in the signed-in navbar while dashboard remains personalized.
-5. Also check first scheduled GitHub scrape cron proof if available.
+1. Push `5b62265` if the user wants the critique-hardening batch on `origin/main`.
+2. Continue manual auth/browser proof at `manual.md` Step 6: Google OAuth browser proof.
+3. Browser-check the committed dashboard redesign for student/business/professor accounts.
+4. Browser-check the committed account deletion flow with a disposable account only; confirm wrong confirmation redirects to `/profile?error=delete_confirmation`, exact `DELETE` removes the auth user, signs out, and cascades forum/profile rows.
+5. Browser proof to capture: sign-up -> onboarding -> dashboard, sign-out -> `/`, sign-in returning user -> dashboard, Auctus AI/Home -> `/` while signed in, guest funding browse works, and student/business/professor accounts see only their own funding track in the signed-in navbar while dashboard remains personalized.
+6. Also check first scheduled GitHub scrape cron proof if available.

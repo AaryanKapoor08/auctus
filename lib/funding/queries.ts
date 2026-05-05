@@ -10,6 +10,7 @@ import { createFundingReadClient } from "./supabase";
 import { getFundingTypeForRole } from "./role-mapping";
 import { scoreFor } from "@/lib/matching";
 import { getProfileMatchTags, getRoleProfile } from "@/lib/profile/queries";
+import { buildIlikeOrFilter } from "@/lib/supabase/postgrest-filters";
 
 function toFundingSummary(
   item: FundingItem,
@@ -49,9 +50,14 @@ export const ListFundingForRole: ListFundingForRoleContract = async (
   }
 
   if (query.search) {
-    request = request.or(
-      `name.ilike.%${query.search}%,provider.ilike.%${query.search}%,description.ilike.%${query.search}%`,
+    const searchFilter = buildIlikeOrFilter(
+      ["name", "provider", "description"],
+      query.search,
     );
+
+    if (searchFilter) {
+      request = request.or(searchFilter);
+    }
   }
 
   if (query.limit) {

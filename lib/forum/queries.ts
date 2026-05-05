@@ -1,6 +1,7 @@
 import type { Role } from "@contracts/role";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session/get-session";
+import { buildIlikeOrFilter } from "@/lib/supabase/postgrest-filters";
 
 export const FORUM_CATEGORIES = [
   "Funding",
@@ -133,9 +134,14 @@ export async function listThreads({
   }
 
   if (search) {
-    request = request.or(
-      `title.ilike.%${search}%,content.ilike.%${search}%,category.ilike.%${search}%`,
+    const searchFilter = buildIlikeOrFilter(
+      ["title", "content", "category"],
+      search,
     );
+
+    if (searchFilter) {
+      request = request.or(searchFilter);
+    }
   }
 
   if (limit) {

@@ -11,69 +11,18 @@ import { delay } from "./utils.js";
 import type { ScrapeContext } from "./types.js";
 import { pathToFileURL } from "node:url";
 import { HELP_TEXT, parseArgs, selectSources } from "./cli.js";
-import https from "node:https";
 
 async function fetchHtml(url: string): Promise<string> {
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "AuctusScraper/0.1 (+https://github.com/aaryan-kapoor/auctus)",
-        Accept: "text/html,application/xhtml+xml",
-      },
-    });
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status} for ${url}`);
-    }
-    return res.text();
-  } catch (err) {
-    if (isCertificateChainError(err)) {
-      return fetchHtmlWithRelaxedCertificate(url);
-    }
-    throw err;
-  }
-}
-
-function isCertificateChainError(err: unknown): boolean {
-  if (!(err instanceof Error)) return false;
-  const cause = err.cause as { code?: string } | undefined;
-  return cause?.code === "UNABLE_TO_VERIFY_LEAF_SIGNATURE";
-}
-
-function fetchHtmlWithRelaxedCertificate(url: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const req = https.get(
-      url,
-      {
-        headers: {
-          "User-Agent": "AuctusScraper/0.1 (+https://github.com/aaryan-kapoor/auctus)",
-          Accept: "text/html,application/xhtml+xml",
-        },
-        rejectUnauthorized: false,
-      },
-      (res) => {
-        const status = res.statusCode ?? 0;
-        if (status >= 300 && status < 400 && res.headers.location) {
-          const nextUrl = new URL(res.headers.location, url).toString();
-          res.resume();
-          void fetchHtmlWithRelaxedCertificate(nextUrl).then(resolve, reject);
-          return;
-        }
-        if (status < 200 || status >= 300) {
-          res.resume();
-          reject(new Error(`HTTP ${status} for ${url}`));
-          return;
-        }
-        res.setEncoding("utf8");
-        let body = "";
-        res.on("data", (chunk) => {
-          body += chunk;
-        });
-        res.on("end", () => resolve(body));
-      },
-    );
-    req.on("error", reject);
-    req.end();
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": "AuctusScraper/0.1 (+https://github.com/aaryan-kapoor/auctus)",
+      Accept: "text/html,application/xhtml+xml",
+    },
   });
+  if (!res.ok) {
+    throw new Error(`HTTP ${res.status} for ${url}`);
+  }
+  return res.text();
 }
 
 async function main(): Promise<void> {

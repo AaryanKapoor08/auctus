@@ -12,16 +12,18 @@ The goal of V2 is to support three user types from the start:
 
 V2 is implemented end to end on `main`:
 
-- Supabase auth (Google OAuth + magic link), profiles, and role-aware middleware.
+- Supabase auth (Google OAuth + email/password), profiles, and role-aware route protection.
 - Per-role onboarding, persistence, and `getRoleProfile` runtime.
 - Unified funding model with role-specific listings, detail pages, filters, and DB-backed preferences.
 - Per-role match scoring wired into `GetFundingSummariesForUser`.
 - Persisted forum (threads, replies, helpful votes) with identity RLS.
 - ETL pipeline (`scraper/`) for six locked official-source modules, with normalize, dedupe, expire, run-tracking, and data-quality checks.
-- Funding-side RLS: role-aware reads, owner-and-current-role preferences, service-role-only writes/metadata.
+- Funding-side RLS: public active funding reads, owner-and-current-role preferences, service-role-only writes/metadata.
 - Composed dashboard (funding summaries, upcoming deadlines, forum activity) consuming only the published runtime contracts.
 
 The legacy demo routes are isolated under `app/(demo)/**` and stay mounted to keep the chatbot working. They are explicitly outside the V2 surface.
+
+Active funding rows are intentionally public-readable so guests can browse before sign-up. Do not add private sponsor notes, internal review data, or role-private fields to `funding`; store private funding metadata in a separate service-role-only table.
 
 Active planning and execution docs live in the [`build/`](build) folder. The active solo tracker is `codex/SoloProgress.md`.
 
@@ -103,7 +105,13 @@ The migration set on `main`:
 | `0004_scrape_metadata.sql` | `funding_sources` (seeded with six locked sources), `scrape_runs` |
 | `0005_forum.sql` | `threads`, `replies`, `reply_helpful_votes`, `mark_reply_helpful` |
 | `0010_rls_identity.sql` | identity RLS |
-| `0020_rls_funding.sql` | funding RLS (role-aware reads, service-role writes) |
+| `0011_profile_match_tags.sql` | profile-derived match tags |
+| `0012_restrict_profile_email_select.sql` | profile email select hardening |
+| `0020_rls_funding.sql` | funding RLS baseline (role-aware reads, service-role writes) |
+| `0021_funding_tag_taxonomy.sql` | canonical funding tag taxonomy |
+| `0022_canonical_funding_filters.sql` | canonical funding filter backfill |
+| `0023_research_social_sciences_tags.sql` | research social-sciences tag backfill |
+| `0024_public_funding_reads.sql` | public active funding reads for guest discovery |
 
 ## Important Project Docs
 

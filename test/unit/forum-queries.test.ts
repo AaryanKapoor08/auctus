@@ -3,6 +3,7 @@ import {
   createReply,
   createThread,
   getThread,
+  listThreads,
   markReplyHelpful,
 } from "@/lib/forum/queries";
 
@@ -121,5 +122,23 @@ describe("forum queries", () => {
     expect(rpc).toHaveBeenCalledWith("mark_reply_helpful", {
       p_reply_id: "reply-1",
     });
+  });
+
+  it("sanitizes forum search input before building PostgREST or filters", async () => {
+    const query = {
+      select: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      or: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue({ data: [threadRow], error: null }),
+    };
+    mocks.createClient.mockResolvedValue({
+      from: vi.fn(() => query),
+    });
+
+    await listThreads({ search: "grant),category.eq.Admin", limit: 1 });
+
+    expect(query.or).toHaveBeenCalledWith(
+      "title.ilike.%grant category eq Admin%,content.ilike.%grant category eq Admin%,category.ilike.%grant category eq Admin%",
+    );
   });
 });

@@ -182,4 +182,20 @@ describe("GetFundingSummariesForUser", () => {
     expect(query.contains).toHaveBeenCalledWith("tags", ["STEM"]);
     expect(query.contains).toHaveBeenCalledWith("tags", ["Provincial"]);
   });
+
+  it("sanitizes search input before passing it to PostgREST or filters", async () => {
+    const query = createQuery([baseItem]);
+    mocks.createFundingReadClient.mockResolvedValue({
+      from: vi.fn(() => query),
+    });
+
+    await ListFundingForRole({
+      role: "business",
+      search: "%,status.eq.expired",
+    });
+
+    expect(query.or).toHaveBeenCalledWith(
+      "name.ilike.%status eq expired%,provider.ilike.%status eq expired%,description.ilike.%status eq expired%",
+    );
+  });
 });

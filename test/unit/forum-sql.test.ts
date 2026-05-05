@@ -5,6 +5,11 @@ import { join } from "node:path";
 const root = process.cwd();
 
 describe("forum and identity RLS migrations", () => {
+  const profileEmailSql = readFileSync(
+    join(root, "supabase/migrations/0012_restrict_profile_email_select.sql"),
+    "utf8",
+  );
+
   it("defines helpful votes through a duplicate-safe security definer function", () => {
     const sql = readFileSync(
       join(root, "supabase/migrations/0005_forum.sql"),
@@ -31,5 +36,13 @@ describe("forum and identity RLS migrations", () => {
     expect(sql).toContain("business profiles owner all");
     expect(sql).toContain("student profiles owner all");
     expect(sql).toContain("professor profiles owner all");
+  });
+
+  it("removes email from authenticated profile select privileges", () => {
+    expect(profileEmailSql).toContain("revoke select on public.profiles from authenticated");
+    expect(profileEmailSql).toContain("grant select (");
+    expect(profileEmailSql).not.toMatch(/grant select \([^)]*email[^)]*\) on public\.profiles to authenticated/s);
+    expect(profileEmailSql).toMatch(/email,\s+avatar_url/s);
+    expect(profileEmailSql).toContain("on public.profiles to service_role");
   });
 });

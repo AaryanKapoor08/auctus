@@ -131,7 +131,32 @@ function RoleFields({
   );
 }
 
-export default async function EditProfilePage() {
+function getFormErrorMessage(error?: string) {
+  if (!error) return null;
+
+  const messages: Record<string, string> = {
+    invalid: "Check the required fields and try again.",
+    save_failed: "We could not save your profile. Try again.",
+    auth_required: "Sign in again, then update your profile.",
+  };
+
+  return messages[error] ?? "We could not save your profile. Try again.";
+}
+
+function getProfileFormError(error: unknown) {
+  const message = error instanceof Error ? error.message.toLowerCase() : "";
+
+  if (message.includes("authentication")) return "auth_required";
+  if (message.includes("required") || message.includes("invalid")) return "invalid";
+
+  return "save_failed";
+}
+
+export default async function EditProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const session = await getSession();
 
   if (!session) {
@@ -153,10 +178,18 @@ export default async function EditProfilePage() {
   async function saveProfile(formData: FormData) {
     "use server";
 
-    const input = parseOnboardingForm(role, formData);
-    await updateRoleProfile(input);
+    try {
+      const input = parseOnboardingForm(role, formData);
+      await updateRoleProfile(input);
+    } catch (error) {
+      redirect(`/profile/edit?error=${getProfileFormError(error)}`);
+    }
+
     redirect("/profile");
   }
+
+  const params = await searchParams;
+  const formError = getFormErrorMessage(params.error);
 
   return (
     <main className="min-h-screen bg-gray-50 py-10">
@@ -171,6 +204,11 @@ export default async function EditProfilePage() {
 
         <Card className="border border-gray-200">
           <form action={saveProfile}>
+            {formError && (
+              <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {formError}
+              </div>
+            )}
             <div className="grid gap-5">
               <Input
                 name="display_name"

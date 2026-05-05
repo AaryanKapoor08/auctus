@@ -19,8 +19,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Auctus AI - Business Growth Platform",
-  description: "Connect with grants, partners, and opportunities in Fredericton",
+  title: "Auctus - Canadian Funding Discovery",
+  description:
+    "Browse Canadian grants, scholarships, and research funding, then personalize matches by role.",
 };
 
 export default async function RootLayout({

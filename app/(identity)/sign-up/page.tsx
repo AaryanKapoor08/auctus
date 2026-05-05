@@ -4,6 +4,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { getSession } from "@/lib/session/get-session";
 import { createClient } from "@/lib/supabase/server";
+import { getPostAuthRoute } from "@/lib/session/post-auth-route";
 
 function getAuthCallbackUrl() {
   return `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback`;
@@ -76,7 +77,7 @@ async function signUpWithEmail(formData: FormData) {
     }
   }
 
-  redirect("/onboarding");
+  redirect(getPostAuthRoute(null));
 }
 
 function getErrorMessage(error?: string) {
@@ -100,11 +101,8 @@ export default async function SignUpPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const session = await getSession();
-  if (session?.role) {
-    redirect("/dashboard");
-  }
   if (session) {
-    redirect("/onboarding");
+    redirect(getPostAuthRoute(session.role));
   }
 
   const params = await searchParams;

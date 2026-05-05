@@ -1,3 +1,5 @@
+import "server-only";
+
 import type {
   FundingItem,
   FundingQuery,
@@ -11,6 +13,8 @@ import { getFundingTypeForRole } from "./role-mapping";
 import { scoreFor } from "@/lib/matching";
 import { getProfileMatchTags, getRoleProfile } from "@/lib/profile/queries";
 import { buildIlikeOrFilter } from "@/lib/supabase/postgrest-filters";
+
+const MAX_CATEGORY_FILTERS = 12;
 
 function toFundingSummary(
   item: FundingItem,
@@ -31,7 +35,8 @@ function parseCategoryFilters(category: string | undefined) {
   return (category ?? "")
     .split(",")
     .map((value) => value.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .slice(0, MAX_CATEGORY_FILTERS);
 }
 
 export const ListFundingForRole: ListFundingForRoleContract = async (

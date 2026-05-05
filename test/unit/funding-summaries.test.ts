@@ -165,6 +165,7 @@ describe("GetFundingSummariesForUser", () => {
     });
 
     expect(query.contains).toHaveBeenCalledWith("tags", ["STEM"]);
+    expect(query.eq).toHaveBeenCalledWith("type", "scholarship");
     expect(query.eq).not.toHaveBeenCalledWith("category", "STEM");
   });
 
@@ -181,6 +182,36 @@ describe("GetFundingSummariesForUser", () => {
 
     expect(query.contains).toHaveBeenCalledWith("tags", ["STEM"]);
     expect(query.contains).toHaveBeenCalledWith("tags", ["Provincial"]);
+  });
+
+  it("caps category filters before building chained tag predicates", async () => {
+    const query = createQuery([baseItem]);
+    mocks.createFundingReadClient.mockResolvedValue({
+      from: vi.fn(() => query),
+    });
+
+    await ListFundingForRole({
+      role: "business",
+      category: Array.from({ length: 20 }, (_, index) => `Tag${index}`).join(","),
+    });
+
+    expect(query.contains).toHaveBeenCalledTimes(12);
+    expect(query.contains).not.toHaveBeenCalledWith("tags", ["Tag12"]);
+  });
+
+  it.each([
+    ["business" as const, "business_grant"],
+    ["student" as const, "scholarship"],
+    ["professor" as const, "research_grant"],
+  ])("always scopes %s listing queries by funding type", async (role, type) => {
+    const query = createQuery([baseItem]);
+    mocks.createFundingReadClient.mockResolvedValue({
+      from: vi.fn(() => query),
+    });
+
+    await ListFundingForRole({ role });
+
+    expect(query.eq).toHaveBeenCalledWith("type", type);
   });
 
   it("sanitizes search input before passing it to PostgREST or filters", async () => {

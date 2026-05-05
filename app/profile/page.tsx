@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Briefcase, GraduationCap, Microscope, Pencil } from "lucide-react";
+import { Briefcase, GraduationCap, Microscope, Pencil, Trash2 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import { DELETE_ACCOUNT_CONFIRMATION } from "@/lib/profile/delete-account-confirmation";
+import { deleteCurrentUserAccount } from "@/lib/profile/delete-account";
 import { getRoleProfile } from "@/lib/profile/queries";
 import { getSession } from "@/lib/session/get-session";
 
@@ -29,7 +32,11 @@ function formatValue(value: unknown) {
   return String(value);
 }
 
-export default async function ProfilePage() {
+export default async function ProfilePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const session = await getSession();
 
   if (!session) {
@@ -62,6 +69,11 @@ export default async function ProfilePage() {
   }[profile.role];
   const Icon = roleMeta.icon;
   const details = Object.entries(profile.details).filter(([key]) => key !== "id");
+  const params = await searchParams;
+  const deleteError =
+    params.error === "delete_confirmation"
+      ? `Type ${DELETE_ACCOUNT_CONFIRMATION} to confirm account deletion.`
+      : null;
   const initials = profile.base.display_name
     .split(/\s+/)
     .filter(Boolean)
@@ -127,6 +139,50 @@ export default async function ProfilePage() {
             </dl>
           </Card>
         </div>
+
+        <Card
+          className="mt-6 border border-red-200 bg-red-50/40"
+          header={
+            <div className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-red-700" />
+              <h2 className="text-lg font-semibold text-red-950">Delete account</h2>
+            </div>
+          }
+        >
+          <div className="grid gap-5 lg:grid-cols-[1fr_320px] lg:items-start">
+            <div className="space-y-3 text-sm text-red-950">
+              <p>
+                This permanently deletes your Auctus account, profile, onboarding
+                details, funding preferences, forum threads, replies, and helpful
+                votes. Threads you started will also remove their reply history.
+              </p>
+              <p className="font-medium">
+                This cannot be undone. Create a new account if you want to use
+                Auctus again later.
+              </p>
+            </div>
+
+            <form action={deleteCurrentUserAccount} className="space-y-3">
+              {deleteError && (
+                <div className="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-700">
+                  {deleteError}
+                </div>
+              )}
+              <Input
+                name="confirm_delete"
+                label={`Type ${DELETE_ACCOUNT_CONFIRMATION} to confirm`}
+                autoComplete="off"
+                required
+              />
+              <Button
+                type="submit"
+                className="w-full bg-red-700 text-white hover:bg-red-800 focus:ring-red-700"
+              >
+                Permanently delete account
+              </Button>
+            </form>
+          </div>
+        </Card>
       </div>
     </main>
   );

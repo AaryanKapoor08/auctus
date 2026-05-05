@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createReply,
   createThread,
+  deleteReply,
+  deleteThread,
   getThread,
   listThreads,
   markReplyHelpful,
@@ -10,6 +12,7 @@ import {
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
   getSession: vi.fn(),
+  revalidatePath: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/server", () => ({
@@ -18,6 +21,10 @@ vi.mock("@/lib/supabase/server", () => ({
 
 vi.mock("@/lib/session/get-session", () => ({
   getSession: mocks.getSession,
+}));
+
+vi.mock("next/cache", () => ({
+  revalidatePath: mocks.revalidatePath,
 }));
 
 const threadRow = {
@@ -112,6 +119,8 @@ describe("forum queries", () => {
       author_id: "user-1",
       content: "Start with eligibility.",
     });
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/forum");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/dashboard");
   });
 
   it("marks replies helpful through the RPC instead of direct row updates", async () => {
@@ -140,5 +149,26 @@ describe("forum queries", () => {
     expect(query.or).toHaveBeenCalledWith(
       "title.ilike.%grant category eq Admin%,content.ilike.%grant category eq Admin%,category.ilike.%grant category eq Admin%",
     );
+  });
+
+  it("revalidates forum and dashboard lists after author deletes", async () => {
+    let eqCalls = 0;
+    const query = {
+      delete: vi.fn().mockReturnThis(),
+      eq: vi.fn(() => {
+        eqCalls += 1;
+        return eqCalls % 2 === 0 ? Promise.resolve({ error: null }) : query;
+      }),
+    };
+    mocks.createClient.mockResolvedValue({
+      from: vi.fn(() => query),
+    });
+
+    await deleteThread("thread-1");
+    await deleteReply("reply-1");
+
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/forum");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/dashboard");
+    expect(mocks.revalidatePath).toHaveBeenCalledTimes(4);
   });
 });

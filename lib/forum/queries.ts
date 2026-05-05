@@ -1,3 +1,6 @@
+import "server-only";
+
+import { revalidatePath } from "next/cache";
 import type { Role } from "@contracts/role";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session/get-session";
@@ -112,6 +115,11 @@ async function requireSession() {
   return session;
 }
 
+function revalidateForumLists() {
+  revalidatePath("/forum");
+  revalidatePath("/dashboard");
+}
+
 export async function listThreads({
   category,
   search,
@@ -212,6 +220,8 @@ export async function createThread(formData: FormData) {
 
   if (error) throw error;
 
+  revalidateForumLists();
+
   return data.id as string;
 }
 
@@ -231,6 +241,8 @@ export async function createReply(threadId: string, formData: FormData) {
   });
 
   if (error) throw error;
+
+  revalidateForumLists();
 }
 
 export async function markReplyHelpful(replyId: string) {
@@ -257,6 +269,8 @@ export async function deleteThread(threadId: string) {
     .eq("author_id", session.user_id);
 
   if (error) throw error;
+
+  revalidateForumLists();
 }
 
 export async function deleteReply(replyId: string) {
@@ -270,4 +284,6 @@ export async function deleteReply(replyId: string) {
     .eq("author_id", session.user_id);
 
   if (error) throw error;
+
+  revalidateForumLists();
 }

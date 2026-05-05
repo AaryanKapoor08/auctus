@@ -1,16 +1,19 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { ArrowLeft, MessageSquare } from "lucide-react";
+import { ArrowLeft, MessageSquare, Trash2 } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import ReplyCard from "@/components/forum/ReplyCard";
 import {
   createReply,
+  deleteReply,
+  deleteThread,
   getThread,
   markReplyHelpful,
 } from "@/lib/forum/queries";
+import { getSession } from "@/lib/session/get-session";
 
 type PageProps = {
   params: Promise<{ threadId: string }>;
@@ -26,19 +29,29 @@ function formatDate(value: string) {
 
 export default async function ThreadDetailPage({ params }: PageProps) {
   const { threadId } = await params;
-  const data = await getThread(threadId);
+  const [data, session] = await Promise.all([getThread(threadId), getSession()]);
 
   if (!data) {
     notFound();
   }
 
   const { thread, replies } = data;
+  const currentUserId = session?.user_id ?? null;
+  const canDeleteThread = Boolean(currentUserId) && thread.author.id === currentUserId;
 
   async function addReply(formData: FormData) {
     "use server";
 
     await createReply(threadId, formData);
     revalidatePath(`/forum/${threadId}`);
+  }
+
+  async function removeThread() {
+    "use server";
+
+    await deleteThread(threadId);
+    revalidatePath("/forum");
+    redirect("/forum");
   }
 
   return (
@@ -54,8 +67,19 @@ export default async function ThreadDetailPage({ params }: PageProps) {
 
         <div className="space-y-6">
           <Card className="border border-gray-200">
-            <div className="mb-4">
+            <div className="mb-4 flex items-center justify-between gap-3">
               <Badge variant="default">{thread.category}</Badge>
+              {canDeleteThread && (
+                <form action={removeThread}>
+                  <button
+                    type="submit"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete thread
+                  </button>
+                </form>
+              )}
             </div>
             <h1 className="text-3xl font-bold text-gray-900">{thread.title}</h1>
             <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-gray-600">
@@ -91,10 +115,20 @@ export default async function ThreadDetailPage({ params }: PageProps) {
             {replies.length > 0 ? (
               <div className="space-y-4">
                 {replies.map((reply) => {
+                  const canDeleteReply =
+                    Boolean(currentUserId) && reply.author.id === currentUserId;
+
                   async function helpfulAction() {
                     "use server";
 
                     await markReplyHelpful(reply.id);
+                    revalidatePath(`/forum/${threadId}`);
+                  }
+
+                  async function removeReply() {
+                    "use server";
+
+                    await deleteReply(reply.id);
                     revalidatePath(`/forum/${threadId}`);
                   }
 
@@ -110,6 +144,7 @@ export default async function ThreadDetailPage({ params }: PageProps) {
                       timestamp={formatDate(reply.created_at)}
                       helpfulCount={reply.helpful_count}
                       helpfulAction={helpfulAction}
+                      deleteAction={canDeleteReply ? removeReply : undefined}
                     />
                   );
                 })}

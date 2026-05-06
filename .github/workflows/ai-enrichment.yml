@@ -6,10 +6,9 @@ on:
       provider:
         description: "Provider to run"
         required: true
-        default: "mock"
+        default: "gemini"
         type: choice
         options:
-          - mock
           - gemini
           - openrouter
       max_rows:
@@ -29,8 +28,10 @@ jobs:
       AI_OPENROUTER_API_KEY: ${{ secrets.AI_OPENROUTER_API_KEY }}
       AI_GEMINI_MODEL: ${{ vars.AI_GEMINI_MODEL }}
       AI_OPENROUTER_MODEL: ${{ vars.AI_OPENROUTER_MODEL }}
+      AI_ENRICHMENT_ENABLED: ${{ vars.AI_ENRICHMENT_ENABLED }}
       AI_MONTHLY_TOKEN_BUDGET: ${{ vars.AI_MONTHLY_TOKEN_BUDGET }}
       AI_MONTHLY_COST_BUDGET_CENTS: ${{ vars.AI_MONTHLY_COST_BUDGET_CENTS }}
+      NODE_OPTIONS: --conditions=react-server
 
     steps:
       - name: Check out repository
@@ -42,12 +43,8 @@ jobs:
           node-version: 24
           package-manager-cache: false
 
-      - name: Install scraper dependencies
-        run: |
-          cd scraper
-          npm ci
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run enrichment
-        run: |
-          cd scraper
-          npx tsx ai-enrich.ts --dry-run --provider "${{ inputs.provider }}" --max-rows "${{ inputs.max_rows }}"
+        run: npx tsx jobs/ai-enrich.ts --provider "${{ inputs.provider }}" --max-rows "${{ inputs.max_rows }}"

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getPublicEnv, getServerEnv } from "@/lib/env";
+import { getPublicEnv, getServerEnv, getServiceEnv } from "@/lib/env";
 
 const validEnv = {
   NEXT_PUBLIC_SUPABASE_URL: "https://example.supabase.co",
@@ -17,6 +17,18 @@ describe("env guard", () => {
 
   it("returns typed server env values", () => {
     expect(getServerEnv(validEnv)).toEqual(validEnv);
+  });
+
+  it("returns service-role env without requiring the anon key", () => {
+    expect(
+      getServiceEnv({
+        NEXT_PUBLIC_SUPABASE_URL: validEnv.NEXT_PUBLIC_SUPABASE_URL,
+        SUPABASE_SERVICE_ROLE_KEY: validEnv.SUPABASE_SERVICE_ROLE_KEY,
+      }),
+    ).toEqual({
+      NEXT_PUBLIC_SUPABASE_URL: validEnv.NEXT_PUBLIC_SUPABASE_URL,
+      SUPABASE_SERVICE_ROLE_KEY: validEnv.SUPABASE_SERVICE_ROLE_KEY,
+    });
   });
 
   it("throws a clear missing-var error", () => {

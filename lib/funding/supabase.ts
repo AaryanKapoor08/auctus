@@ -1,5 +1,5 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { getPublicEnv, getServerEnv } from "@/lib/env";
+import { getPublicEnv, getServiceEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
 export async function createFundingReadClient() {
@@ -7,7 +7,7 @@ export async function createFundingReadClient() {
 }
 
 export function createFundingServiceClient() {
-  const env = getServerEnv();
+  const env = getServiceEnv();
 
   return createSupabaseClient(
     env.NEXT_PUBLIC_SUPABASE_URL,

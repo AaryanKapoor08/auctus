@@ -20,9 +20,9 @@ Avoid implying a real-time AI advisor unless one is actually shipped. Wordmark d
 
 First release rule: ship G13-G15 as one narrow AI slice before starting semantic search, monthly radar, or chatbot-like work. G13-G15 must prove schema safety, queue safety, and visible funding-page value on real rows before G16/G17 expands the feature set.
 
-Primary provider for the first real run: Gemini 2.5 Flash-Lite, but only for cheap/simple public-data tasks. Use one combined enrichment call per funding row instead of six separate task calls. The output can populate multiple fields, but provider work should stay one row-level enrichment request where practical.
+Primary provider for the first real run: Gemini 2.5 Flash, for better quality on the first proof run while still staying in the Flash price/performance family. Use one combined enrichment call per funding row instead of six separate task calls. The output can populate multiple fields, but provider work should stay one row-level enrichment request where practical.
 
-The model name "Gemini 2.5 Flash-Lite" is a **recommended default**, not a hardcode. Set it in `.env.example` as `AI_GEMINI_MODEL=gemini-2.5-flash-lite`; runtime code reads it via env only.
+The model name "Gemini 2.5 Flash" is a **recommended default**, not a hardcode. Set it in `.env.example` as `AI_GEMINI_MODEL=gemini-2.5-flash`; runtime code reads it via env only.
 
 **Combined-call mechanics.** One job per `(funding_id, content_hash)` enqueues one provider call per attempt. The call returns a single structured response covering all active task types for that row (initial scope: `summary`, `tags`, `checklist`, `match_reasons`, `data_quality`). Per-task outputs are then written as separate `funding_ai_enrichment` rows discriminated by `task_type` so readers can hide a single task without losing the others. The job table tracks the union of task outputs the call will produce, not a single task type — see `ai_enrichment_jobs.task_types` below.
 
@@ -38,7 +38,7 @@ Do not rely on Gemini Flash for high-judgment work. Treat its output as low-conf
 
 Gemma is not used in G13-G15. Its TPM ceiling is too low for full funding records. If a future helper/canary path needs it, add it as a separate provider adapter at that time; do not pre-wire it now.
 
-Fallback/escalation provider: OpenRouter Nemotron Super.
+Fallback/escalation provider: OpenRouter Nemotron Super (`nvidia/nemotron-3-super-120b-a12b`).
 
 Use Nemotron Super for:
 

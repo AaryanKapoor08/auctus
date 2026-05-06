@@ -10,7 +10,7 @@ import {
 
 describe("AI enrichment schema", () => {
   it("keeps fixed runtime constants explicit", () => {
-    expect(COMBINED_PROMPT_VERSION).toBe(1);
+    expect(COMBINED_PROMPT_VERSION).toBe(2);
     expect(TASK_TYPES).toEqual([
       "summary",
       "tags",
@@ -45,7 +45,11 @@ describe("AI enrichment schema", () => {
         },
         {
           task_type: "checklist",
-          application_checklist: ["Review eligibility."],
+          application_checklist: [
+            "Review eligibility.",
+            "Prepare project documents.",
+            "Confirm deadline details.",
+          ],
           deadline_urgency: "dated",
           confidence: 0.75,
         },

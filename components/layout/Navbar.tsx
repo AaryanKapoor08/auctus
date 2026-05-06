@@ -112,7 +112,7 @@ export default function Navbar({ initialSession }: { initialSession?: Session | 
             href="/"
             className="flex items-center"
           >
-            <span className="text-xl font-bold text-gray-900">Auctus AI</span>
+            <span className="text-xl font-bold text-gray-900">Auctus</span>
           </Link>
 
           <div className="hidden items-center gap-1 md:flex">

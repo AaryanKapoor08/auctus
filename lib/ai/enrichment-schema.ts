@@ -47,7 +47,7 @@ export const RUN_STATUSES = [
   "failed",
 ] as const;
 
-export const COMBINED_PROMPT_VERSION = 1;
+export const COMBINED_PROMPT_VERSION = 2;
 
 export const SCHEMA_VERSIONS: Record<AiTaskType, number> = {
   summary: 1,
@@ -84,7 +84,7 @@ export const tagsOutputSchema = z.object({
 
 export const checklistOutputSchema = z.object({
   task_type: z.literal("checklist"),
-  application_checklist: z.array(bulletString).min(1).max(12),
+  application_checklist: z.array(bulletString).min(3).max(12),
   deadline_urgency: z.enum(["rolling", "soon", "dated", "unknown"]).default("unknown"),
   confidence: confidenceSchema,
 });

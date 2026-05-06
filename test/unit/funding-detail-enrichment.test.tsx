@@ -32,8 +32,8 @@ const enrichment: FundingEnrichmentBundle = {
     funding_id: "funding-1",
     task_type: "summary",
     summary: "Validated enrichment summary.",
-    eligibility_bullets: [],
-    best_fit_applicant: null,
+    eligibility_bullets: ["Must be a Canadian business.", "Requires a growth project."],
+    best_fit_applicant: "Small businesses preparing a near-term expansion plan.",
     normalized_tags: [],
     application_checklist: [],
     match_reason_templates: {},
@@ -70,6 +70,10 @@ describe("FundingDetail enrichment rendering", () => {
 
     expect(html).toContain("Overview");
     expect(html).toContain("Validated enrichment summary.");
+    expect(html).toContain("Good fit for");
+    expect(html).toContain("Small businesses preparing a near-term expansion plan.");
+    expect(html).toContain("Eligibility signals");
+    expect(html).toContain("Must be a Canadian business.");
     expect(html).toContain("Application prep checklist");
     expect(html).toContain("Preparation guidance, not legal or financial advice.");
     expect(html).not.toContain("Canonical provider description.");
@@ -80,5 +84,24 @@ describe("FundingDetail enrichment rendering", () => {
 
     expect(html).toContain("Canonical provider description.");
     expect(html).not.toContain("Application prep checklist");
+  });
+
+  it("hides thin generic checklist output while keeping useful summary context", () => {
+    const html = renderToStaticMarkup(
+      <FundingDetail
+        item={item}
+        enrichment={{
+          ...enrichment,
+          checklist: {
+            ...enrichment.checklist!,
+            application_checklist: ["Submit an application for Growth Grant."],
+          },
+        }}
+      />,
+    );
+
+    expect(html).toContain("Validated enrichment summary.");
+    expect(html).not.toContain("Application prep checklist");
+    expect(html).not.toContain("Submit an application for Growth Grant.");
   });
 });

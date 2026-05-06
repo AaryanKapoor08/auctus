@@ -14,8 +14,14 @@ export default function FundingDetail({
   showPersonalizationPrompt?: boolean;
 }) {
   const applicationUrl = getSafeExternalUrl(item.application_url);
-  const summary = enrichment?.summary?.summary;
-  const checklist = enrichment?.checklist?.application_checklist ?? [];
+  const summaryEnrichment = enrichment?.summary;
+  const summary = summaryEnrichment?.summary;
+  const eligibilityBullets = summaryEnrichment?.eligibility_bullets ?? [];
+  const bestFitApplicant = summaryEnrichment?.best_fit_applicant;
+  const checklist = (enrichment?.checklist?.application_checklist ?? []).filter(
+    (entry) => !/^submit an application\b/i.test(entry.trim()),
+  );
+  const showChecklist = checklist.length >= 2;
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-10">
@@ -34,9 +40,37 @@ export default function FundingDetail({
           </div>
 
           {summary ? (
-            <section>
+            <section className="space-y-4">
               <h2 className="text-lg font-semibold text-gray-900">Overview</h2>
               <p className="mt-2 text-base leading-7 text-gray-700">{summary}</p>
+
+              {(bestFitApplicant || eligibilityBullets.length > 0) && (
+                <div className="grid gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 md:grid-cols-[0.9fr_1.1fr]">
+                  {bestFitApplicant && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900">
+                        Good fit for
+                      </h3>
+                      <p className="mt-1 text-sm leading-6 text-gray-700">
+                        {bestFitApplicant}
+                      </p>
+                    </div>
+                  )}
+
+                  {eligibilityBullets.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900">
+                        Eligibility signals
+                      </h3>
+                      <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-6 text-gray-700">
+                        {eligibilityBullets.map((bullet) => (
+                          <li key={bullet}>{bullet}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
             </section>
           ) : item.description ? (
             <p className="text-base leading-7 text-gray-700">
@@ -55,7 +89,7 @@ export default function FundingDetail({
             </ul>
           </section>
 
-          {checklist.length > 0 && (
+          {showChecklist && (
             <section className="rounded-lg border border-blue-100 bg-blue-50 p-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 Application prep checklist

@@ -3,7 +3,7 @@
 **Last Updated:** 2026-05-06
 **Current Gate:** G15 — Enrichment Outputs in Funding UX
 **Branch:** `main`
-**Status:** G13-G15 code is implemented and locally verified; production AI workflow runner is pushed, but G15 remains manually blocked on dispatching the real provider workflow and real enriched-row browser proof.
+**Status:** G13-G15 code is implemented and locally verified; production AI workflow runner is pushed. First real Gemini smoke proved plumbing but failed quality/coverage, so G15 remains open pending prompt-v2 rerun and real enriched-row browser proof.
 
 ## Read First
 
@@ -30,6 +30,12 @@
 - Replaced the dry-run-only Actions command with production `jobs/ai-enrich.ts`, which enqueues missing active scraped funding jobs, runs the service-role queue, and writes run results.
 - Updated first-run model defaults to `gemini-2.5-flash` and `nvidia/nemotron-3-super-120b-a12b`.
 - Pushed production workflow/runtime commit `da756b8` to `main`.
+- Observed first real Gemini smoke run: 25 attempted, 1 enriched, 24 failed retryable; main error was Gemini rate limiting. The one visible row (`Alliance Society`) was useful as plumbing proof but too weak as product proof.
+- Bumped `COMBINED_PROMPT_VERSION` to 2 and tightened prompt/schema/UI quality:
+  - at least 3 checklist bullets are required.
+  - generic one-line checklist output is hidden.
+  - funding detail pages show best-fit applicant and eligibility signals.
+  - active shell/footer copy now says `Auctus`, not `Auctus AI`.
 
 ## Verification Run
 
@@ -49,10 +55,15 @@
 - `npx tsc -p scraper/tsconfig.json --noEmit` => success.
 - `npm run build` => success after deleting stale generated `.next` output.
 - `git push origin main` => pushed `da756b8` to `main`; branch protection was bypassed by the GitHub account.
+- Supabase run query => latest AI run `partial`, `rows_attempted=25`, `rows_enriched=1`, `rows_failed=24`, `gemini.rate_limit=20`.
+- Focused prompt/UI tests initially hit local Windows `spawn EPERM`; elevated rerun => 2 files / 7 tests passed.
+- `npm run lint` => success with 20 known legacy demo warnings only.
+- `npm run build` => success.
+- Active app `Auctus AI` grep outside frozen demo/archive paths => no matches.
 
 ## Manual Blockers
 
-- Real AI provider run is not complete: user says GitHub Actions secrets/variables are configured, but local `gh` auth is invalid (`HTTP 401`), so the workflow could not be verified or triggered from this machine.
+- Real AI provider quality proof is not complete: first run proved the queue writes rows, but only 1/25 enriched and the result was too thin. Prompt v2 must be rerun.
 - G15 browser proof on real enriched rows is pending. Need at least one G14 real enrichment cycle producing >= 50 enriched rows, then verify one visible row and one deliberate `needs_review=true` hidden row.
 - Existing external auth/browser blockers from prior gates remain: Google OAuth/email-password proof and multi-role browser walkthrough.
 
@@ -60,9 +71,9 @@
 
 Do not start G16 yet. First close the G15 manual proof:
 
-1. Re-authenticate GitHub CLI with `gh auth login` or manually trigger Actions in the GitHub UI.
-2. Trigger `.github/workflows/ai-enrichment.yml` for a real Gemini run with `max_rows=50`.
-3. Confirm >= 50 active scraped rows have current-version enrichment with `needs_review=false`.
+1. Push the prompt-v2 quality hardening commit if not already pushed.
+2. Manually trigger `.github/workflows/ai-enrichment.yml` for a smaller real run first (`provider=openrouter`, `max_rows=5`, or Gemini after rate limits cool down) and inspect the visible rows for quality.
+3. If prompt-v2 quality is acceptable, run enough batches to reach >= 50 current-version enriched rows with `needs_review=false`.
 4. Browser-check a visible enriched funding row and a row with `needs_review=true` to confirm the AI surface is hidden.
 5. Record the manual proof and commit reference in `codex/SoloProgress.md`.
 

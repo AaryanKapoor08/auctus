@@ -18,7 +18,7 @@ export default function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Copyright */}
           <div className="text-sm text-gray-600">
-            © {currentYear} Auctus AI. All rights reserved.
+            © {currentYear} Auctus. All rights reserved.
           </div>
 
           {/* Footer Links */}

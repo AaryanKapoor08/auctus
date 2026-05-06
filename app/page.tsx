@@ -117,7 +117,7 @@ export default async function Home() {
               Browse funding first. Personalize when it is worth it.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-gray-600">
-              Auctus AI gives guests the full grant browser up front: business grants,
+              Auctus gives guests the full grant browser up front: business grants,
               scholarships, and research funding. Sign in only when you want role-aware
               matching, saved preferences, and dashboard shortcuts.
             </p>

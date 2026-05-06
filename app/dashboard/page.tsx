@@ -24,6 +24,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { getSession } from "@/lib/session/get-session";
 import { GetFundingSummariesForUser, ListFundingForRole } from "@/lib/funding/queries";
+import { getEnrichmentForFundingIds } from "@/lib/funding/enrichment";
 import { listThreads } from "@/lib/forum/queries";
 import {
   EXPIRING_DEADLINE_WINDOW_DAYS,
@@ -223,12 +224,17 @@ export default async function DashboardPage() {
     listThreads({ limit: 5 }),
     getRoleProfile(session.user_id),
   ]);
+  const enrichmentByFundingId = await getEnrichmentForFundingIds(
+    fundingSummaries.slice(0, TOP_MATCHES_LIMIT).map((item) => item.id),
+  );
 
   const data = composeDashboard({
     topMatches: fundingSummaries.slice(0, TOP_MATCHES_LIMIT),
     candidateDeadlines: fundingSummaries,
     threads,
     asOf,
+    role: session.role,
+    enrichmentByFundingId,
   });
 
   const fundingHomeRoute = ROLE_DEFAULT_ROUTE[session.role];
@@ -360,6 +366,11 @@ export default async function DashboardPage() {
                             {item.name}
                           </Link>
                           <p className="mt-1 text-sm text-gray-600">{item.provider}</p>
+                          {data.topMatchReasons[item.id] && (
+                            <p className="mt-2 text-sm text-gray-700">
+                              {data.topMatchReasons[item.id]}
+                            </p>
+                          )}
                           <div className="mt-3 flex flex-wrap gap-2">
                             <Badge variant={scoreVariant(item.match_score)}>
                               {item.match_score === null ? "Unscored" : `${item.match_score}% match`}

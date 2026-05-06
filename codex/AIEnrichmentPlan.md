@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-05
 **Decision:** Remove the legacy chatbot as the AI placeholder. Auctus should present AI as offline enrichment and discovery intelligence, not as a live assistant.
-**Review status:** Updated after Claude gap review and provider-limit review on 2026-05-05.
+**Review status:** Updated after Claude gap review and provider-limit review on 2026-05-05; ambiguity-resolution pass on 2026-05-05.
 
 ## Product Direction
 
@@ -22,6 +22,10 @@ First release rule: ship G13-G15 as one narrow AI slice before starting semantic
 
 Primary provider for the first real run: Gemini 2.5 Flash-Lite, but only for cheap/simple public-data tasks. Use one combined enrichment call per funding row instead of six separate task calls. The output can populate multiple fields, but provider work should stay one row-level enrichment request where practical.
 
+The model name "Gemini 2.5 Flash-Lite" is a **recommended default**, not a hardcode. Set it in `.env.example` as `AI_GEMINI_MODEL=gemini-2.5-flash-lite`; runtime code reads it via env only.
+
+**Combined-call mechanics.** One job per `(funding_id, content_hash)` enqueues one provider call per attempt. The call returns a single structured response covering all active task types for that row (initial scope: `summary`, `tags`, `checklist`, `match_reasons`, `data_quality`). Per-task outputs are then written as separate `funding_ai_enrichment` rows discriminated by `task_type` so readers can hide a single task without losing the others. The job table tracks the union of task outputs the call will produce, not a single task type — see `ai_enrichment_jobs.task_types` below.
+
 Use Gemini Flash or Flash-Lite for:
 
 - short funding summaries
@@ -32,7 +36,7 @@ Use Gemini Flash or Flash-Lite for:
 
 Do not rely on Gemini Flash for high-judgment work. Treat its output as low-confidence unless validated against deterministic rules.
 
-Gemma is not the primary model. Its request/day limit is high, but its token/minute limit is too low for full funding records. Keep Gemma optional for tiny helper/canary work only, such as tag suggestion, brief repair attempts, or test comparison. Do not make G13-G15 depend on Gemma.
+Gemma is not used in G13-G15. Its TPM ceiling is too low for full funding records. If a future helper/canary path needs it, add it as a separate provider adapter at that time; do not pre-wire it now.
 
 Fallback/escalation provider: OpenRouter Nemotron Super.
 
@@ -119,7 +123,7 @@ Each run should enforce:
 
 If a run partially completes, later runs resume from `pending` and `failed_retryable` rows where `next_attempt_at <= now()`. The queue must never reprocess unchanged enriched rows unless the prompt version, schema version, model, or content hash changed.
 
-Bumping `PROMPT_VERSIONS[task]` or `SCHEMA_VERSIONS[task]` in code requires the next queue run to enqueue pending jobs for active scraped funding rows whose latest enrichment for that task does not match the new version constants. Otherwise version columns are stale metadata and not a freshness mechanism.
+Bumping `COMBINED_PROMPT_VERSION` or any `SCHEMA_VERSIONS[task]` in code requires the next queue run to enqueue pending jobs for active scraped funding rows whose latest enrichment row does not match the new version constants. Each combined call produces all targeted task outputs in one row write, so any version bump invalidates the whole row. Otherwise version columns are stale metadata and not a freshness mechanism.
 
 ## Data Model
 
@@ -164,11 +168,13 @@ G16 extends `ai_enrichment_task_type` with `embedding` if semantic search choose
 
 - `TASK_TYPES`
 - `PROVIDER_PREFERENCES`
-- `PROMPT_VERSIONS: Record<TaskType, number>`
-- `SCHEMA_VERSIONS: Record<TaskType, number>`
+- `COMBINED_PROMPT_VERSION: number` — single integer covering the row-level combined call
+- `SCHEMA_VERSIONS: Record<TaskType, number>` — per-task output schemas, evolved independently
 - `CONFIDENCE_NEEDS_REVIEW_THRESHOLD`
 
 Database enum values and tests must match these constants.
+
+Bumping `COMBINED_PROMPT_VERSION` or any `SCHEMA_VERSIONS[task]` triggers a full-row re-enrichment because each row is produced by one combined call. Per-task prompt independence is intentionally not supported; if a single task needs prompt drift independent of the rest, split it out of the combined call first and document it in the plan.
 
 ### `funding_ai_enrichment`
 
@@ -200,18 +206,22 @@ Required constraints:
 
 Reader rule:
 
-`getEnrichmentForFunding(id)` and `getEnrichmentForRole(role)` read only rows whose `content_hash` equals the current `funding.content_hash`, whose `prompt_version` equals `PROMPT_VERSIONS[task_type]`, whose `schema_version` equals `SCHEMA_VERSIONS[task_type]`, and whose `needs_review = false`. Rows for older hashes or versions are stale and ignored.
+`getEnrichmentForFunding(id)` and `getEnrichmentForRole(role)` read only rows whose `content_hash` equals the current `funding.content_hash`, whose `prompt_version` equals `COMBINED_PROMPT_VERSION`, whose `schema_version` equals `SCHEMA_VERSIONS[task_type]`, and whose `needs_review = false`. Rows for older hashes or versions are stale and ignored.
 
 `needs_review` is a queue-runtime computed boolean, not a generated column and not a database CHECK expression. The queue writes `needs_review = confidence < CONFIDENCE_NEEDS_REVIEW_THRESHOLD OR validator_flagged`.
 
 `match_reason_templates` may be partial. Missing role/tag maps are accepted; UI falls back to deterministic match copy for missing templates.
 
+`updated_at` is advanced only by admin overrides of `needs_review` (e.g., reviewer clears a flagged row in G17). Re-enrichment under a new `COMBINED_PROMPT_VERSION` or `SCHEMA_VERSIONS[task]` writes a new row instead of updating the existing one — the unique key includes the version columns, so history is preserved.
+
 ### `ai_enrichment_jobs`
+
+One job represents one combined call against `(funding_id, content_hash)`. The job's `task_types` array names which task outputs the call is expected to produce; the queue runtime writes one `funding_ai_enrichment` row per task type after a successful call.
 
 - `id`
 - `funding_id`
 - `content_hash`
-- `task_type`
+- `task_types text[]` — subset of `ai_enrichment_task_type` values the combined call will produce; non-empty
 - `status`
 - `attempt_count`
 - `provider_preference`
@@ -223,9 +233,10 @@ Reader rule:
 Required constraints:
 
 - FK to `funding(id)` with cascade delete
-- unique pending/current job key that prevents duplicate work for the same `funding_id`, `content_hash`, and `task_type`
+- unique pending/current job key that prevents duplicate work for the same `funding_id` and `content_hash` — one combined-call job per row at a time
 - `attempt_count >= 0`
 - `provider_preference` must be one of the `ai_provider_preference` enum values
+- `task_types` must be a non-empty subset of `ai_enrichment_task_type` values; enforced in code (Postgres array-vs-enum constraints are clumsy, so validate at insert)
 
 Cleanup:
 
@@ -248,6 +259,7 @@ Cleanup:
 - `cost_in_cents`
 - `cost_out_cents`
 - `status`
+- `aborted_reason text` — populated only when `status = 'aborted_budget'`; one of `token_budget`, `cost_budget`, `provider_failure_cap`
 - `error_summary jsonb`
 - `created_at`
 
@@ -256,6 +268,7 @@ Required constraints:
 - `status` uses `ai_enrichment_run_status`
 - token and cost counters are non-negative
 - `error_summary` shape is `{by_provider: {gemini: {...}, openrouter: {...}}, by_validator: {...}}`
+- `aborted_reason` is `null` unless `status = 'aborted_budget'`
 
 Cleanup:
 
@@ -291,8 +304,23 @@ Enable RLS on every AI enrichment table.
 `funding_ai_enrichment`:
 
 - `anon` and `authenticated` may select only enrichment rows whose parent `funding.status = 'active'`
-- no public insert/update/delete
-- service role owns writes
+- write the public select policy as an EXISTS-join, not a redundant denormalized column:
+  ```sql
+  create policy "funding_ai_enrichment public select"
+  on public.funding_ai_enrichment
+  for select
+  to anon, authenticated
+  using (
+    exists (
+      select 1
+      from public.funding f
+      where f.id = funding_ai_enrichment.funding_id
+        and f.status = 'active'
+    )
+  );
+  ```
+- do not store a redundant `funding_status` column
+- no public insert/update/delete; service role owns writes
 
 `ai_enrichment_jobs`, `ai_enrichment_runs`, and `ai_enrichment_quarantine`:
 
@@ -403,6 +431,8 @@ If `funding_ai_enrichment` is absent or `needs_review = true`:
 
 `needs_review = true` rows are admin/review-only until G17.
 
+**Precedence between hide and partial-template fallback:** `needs_review = true` always wins. When the row is hidden, no AI surface renders regardless of which fields are populated. Partial `match_reason_templates` only matter on the path where the AI surface is rendered (row is current-version, current-hash, validated, and `needs_review = false`); on that path, missing role/tag entries fall back to deterministic copy.
+
 Define:
 
 - `confidence` is a number in `[0, 1]`
@@ -423,7 +453,10 @@ Define:
 - Make enrichment optional at runtime; pages must still work when enrichment is missing.
 - Keep human-readable fallback text for every UI surface.
 - Never log full prompts or responses in production logs.
-- Redact URL query strings and any unexpected email-like strings from logs.
+- All log writes and `ai_enrichment_quarantine` inserts go through `lib/ai/redact.ts`. Required redaction patterns:
+  - email regex `\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b` → replaced with `[redacted-email]`
+  - URLs: strip everything after the first `?` (drop query strings) before logging or quarantine insert
+  - cap any single redacted string at 32 KB before storage; longer strings are truncated with a `[truncated]` suffix
 - Do not send private user/profile/forum/auth data to providers.
 - CI uses mock providers only.
 

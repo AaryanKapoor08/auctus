@@ -1,9 +1,9 @@
 # Auctus V2 Handoff
 
-**Last Updated:** 2026-05-05
-**Current Gate:** G13 — AI Enrichment Foundation
+**Last Updated:** 2026-05-06
+**Current Gate:** G15 — Enrichment Outputs in Funding UX
 **Branch:** `main`
-**Status:** Ready to start G13 implementation after committing/pushing the AI planning docs.
+**Status:** G13-G15 code is implemented and locally verified; G15 remains manually blocked on real provider secrets/workflow run and real enriched-row browser proof.
 
 ## Read First
 
@@ -12,86 +12,54 @@
 3. `AGENTS.md`
 4. `codex/AIEnrichmentPlan.md`
 
-`codex/SoloProgress.md` is the full proof/history source of truth. This handoff is intentionally short so the next window can start building without re-reading old G2-G12 detail.
+`codex/SoloProgress.md` is the proof/history source of truth. `critique-followup.md` remains untracked review context and should stay uncommitted unless the user explicitly asks.
 
-## Current Decision
+## Completed This Session
 
-Replace the legacy chatbot/AI placeholder with offline AI enrichment for public funding records.
+- Added `supabase/migrations/0025_ai_enrichment.sql` and applied it to the linked Supabase DB.
+- Added deterministic trigger-maintained `funding.content_hash` including `source_url`.
+- Added AI enums, enrichment/jobs/runs/quarantine tables, public active-parent enrichment SELECT policy, and service-role-only queue/run/quarantine posture.
+- Added `lib/ai/**` validation/provider/mock/queue/redaction foundation with Zod schemas, combined-call versions, failover/escalation behavior, retry/budget helpers, and service-role DB runner.
+- Added `lib/funding/enrichment.ts` current-version readers that hide stale-hash, stale-version, and `needs_review` rows.
+- Added mock dry-run CLI `scraper/ai-enrich.ts` and workflow-dispatch stub `.github/workflows/ai-enrichment.yml`.
+- Wired G15 visible surfaces:
+  - funding cards optionally show validated enrichment summary subtitle.
+  - funding detail pages show enrichment overview and prep checklist when current/review-cleared.
+  - dashboard match-reason copy consumes enrichment through `lib/funding/enrichment.ts`, not direct `lib/ai/**`.
+- Installed `zod` and updated `.env.example`, ESLint restricted-import boundaries, and tests.
 
-Build only the first narrow AI slice before expanding:
+## Verification Run
 
-- **G13:** schema, deterministic `funding.content_hash`, AI enums/tables/RLS, typed validation/version constants, current-version enrichment readers.
-- **G14:** provider adapters and queue runtime, mocked in CI, one combined row-level enrichment call where practical.
-- **G15:** visible funding UX for validated enrichment only.
-
-Do **not** start G16/G17 until G13-G15 are complete and proven on real rows.
-
-Provider decision:
-
-- Primary first-run target: Gemini 2.5 Flash-Lite for cheap offline public-data enrichment.
-- Gemma is optional tiny-task/canary only; do not make it primary because its token/minute limit is too low for full funding records.
-- OpenRouter/Nemotron is escalation/fallback only for low-confidence or failed rows.
-- If free-tier data-use is unacceptable, disable real provider runs until paid/private provider usage is configured.
-
-AI safety boundary:
-
-- Send only public scraped funding text and public derived funding metadata to providers.
-- Never send profile, forum, auth, email, session, or user-specific data.
-- AI never edits canonical funding fields: deadline, amount, status, application URL, source URL, role/type filtering, or match score.
-- Hide AI surfaces unless enrichment matches current `content_hash`, current prompt/schema versions, passes Zod validation, and `needs_review = false`.
-
-## Files Changed In Planning
-
-Planning/ownership docs staged for commit:
-
-- `AGENTS.md`
-- `codex/AIEnrichmentPlan.md`
-- `codex/ClaudeAIPlanReviewPrompt.md`
-- `codex/SoloProgress.md`
-- `codex/Handoff.md`
-
-Leave `critique-followup.md` untracked unless the user explicitly asks to commit it; it is review context, not product documentation.
-
-## Exact Next Build Action
-
-Start G13 from `codex/SoloProgress.md`:
-
-1. Record G13 decisions in the Proof Log before implementation:
-   - `content_hash` field set includes `source_url`.
-   - trigger vs generated column.
-   - AI enum values.
-   - RLS shape for enrichment/jobs/runs/quarantine.
-   - retention windows.
-   - current-version reader behavior.
-   - one combined row-level enrichment call as the G14 default.
-2. Implement `supabase/migrations/0025_ai_enrichment.sql`.
-3. Add `lib/ai/enrichment-schema.ts` with typed task/provider/version constants and Zod schemas.
-4. Add `lib/funding/enrichment.ts` readers that return only current-hash/current-version/non-review rows.
-5. Update `.env.example`.
-6. Add SQL-text/unit tests listed under G13.
-
-## Verification Target For G13
-
-- `npx supabase db push --include-all --yes`
-- `npm test`
-- `npm run lint`
-- `npm run build`
-- `npx tsc -p scraper/tsconfig.json --noEmit`
-
-If a command fails, record the exact failure in `codex/SoloProgress.md` and this file before moving on.
+- `npx supabase db push --include-all --yes` => applied `0025_ai_enrichment.sql` after fixing one backfill alias error.
+- Supabase metadata query => RLS true on `funding_ai_enrichment`, `ai_enrichment_jobs`, `ai_enrichment_runs`, `ai_enrichment_quarantine`.
+- Supabase enum query => expected task/status/provider/run enum values present.
+- `npm test` => 30 files / 155 tests passed.
+- `npm run lint` => success with 20 known legacy demo warnings only.
+- `npm run build` => success.
+- `npx tsc -p scraper/tsconfig.json --noEmit` => success.
+- `npx tsx ai-enrich.ts --dry-run --provider mock --max-rows 3` from `scraper/` => emitted 3 deterministic mock rows.
+- Temporary ESLint violation in `lib/ai/__restricted-import-test.ts` importing `@/lib/profile/queries` => rejected by `no-restricted-imports`; temp file removed.
+- `git diff --check` => no whitespace errors; CRLF warnings only.
 
 ## Manual Blockers
 
-These are parallel blockers, not G13 blockers:
+- Real AI provider run is not complete: GitHub Actions secrets/variables must be configured for `AI_GEMINI_API_KEY`, `AI_OPENROUTER_API_KEY`, model names, token budget, and cost budget.
+- G15 browser proof on real enriched rows is pending. Need at least one G14 real enrichment cycle producing >= 50 enriched rows, then verify one visible row and one deliberate `needs_review=true` hidden row.
+- Existing external auth/browser blockers from prior gates remain: Google OAuth/email-password proof and multi-role browser walkthrough.
 
-- Google OAuth/email-password browser proof remains incomplete.
-- First scheduled GitHub scrape cron proof remains pending.
-- Real AI provider runs require GitHub Actions secrets/variables for provider keys and budget/model env values.
+## Exact Next Action
 
-## Commit Note
+Do not start G16 yet. First close the G15 manual proof:
 
-Commit the planning docs as:
+1. Configure AI provider secrets/variables in GitHub Actions.
+2. Trigger `.github/workflows/ai-enrichment.yml` for a real provider run after replacing the current dry-run-only command with the production queue invocation.
+3. Confirm >= 50 active scraped rows have current-version enrichment with `needs_review=false`.
+4. Browser-check a visible enriched funding row and a row with `needs_review=true` to confirm the AI surface is hidden.
+5. Record the manual proof and commit reference in `codex/SoloProgress.md`.
 
-`docs(ai): plan staged enrichment rollout`
+## Assumptions To Preserve
 
-The commit touches shared/coordinated docs and funding-domain ownership rules; mention that in the commit body.
+- G13-G15 use one combined row-level enrichment call by default, with per-task rows written afterward.
+- `source='manual'` rows are excluded from queue claims until a separate public-safety policy exists.
+- AI never receives profile, forum, auth, session, email, or user-specific data.
+- G16 semantic search/pgvector remains deferred until real enriched-row quality is proven.

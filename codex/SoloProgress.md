@@ -1,9 +1,9 @@
 # Auctus V2 Solo Progress
 
-**Current Gate:** G13
-**Current Phase:** P13 — AI Enrichment Foundation
+**Current Gate:** G15
+**Current Phase:** P15 — Enrichment Outputs in Funding UX
 **Project Category:** web
-**Last Updated:** 2026-05-05
+**Last Updated:** 2026-05-06
 
 This is the active root tracker for the solo build. The old `dev-a-space`, `dev-b-space`, and `shared-space` trackers are reference archives only.
 
@@ -69,7 +69,9 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-05-04 G12 manual/browser hardening [direct-main]: documented manual auth setup, restricted signed-in navbar funding links to the user's role track, and refreshed client session role on route changes so onboarding updates the navbar without reload | targets: `manual.md`, `components/layout/Navbar.tsx`, `lib/session/use-session.ts`, `codex/Handoff.md`, `codex/SoloProgress.md`, `codex_prompt.md`, `issues.md`, `pendingcommits.md` | verify: Step 5 env/local HTTP preflight => required keys present and `/`, `/grants`, `/scholarships`, `/research-funding` returned 200; `npm run lint` => success with 20 legacy warnings only; `npm run build` => success; focused `npm test -- --run test/unit/session.test.ts test/unit/route-policies.test.ts` => 2 files / 10 tests passed after sandbox `spawn EPERM` elevated rerun | ref: `425d360`
 - 2026-05-05 G12 critique hardening [direct-main]: sanitized PostgREST search filter inputs, restricted profile email column SELECT, centralized post-auth routing, added onboarding/profile-edit form error redirects, validated funding application URLs, removed scraper insecure TLS fallback, and refreshed README/root metadata; chatbot/demo routes intentionally left untouched per user direction | targets: `lib/supabase/postgrest-filters.ts`, `lib/funding/queries.ts`, `lib/forum/queries.ts`, `supabase/migrations/0012_restrict_profile_email_select.sql`, `lib/profile/queries.ts`, `lib/session/post-auth-route.ts`, `app/auth/callback/route.ts`, `app/(identity)/sign-in/page.tsx`, `app/(identity)/sign-up/page.tsx`, `app/onboarding/[role]/page.tsx`, `app/profile/edit/page.tsx`, `components/funding/FundingDetail.tsx`, `scraper/index.ts`, `README.md`, `app/layout.tsx`, `test/unit/**`, `codex/Handoff.md`, `codex/SoloProgress.md` | verify: focused tests => 6 files / 26 tests passed after sandbox `spawn EPERM` elevated rerun; `git diff --check` => no whitespace errors; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 26 files / 126 tests passed; `npx tsc -p scraper/tsconfig.json --noEmit` => success; `npx supabase db push --include-all --yes` => applied `0012`; linked privilege query => `authenticated` profile SELECT excludes `email`, `service_role` retains it | ref: `f078bc7`
 - 2026-05-05 G12 critique follow-up [direct-main]: addressed the next small high-value critique items in separate contributions: role-required onboarding/profile validation plus non-negative numeric parsing; forum/dashboard revalidation after forum mutations and explicit forum server boundary; funding query server boundary, type-scope regression tests, and capped category filters; hardened PostgREST search sanitization/truncation; documented/pinned the profile email column-privilege boundary | targets: `app/onboarding/[role]/page.tsx`, `app/profile/edit/page.tsx`, `lib/forum/queries.ts`, `lib/funding/queries.ts`, `lib/profile/upsert.ts`, `lib/supabase/postgrest-filters.ts`, `supabase/migrations/0010_rls_identity.sql`, `supabase/migrations/0012_restrict_profile_email_select.sql`, `test/unit/forum-queries.test.ts`, `test/unit/forum-sql.test.ts`, `test/unit/funding-summaries.test.ts`, `test/unit/postgrest-filters.test.ts`, `test/unit/profile-upsert.test.ts`, `vitest.config.ts`, `test/shims/server-only.ts` | verify: focused `npm test -- --run test/unit/profile-upsert.test.ts test/unit/forum-queries.test.ts test/unit/funding-summaries.test.ts test/unit/postgrest-filters.test.ts test/unit/forum-sql.test.ts` first hit sandbox `spawn EPERM`, elevated rerun => 5 files / 29 tests passed; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npm test` => 26 files / 136 tests passed; `git diff --check` => no whitespace errors, CRLF warnings only | ref: `b6979c3`, `8ca00f7`, `ae31b9b`, `ca489b5`, `61ea2ac`
-- 2026-05-05 G13 planning [direct-main]: documented the chatbot replacement decision, incorporated Claude AI-plan tightening and Gemini/Gemma provider-limit review, narrowed the committed AI rollout to G13-G15 first, and updated AI ownership/workflow boundaries | targets: `AGENTS.md`, `codex/AIEnrichmentPlan.md`, `codex/ClaudeAIPlanReviewPrompt.md`, `codex/SoloProgress.md`, `codex/Handoff.md` | verify: `git diff --check` => no whitespace errors, CRLF warnings only | ref: uncommitted docs
+- 2026-05-05 G13 planning [direct-main]: documented the chatbot replacement decision, incorporated Claude AI-plan tightening and Gemini/Gemma provider-limit review, narrowed the committed AI rollout to G13-G15 first, and updated AI ownership/workflow boundaries | targets: `AGENTS.md`, `codex/AIEnrichmentPlan.md`, `codex/ClaudeAIPlanReviewPrompt.md`, `codex/SoloProgress.md`, `codex/Handoff.md` | verify: `git diff --check` => no whitespace errors, CRLF warnings only | ref: `e68380c`
+- 2026-05-06 G13 decisions [direct-main]: fixed the AI foundation decisions before implementation: trigger-maintained `funding.content_hash` over `name`, `provider`, `source_url`, `description`, `eligibility`, `requirements`, sorted `tags`, `deadline`, `amount_min`, `amount_max`, and `application_url`; task enum `summary|tags|checklist|match_reasons|data_quality|radar`; status enum `pending|processing|enriched|needs_review|failed_retryable|failed_permanent`; provider preference enum `auto|gemini-only|openrouter-only|gemini-then-openrouter`; run status enum `running|success|partial|aborted_budget|failed`; public SELECT only for current active-parent enrichment; jobs/runs/quarantine service-role only; default budget 2M tokens/month, 500 cents/month, 80% warning, 100% hard stop; retention targets jobs 90d, runs 180d, quarantine 30d; `source='scraped'` only; shell wordmark remains Auctus; `COMBINED_PROMPT_VERSION=1`, all schema versions `1`, confidence review threshold `0.6`; readers ignore stale hash/version and `needs_review`; prompt input cap 6000 chars; malformed payloads redacted/quarantined; G17 SLO placeholder remains 90% enriched and 80% non-review | targets: `codex/SoloProgress.md`, `codex/Handoff.md`, `codex/AIEnrichmentPlan.md` | verify: decisions consumed by migration/tests below | ref: `e68380c`
+- 2026-05-06 G13-G15 [direct-main]: implemented AI enrichment schema, Zod validation, current-version funding readers, provider/mock/queue/redaction foundation, mock dry-run CLI/workflow dispatch, restricted AI import boundary, and visible funding/dashboard enrichment surfaces | targets: `supabase/migrations/0025_ai_enrichment.sql`, `lib/ai/**`, `lib/funding/enrichment.ts`, `scraper/ai-enrich.ts`, `.github/workflows/ai-enrichment.yml`, `.env.example`, `eslint.config.mjs`, `package.json`, `package-lock.json`, `app/(funding)/**`, `components/funding/**`, `app/dashboard/page.tsx`, `lib/dashboard/composer.ts`, `vitest.config.ts`, `test/unit/**`, `codex/Handoff.md`, `codex/SoloProgress.md` | verify: `npx supabase db push --include-all --yes` => applied `0025`; metadata query => RLS true on all four AI tables; enum query => expected task/status/provider/run values present; `npm test` => 30 files / 155 tests passed; `npm run lint` => success with 20 legacy demo warnings only; `npm run build` => success; `npx tsc -p scraper/tsconfig.json --noEmit` => success; `npx tsx ai-enrich.ts --dry-run --provider mock --max-rows 3` from `scraper/` => 3 deterministic rows; temporary `lib/ai` import violation rejected by ESLint; `git diff --check` => no whitespace errors, CRLF warnings only | ref: `e68380c`; manual blocker: real provider workflow/enriched-row browser proof pending
 
 ---
 
@@ -368,27 +370,27 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G13 — AI Enrichment Foundation `[not started]`
+## G13 — AI Enrichment Foundation `[complete]`
 
 **Scope:** schema, deterministic content hash, env, validation. No provider calls in this phase.
 
 **Rollout decision:** G13-G15 are the only committed AI build slice. Finish and prove schema safety, queue/runtime safety, and visible funding UX before starting G16 semantic search/radar or any chatbot-like work. Gemini 2.5 Flash-Lite is the first provider target for one combined row-level enrichment call; Gemma is optional tiny-task/canary only and must not be primary.
 
-- [ ] Decide `funding.content_hash` field set and trigger vs generated column. Required field set: deterministic hash over `name||provider||source_url||description||eligibility||requirements||tags||deadline||amount_min||amount_max||application_url`. Record decision in proof log.
-- [ ] Decide RLS shape: `funding_ai_enrichment` select to `anon, authenticated` gated on parent `funding.status='active'`; `ai_enrichment_jobs`, `ai_enrichment_runs`, and `ai_enrichment_quarantine` service-role only (no authenticated policy).
-- [ ] Decide `task_type` enum values. Suggested: `summary`, `tags`, `checklist`, `match_reasons`, `data_quality`, `radar`.
-- [ ] Decide `enrichment_status` enum values. Suggested: `pending`, `processing`, `enriched`, `needs_review`, `failed_retryable`, `failed_permanent`.
-- [ ] Decide `provider_preference` enum values. Required: `auto`, `gemini-only`, `openrouter-only`, `gemini-then-openrouter`.
-- [ ] Decide required `ai_enrichment_run_status` enum values. Required: `running`, `success`, `partial`, `aborted_budget`, `failed`.
-- [ ] Decide monthly token budget (suggested: 2M tokens), combined monthly cost cap in cents, and circuit-breaker threshold (suggested: 80% warning, 100% hard stop). Cost cap is the hard cap across providers.
-- [ ] Decide retention windows: jobs 90d after `enriched`/`failed_permanent`; runs 180d; quarantine 30d.
-- [ ] Decide whether `source='manual'` rows are eligible for enrichment in G14. Default: `source='scraped'` only; no manual public-safety column in G13.
-- [ ] Record fixed wordmark policy: drop "AI" from shell/navigation now; G15 can add AI-feature copy only on visible enrichment surfaces.
-- [ ] Record runtime rules: `lib/ai/enrichment-schema.ts` exports `PROMPT_VERSIONS`, `SCHEMA_VERSIONS`, provider preferences, task types, and confidence threshold; readers ignore rows whose hash/version does not match current constants.
-- [ ] Record freshness rule: bumping a prompt/schema version enqueues pending jobs for active scraped rows missing current-version enrichment for that task.
-- [ ] Record prompt guardrails: cap provider input text at about 6 KB with a `data_quality` truncation flag; treat funding text as data, not instructions.
-- [ ] Record review/quarantine rules: queue computes `needs_review`; Zod failures get one stricter retry then `failed_permanent`; malformed payloads go to `ai_enrichment_quarantine`.
-- [ ] Add `supabase/migrations/0025_ai_enrichment.sql`:
+- [x] Decide `funding.content_hash` field set and trigger vs generated column. Required field set: deterministic hash over `name||provider||source_url||description||eligibility||requirements||tags||deadline||amount_min||amount_max||application_url`. Record decision in proof log.
+- [x] Decide RLS shape: `funding_ai_enrichment` select to `anon, authenticated` gated on parent `funding.status='active'`; `ai_enrichment_jobs`, `ai_enrichment_runs`, and `ai_enrichment_quarantine` service-role only (no authenticated policy).
+- [x] Decide `task_type` enum values. Suggested: `summary`, `tags`, `checklist`, `match_reasons`, `data_quality`, `radar`.
+- [x] Decide `enrichment_status` enum values. Suggested: `pending`, `processing`, `enriched`, `needs_review`, `failed_retryable`, `failed_permanent`.
+- [x] Decide `provider_preference` enum values. Required: `auto`, `gemini-only`, `openrouter-only`, `gemini-then-openrouter`.
+- [x] Decide required `ai_enrichment_run_status` enum values. Required: `running`, `success`, `partial`, `aborted_budget`, `failed`.
+- [x] Decide monthly token budget (suggested: 2M tokens), combined monthly cost cap in cents, and circuit-breaker threshold (suggested: 80% warning, 100% hard stop). Cost cap is the hard cap across providers.
+- [x] Decide retention windows: jobs 90d after `enriched`/`failed_permanent`; runs 180d; quarantine 30d.
+- [x] Decide whether `source='manual'` rows are eligible for enrichment in G14. Default: `source='scraped'` only; no manual public-safety column in G13.
+- [x] Record fixed wordmark policy: drop "AI" from shell/navigation now; G15 can add AI-feature copy only on visible enrichment surfaces.
+- [x] Record runtime rules: `lib/ai/enrichment-schema.ts` exports `COMBINED_PROMPT_VERSION`, `SCHEMA_VERSIONS`, provider preferences, task types, and confidence threshold; readers ignore rows whose hash/version does not match current constants.
+- [x] Record freshness rule: bumping a prompt/schema version enqueues pending jobs for active scraped rows missing current-version enrichment for that task.
+- [x] Record prompt guardrails: cap provider input text at about 6 KB with a `data_quality` truncation flag; treat funding text as data, not instructions.
+- [x] Record review/quarantine rules: queue computes `needs_review`; Zod failures get one stricter retry then `failed_permanent`; malformed payloads go to `ai_enrichment_quarantine`.
+- [x] Add `supabase/migrations/0025_ai_enrichment.sql`:
   - alter `public.funding` add `content_hash text` plus content-hash trigger or generated column.
   - create `public.ai_enrichment_task_type`, `public.ai_enrichment_status`, `public.ai_provider_preference`, and `public.ai_enrichment_run_status` enums.
   - create `public.funding_ai_enrichment` (`funding_id uuid references funding(id) on delete cascade`, `task_type public.ai_enrichment_task_type`, `content_hash text`, `summary text`, `eligibility_bullets text[]`, `best_fit_applicant text`, `normalized_tags text[]`, `application_checklist text[]`, `match_reason_templates jsonb`, `deadline_urgency text`, `confidence numeric`, `needs_review boolean default false`, `provider text`, `model text`, `prompt_version int`, `schema_version int`, `enriched_at timestamptz`, `created_at`, `updated_at`; unique `(funding_id, task_type, content_hash, prompt_version, schema_version)`).
@@ -396,15 +398,15 @@ These require user/admin/dashboard action or credentials.
   - create `public.ai_enrichment_runs` (`id uuid primary key`, `started_at`, `finished_at`, `provider`, `model`, `rows_attempted int`, `rows_enriched int`, `rows_needs_review int`, `rows_failed int`, `tokens_in int`, `tokens_out int`, `cost_in_cents int`, `cost_out_cents int`, `status public.ai_enrichment_run_status`, `error_summary jsonb`, `created_at`).
   - create `public.ai_enrichment_quarantine` for redacted malformed payloads (`funding_id`, `task_type`, `provider`, `model`, `content_hash`, `prompt_version`, `schema_version`, `error_category`, `redacted_payload`, `created_at`).
   - enable RLS on all four AI tables; add explicit policies as decided above.
-- [ ] Apply migration via `npx supabase db push --include-all --yes`.
-- [ ] Add `lib/ai/enrichment-schema.ts` with Zod discriminated union per `task_type`, typed constants for prompt/schema versions, provider preferences, task types, and confidence threshold.
-- [ ] Add `lib/funding/enrichment.ts` exposing `getEnrichmentForFunding(id)` and `getEnrichmentForRole(role)` that return only current-hash/current-version/non-review enrichment and otherwise hide AI output.
-- [ ] Add `import "server-only"` to `lib/ai/**` entry points and `lib/funding/enrichment.ts`.
-- [ ] Add `.env.example` entries: `AI_ENRICHMENT_ENABLED`, `AI_GEMINI_API_KEY`, `AI_OPENROUTER_API_KEY`, `AI_GEMINI_MODEL`, `AI_OPENROUTER_MODEL`, `AI_MONTHLY_TOKEN_BUDGET`, `AI_MONTHLY_TOKEN_WARN_RATIO`, `AI_MONTHLY_COST_BUDGET_CENTS`.
-- [ ] Update `AGENTS.md`: `lib/ai/**` is funding-domain-internal; only `lib/funding/**`, `scraper/**`, and `jobs/**` may import it; `.github/workflows/ai-enrichment.yml` is Dev B-owned.
-- [ ] Add `test/unit/ai-enrichment-schema.test.ts` covering all 6 task types, valid + rejected payloads.
-- [ ] Add `test/unit/funding-enrichment-sql.test.ts` (SQL-text test) asserting RLS true on all four AI tables, enum values, content_hash trigger, parent FK on delete cascade, provider preference values, required run status enum, and current-reader version rules.
-- [ ] Verify `npm test`, `npm run lint`, `npm run build`, `npx tsc -p scraper/tsconfig.json --noEmit`.
+- [x] Apply migration via `npx supabase db push --include-all --yes`.
+- [x] Add `lib/ai/enrichment-schema.ts` with Zod discriminated union per `task_type`, typed constants for prompt/schema versions, provider preferences, task types, and confidence threshold.
+- [x] Add `lib/funding/enrichment.ts` exposing `getEnrichmentForFunding(id)` and `getEnrichmentForRole(role)` that return only current-hash/current-version/non-review enrichment and otherwise hide AI output.
+- [x] Add `import "server-only"` to `lib/ai/**` entry points and `lib/funding/enrichment.ts`.
+- [x] Add `.env.example` entries: `AI_ENRICHMENT_ENABLED`, `AI_GEMINI_API_KEY`, `AI_OPENROUTER_API_KEY`, `AI_GEMINI_MODEL`, `AI_OPENROUTER_MODEL`, `AI_MONTHLY_TOKEN_BUDGET`, `AI_MONTHLY_TOKEN_WARN_RATIO`, `AI_MONTHLY_COST_BUDGET_CENTS`.
+- [x] Update `AGENTS.md`: `lib/ai/**` is funding-domain-internal; only `lib/funding/**`, `scraper/**`, and `jobs/**` may import it; `.github/workflows/ai-enrichment.yml` is Dev B-owned.
+- [x] Add `test/unit/ai-enrichment-schema.test.ts` covering all 6 task types, valid + rejected payloads.
+- [x] Add `test/unit/funding-enrichment-sql.test.ts` (SQL-text test) asserting RLS true on all four AI tables, enum values, content_hash trigger, parent FK on delete cascade, provider preference values, required run status enum, and current-reader version rules.
+- [x] Verify `npm test`, `npm run lint`, `npm run build`, `npx tsc -p scraper/tsconfig.json --noEmit`.
 
 **Proof requirements:**
 - Migration applied; metadata query confirms RLS true on all four AI tables and column-level grants match the plan.
@@ -416,28 +418,28 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G14 — Provider Adapters and Queue Runtime `[not started]`
+## G14 — Provider Adapters and Queue Runtime `[code complete with real-provider blocker]`
 
 **Scope:** safe, capped, retryable enrichment runs. Mocked in CI; real Gemini/OpenRouter via GitHub Action only.
 
 **Provider decision:** Prefer one combined enrichment request per funding row that can fill summary, checklist, normalized tags, data-quality flags, and static match-reason templates. Do not implement six separate provider calls per row unless G15 proof shows the combined output cannot meet quality requirements.
 
-- [ ] Add `lib/ai/provider.ts` defining a single `Provider` interface (timeout, `Retry-After` parsing, structured-output return shape, token-usage reporting).
-- [ ] Add `lib/ai/gemini.ts` and `lib/ai/openrouter.ts` adapters; both env-configurable model names; both expose retry-after on 429.
-- [ ] Add `lib/ai/mock.ts` deterministic provider for tests and `--dry-run`.
-- [ ] Add `lib/ai/enrichment-queue.ts`: claim a batch of `pending` jobs by `next_attempt_at`, call provider according to `provider_preference`, validate via Zod, write current-version rows to `funding_ai_enrichment`, write malformed payload metadata to quarantine, and update job status. Honor `Retry-After`. Differentiate **failover** (HTTP error) from **escalation** (low-confidence valid output) cleanly.
-- [ ] Implement circuit-breaker: read month-to-date tokens and cost cents from `ai_enrichment_runs`; if ≥ `AI_MONTHLY_TOKEN_BUDGET` or `AI_MONTHLY_COST_BUDGET_CENTS`, set all `pending` jobs to `next_attempt_at = first of next month` and exit run with `aborted_budget`. Use one combined cap across Gemini/OpenRouter.
-- [ ] Implement retry policy: `attempt_count` max 3; backoff 1m / 5m / 30m; Zod failure gets one stricter repair prompt, then `failed_permanent`; flip other retryable failures to `failed_permanent` on attempt 4.
-- [ ] Implement source filter: queue claim restricted to `source='scraped'` until manual-source policy lands.
-- [ ] Implement `needs_review` rule in queue runtime: any output with `confidence < 0.6` OR Zod-validated-but-content-flagged → `needs_review=true`. UI must hide enrichment when `needs_review=true`; DB does not generate/check this value.
-- [ ] Implement prompt input cap and injection guard: truncate public text to about 6 KB, emit `data_quality` truncation flag, and treat funding text as data rather than instructions.
-- [ ] Implement `error_summary` as `{by_provider: {gemini: {...}, openrouter: {...}}, by_validator: {...}}`.
-- [ ] Add `scraper/ai-enrich.ts` CLI: `--dry-run`, `--provider <gemini|openrouter|mock>`, `--task-type <...>`, `--max-rows <N>`, `--max-tokens <N>`. Structured logger that NEVER imports `lib/profile/**`, `lib/forum/**`, `lib/session/**`, `app/(identity)/**`, `app/profile/**`, `app/forum/**`, `app/dashboard/**`, `app/onboarding/**`.
-- [ ] Add `.github/workflows/ai-enrichment.yml` with `workflow_dispatch` only at this stage; cron added in G16 once stability is proven.
-- [ ] Add ESLint `no-restricted-imports` rule scoped to `lib/ai/**` and `scraper/ai-enrich.ts` banning the identity/community paths above.
-- [ ] Add `test/unit/ai-provider-mock.test.ts`, `ai-queue.test.ts`, `ai-circuit-breaker.test.ts`, `ai-retry-policy.test.ts`, `ai-failover.test.ts`, `ai-escalation.test.ts`.
-- [ ] Add manual proof: `npx tsx scraper/ai-enrich.ts --dry-run --provider mock --max-rows 3` returns deterministic output.
-- [ ] Verify `npm test`, `npm run lint`, `npm run build`, `npx tsc -p scraper/tsconfig.json --noEmit`.
+- [x] Add `lib/ai/provider.ts` defining a single `Provider` interface (timeout, `Retry-After` parsing, structured-output return shape, token-usage reporting).
+- [x] Add `lib/ai/gemini.ts` and `lib/ai/openrouter.ts` adapters; both env-configurable model names; both expose retry-after on 429.
+- [x] Add `lib/ai/mock.ts` deterministic provider for tests and `--dry-run`.
+- [x] Add `lib/ai/enrichment-queue.ts`: claim a batch of `pending` jobs by `next_attempt_at`, call provider according to `provider_preference`, validate via Zod, write current-version rows to `funding_ai_enrichment`, write malformed payload metadata to quarantine, and update job status. Honor `Retry-After`. Differentiate **failover** (HTTP error) from **escalation** (low-confidence valid output) cleanly.
+- [x] Implement circuit-breaker: read month-to-date tokens and cost cents from `ai_enrichment_runs`; if ≥ `AI_MONTHLY_TOKEN_BUDGET` or `AI_MONTHLY_COST_BUDGET_CENTS`, set all `pending` jobs to `next_attempt_at = first of next month` and exit run with `aborted_budget`. Use one combined cap across Gemini/OpenRouter.
+- [x] Implement retry policy: `attempt_count` max 3; backoff 1m / 5m / 30m; Zod failure gets one stricter repair prompt, then `failed_permanent`; flip other retryable failures to `failed_permanent` on attempt 4.
+- [x] Implement source filter: queue claim restricted to `source='scraped'` until manual-source policy lands.
+- [x] Implement `needs_review` rule in queue runtime: any output with `confidence < 0.6` OR Zod-validated-but-content-flagged → `needs_review=true`. UI must hide enrichment when `needs_review=true`; DB does not generate/check this value.
+- [x] Implement prompt input cap and injection guard: truncate public text to about 6 KB, emit `data_quality` truncation flag, and treat funding text as data rather than instructions.
+- [x] Implement `error_summary` as `{by_provider: {gemini: {...}, openrouter: {...}}, by_validator: {...}}`.
+- [x] Add `scraper/ai-enrich.ts` CLI: `--dry-run`, `--provider <gemini|openrouter|mock>`, `--task-type <...>`, `--max-rows <N>`, `--max-tokens <N>`. Structured logger that NEVER imports `lib/profile/**`, `lib/forum/**`, `lib/session/**`, `app/(identity)/**`, `app/profile/**`, `app/forum/**`, `app/dashboard/**`, `app/onboarding/**`.
+- [x] Add `.github/workflows/ai-enrichment.yml` with `workflow_dispatch` only at this stage; cron added in G16 once stability is proven.
+- [x] Add ESLint `no-restricted-imports` rule scoped to `lib/ai/**` and `scraper/ai-enrich.ts` banning the identity/community paths above.
+- [x] Add focused queue/provider tests covering the mock provider, circuit breaker, retry/failure path, Gemini failover, and low-confidence escalation.
+- [x] Add manual proof: `npx tsx scraper/ai-enrich.ts --dry-run --provider mock --max-rows 3` returns deterministic output.
+- [x] Verify `npm test`, `npm run lint`, `npm run build`, `npx tsc -p scraper/tsconfig.json --noEmit`.
 
 **Proof requirements:**
 - Mock provider dry-run produces canned outputs.
@@ -452,19 +454,19 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G15 — Enrichment Outputs in Funding UX `[not started]`
+## G15 — Enrichment Outputs in Funding UX `[code complete with manual browser blocker]`
 
 **Scope:** make enrichment visible in funding pages and the dashboard without breaking the missing-enrichment fallback.
 
-- [ ] Update `components/funding/FundingDetail.tsx`: render an "Overview" section sourced from `funding_ai_enrichment.summary` when present and `needs_review=false`; otherwise render existing `description` only.
-- [ ] Update `components/funding/FundingDetail.tsx`: render application-prep checklist when present; framed as "Preparation guidance, not legal or financial advice."
-- [ ] Update `components/funding/FundingCard.tsx`: optional one-line AI subtitle when summary exists, falls back to provider name when missing.
-- [ ] Update `lib/dashboard/composer.ts` and `app/dashboard/page.tsx`: render match-reason templates next to top matches; deterministic interpolation in app code, never pass profile fields to AI.
-- [ ] Apply wordmark decision recorded in G13: shell/navigation use "Auctus"; AI-feature copy appears only on visible enrichment surfaces.
-- [ ] Hide AI surfaces entirely when enrichment row is missing or `needs_review=true`. No "AI summary unavailable" copy.
-- [ ] Add snapshot tests for `FundingDetail` with both enriched and missing-enrichment fixtures.
-- [ ] Add unit test asserting the dashboard composer never reads anything from `lib/ai/**` directly (must consume via `lib/funding/enrichment.ts`).
-- [ ] Verify `npm test`, `npm run lint`, `npm run build`.
+- [x] Update `components/funding/FundingDetail.tsx`: render an "Overview" section sourced from `funding_ai_enrichment.summary` when present and `needs_review=false`; otherwise render existing `description` only.
+- [x] Update `components/funding/FundingDetail.tsx`: render application-prep checklist when present; framed as "Preparation guidance, not legal or financial advice."
+- [x] Update `components/funding/FundingCard.tsx`: optional one-line AI subtitle when summary exists, falls back to provider name when missing.
+- [x] Update `lib/dashboard/composer.ts` and `app/dashboard/page.tsx`: render match-reason templates next to top matches; deterministic interpolation in app code, never pass profile fields to AI.
+- [x] Apply wordmark decision recorded in G13: shell/navigation use "Auctus"; AI-feature copy appears only on visible enrichment surfaces.
+- [x] Hide AI surfaces entirely when enrichment row is missing or `needs_review=true`. No "AI summary unavailable" copy.
+- [x] Add render tests for `FundingDetail` with both enriched and missing-enrichment fixtures.
+- [x] Add unit test asserting the dashboard composer never reads anything from `lib/ai/**` directly (must consume via `lib/funding/enrichment.ts`).
+- [x] Verify `npm test`, `npm run lint`, `npm run build`.
 
 **Proof requirements:**
 - Snapshot tests pass for both enriched and missing-enrichment states.

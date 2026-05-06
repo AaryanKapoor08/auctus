@@ -1,0 +1,53 @@
+name: AI Enrichment
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: "Provider to run"
+        required: true
+        default: "mock"
+        type: choice
+        options:
+          - mock
+          - gemini
+          - openrouter
+      max_rows:
+        description: "Maximum funding rows to enrich"
+        required: true
+        default: "25"
+
+jobs:
+  ai-enrichment:
+    name: Funding AI enrichment
+    runs-on: ubuntu-latest
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      AI_GEMINI_API_KEY: ${{ secrets.AI_GEMINI_API_KEY }}
+      AI_OPENROUTER_API_KEY: ${{ secrets.AI_OPENROUTER_API_KEY }}
+      AI_GEMINI_MODEL: ${{ vars.AI_GEMINI_MODEL }}
+      AI_OPENROUTER_MODEL: ${{ vars.AI_OPENROUTER_MODEL }}
+      AI_MONTHLY_TOKEN_BUDGET: ${{ vars.AI_MONTHLY_TOKEN_BUDGET }}
+      AI_MONTHLY_COST_BUDGET_CENTS: ${{ vars.AI_MONTHLY_COST_BUDGET_CENTS }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Install scraper dependencies
+        run: |
+          cd scraper
+          npm ci
+
+      - name: Run enrichment
+        run: |
+          cd scraper
+          npx tsx ai-enrich.ts --dry-run --provider "${{ inputs.provider }}" --max-rows "${{ inputs.max_rows }}"

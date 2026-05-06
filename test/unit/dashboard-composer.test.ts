@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   composeDashboard,
   isWithinNextDays,
+  renderMatchReason,
   selectUpcomingDeadlines,
   NO_UPCOMING_DEADLINES_TEXT,
 } from "@/lib/dashboard/composer";
@@ -108,6 +111,76 @@ describe("composeDashboard", () => {
       asOf: now,
     });
     expect(data.upcomingDeadlines).toEqual([]);
+  });
+
+  it("renders match reasons from funding enrichment without profile data", () => {
+    expect(
+      renderMatchReason({
+        role: "business",
+        bundle: {
+          match_reasons: {
+            funding_id: "m1",
+            task_type: "match_reasons",
+            summary: null,
+            eligibility_bullets: [],
+            best_fit_applicant: null,
+            normalized_tags: [],
+            application_checklist: [],
+            match_reason_templates: {
+              business: "Matched because this aligns with {role} funding signals.",
+            },
+            data_quality_flags: [],
+            deadline_urgency: null,
+            confidence: 0.8,
+            provider: "mock",
+            model: "mock",
+            enriched_at: now.toISOString(),
+          },
+        },
+      }),
+    ).toBe("Matched because this aligns with business funding signals.");
+  });
+
+  it("adds top match reasons while consuming only funding enrichment bundles", () => {
+    const data = composeDashboard({
+      topMatches: [summary({ id: "m1" })],
+      candidateDeadlines: [],
+      threads: [],
+      asOf: now,
+      role: "business",
+      enrichmentByFundingId: {
+        m1: {
+          match_reasons: {
+            funding_id: "m1",
+            task_type: "match_reasons",
+            summary: null,
+            eligibility_bullets: [],
+            best_fit_applicant: null,
+            normalized_tags: [],
+            application_checklist: [],
+            match_reason_templates: {
+              business: "Matched for {role}.",
+            },
+            data_quality_flags: [],
+            deadline_urgency: null,
+            confidence: 0.8,
+            provider: "mock",
+            model: "mock",
+            enriched_at: now.toISOString(),
+          },
+        },
+      },
+    });
+
+    expect(data.topMatchReasons).toEqual({ m1: "Matched for business." });
+  });
+
+  it("does not import lib/ai directly for dashboard composition", () => {
+    const source = readFileSync(
+      join(process.cwd(), "lib/dashboard/composer.ts"),
+      "utf8",
+    );
+    expect(source).not.toContain("@/lib/ai");
   });
 });
 

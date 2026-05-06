@@ -3,6 +3,7 @@ import FundingBrowser, {
   type FundingBrowserSortOption,
 } from "@/components/funding/FundingBrowser";
 import { ListFundingForRole } from "@/lib/funding/queries";
+import { getEnrichmentForRole } from "@/lib/funding/enrichment";
 import { getRecommendedFundingTags } from "@/lib/funding/recommended-tags";
 import { getSession } from "@/lib/session/get-session";
 
@@ -36,10 +37,11 @@ export default async function ResearchFundingPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const [items, recommendedTags, session] = await Promise.all([
+  const [items, recommendedTags, session, enrichmentByFundingId] = await Promise.all([
     ListFundingForRole({ role: "professor" }),
     getRecommendedFundingTags("professor"),
     getSession(),
+    getEnrichmentForRole("professor"),
   ]);
 
   return (
@@ -66,6 +68,7 @@ export default async function ResearchFundingPage({
           initialSort={parseSort(params.sort)}
           recommendedCategories={recommendedTags}
           showPersonalizationPrompt={!session}
+          enrichmentByFundingId={enrichmentByFundingId}
         />
       </div>
     </div>

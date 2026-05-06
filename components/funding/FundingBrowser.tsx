@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { FundingItem } from "@contracts/funding";
 import type { Role } from "@contracts/role";
 import { FUNDING_FILTERS } from "@/lib/funding/filter-definitions";
+import type { FundingEnrichmentBundle } from "@/lib/funding/enrichment";
 import Button from "@/components/ui/Button";
 import FundingCard from "./FundingCard";
 import { cn } from "@/lib/utils";
@@ -95,6 +96,7 @@ export default function FundingBrowser({
   initialSort = "relevance",
   recommendedCategories = [],
   showPersonalizationPrompt = false,
+  enrichmentByFundingId = {},
 }: {
   role: Role;
   items: FundingItem[];
@@ -105,6 +107,7 @@ export default function FundingBrowser({
   initialSort?: SortOption;
   recommendedCategories?: string[];
   showPersonalizationPrompt?: boolean;
+  enrichmentByFundingId?: Record<string, FundingEnrichmentBundle>;
 }) {
   const filters = FUNDING_FILTERS[role];
   const categoryFilter = filters.find((filter) => filter.key === "category");
@@ -467,9 +470,18 @@ export default function FundingBrowser({
 
         {visibleItems.length > 0 ? (
           <div className="grid gap-5 md:grid-cols-2">
-            {visibleItems.map((item) => (
-              <FundingCard key={item.id} item={item} href={`${basePath}/${item.id}`} />
-            ))}
+            {visibleItems.map((item) => {
+              const summary = enrichmentByFundingId[item.id]?.summary?.summary;
+
+              return (
+                <FundingCard
+                  key={item.id}
+                  item={item}
+                  href={`${basePath}/${item.id}`}
+                  enrichment={summary ? { summary } : null}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="rounded-lg border border-dashed border-gray-300 bg-white py-12 text-center">

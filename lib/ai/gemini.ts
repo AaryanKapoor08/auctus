@@ -35,6 +35,10 @@ Public funding text:
 ${text}`;
 }
 
+export function supportsGeminiStructuredOutput(model: string) {
+  return !model.toLowerCase().startsWith("gemma-");
+}
+
 export function createGeminiProvider(input: {
   apiKey: string;
   model: string;
@@ -47,6 +51,15 @@ export function createGeminiProvider(input: {
       const controller = new AbortController();
       const timeoutMs = input.timeoutMs ?? 120_000;
       const timer = setTimeout(() => controller.abort(), timeoutMs);
+      const requestBody: {
+        generationConfig?: { responseMimeType: "application/json" };
+        contents: Array<{ role: "user"; parts: Array<{ text: string }> }>;
+      } = {
+        contents: [{ role: "user", parts: [{ text: buildPrompt(providerInput) }] }],
+      };
+      if (supportsGeminiStructuredOutput(input.model)) {
+        requestBody.generationConfig = { responseMimeType: "application/json" };
+      }
 
       try {
         const response = await fetch(
@@ -55,10 +68,7 @@ export function createGeminiProvider(input: {
             method: "POST",
             headers: { "content-type": "application/json" },
             signal: controller.signal,
-            body: JSON.stringify({
-              generationConfig: { responseMimeType: "application/json" },
-              contents: [{ role: "user", parts: [{ text: buildPrompt(providerInput) }] }],
-            }),
+            body: JSON.stringify(requestBody),
           },
         );
 
@@ -66,7 +76,7 @@ export function createGeminiProvider(input: {
           throw new AiProviderError({
             provider: "gemini",
             message: `Gemini request failed with ${response.status}`,
-            category: response.status === 429 ? "rate_limit" : "http_error",
+            category: response.status === 429 ? "rate_limit" : `http_${response.status}`,
             retryable: response.status === 429 || response.status >= 500,
             retryAfterSeconds: parseRetryAfter(response.headers.get("retry-after")),
           });

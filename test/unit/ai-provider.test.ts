@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { supportsGeminiStructuredOutput } from "@/lib/ai/gemini";
 import { AiProviderError, parseProviderJsonContent } from "@/lib/ai/provider";
 
 describe("parseProviderJsonContent", () => {
@@ -26,5 +27,16 @@ describe("parseProviderJsonContent", () => {
       expect(error).toBeInstanceOf(AiProviderError);
       expect((error as AiProviderError).category).toBe("json_parse_error");
     }
+  });
+});
+
+describe("supportsGeminiStructuredOutput", () => {
+  it("does not request structured-output mode for Gemma models", () => {
+    expect(supportsGeminiStructuredOutput("gemma-4-31b-it")).toBe(false);
+    expect(supportsGeminiStructuredOutput("gemma-4-26b-a4b-it")).toBe(false);
+  });
+
+  it("keeps structured-output mode for Gemini models", () => {
+    expect(supportsGeminiStructuredOutput("gemini-2.5-flash")).toBe(true);
   });
 });

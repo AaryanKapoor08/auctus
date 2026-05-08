@@ -52,6 +52,13 @@
   - timeout failures are categorized as `timeout`.
   - fetch failures are categorized as `network_error`.
   - invalid provider JSON is categorized as `json_parse_error`.
+- Investigated the next Gemma `max_rows=1` smoke:
+  - latest run failed as an HTTP error before any model output was returned.
+  - official structured-output docs list Gemini models as supported and do not list Gemma; Gemma API examples use plain `generateContent`.
+- Added Gemma structured-output fallback:
+  - `gemma-*` models no longer send `generationConfig.responseMimeType`.
+  - Gemini models still request JSON mode.
+  - Gemma output is parsed by the tolerant JSON parser added above.
 
 ## Verification Run
 
@@ -82,6 +89,9 @@
 - `npm test -- --run test/unit/ai-provider.test.ts test/unit/ai-queue.test.ts` => 2 files / 9 tests passed.
 - `npm run lint` => success with 20 known legacy demo warnings only.
 - `npm run build` => success.
+- `npm test -- --run test/unit/ai-provider.test.ts test/unit/ai-queue.test.ts` => 2 files / 11 tests passed.
+- `npm run lint` => success with 20 known legacy demo warnings only.
+- `npm run build` => success.
 
 ## Manual Blockers
 
@@ -93,7 +103,7 @@
 
 Do not start G16 yet. First close the G15 manual proof:
 
-1. Push the provider parsing/error-classification hardening commit.
+1. Push the Gemma structured-output fallback commit.
 2. Wait until the current failed-retryable Gemma jobs are eligible again, then manually trigger `.github/workflows/ai-enrichment.yml` with `provider=gemini`, `max_rows=1`.
 3. If that enriches, rerun with `provider=gemini`, `max_rows=5` and inspect the visible rows for quality.
 4. If prompt-v2 quality is acceptable, run enough batches to reach >= 50 current-version enriched rows with `needs_review=false`.

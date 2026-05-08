@@ -1,7 +1,7 @@
 import "server-only";
 
 import { AI_INPUT_TEXT_LIMIT_CHARS } from "./enrichment-schema";
-import { AiProviderError, parseRetryAfter, type AiProvider, type EnrichmentProviderInput, type ProviderResult } from "./provider";
+import { AiProviderError, parseProviderJsonContent, parseRetryAfter, type AiProvider, type EnrichmentProviderInput, type ProviderResult } from "./provider";
 
 function buildPrompt(input: EnrichmentProviderInput) {
   const text = [
@@ -45,7 +45,8 @@ export function createGeminiProvider(input: {
     model: input.model,
     async enrich(providerInput: EnrichmentProviderInput): Promise<ProviderResult> {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), input.timeoutMs ?? 120_000);
+      const timeoutMs = input.timeoutMs ?? 120_000;
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
 
       try {
         const response = await fetch(
@@ -85,7 +86,7 @@ export function createGeminiProvider(input: {
         return {
           provider: "gemini",
           model: input.model,
-          output: JSON.parse(text),
+          output: parseProviderJsonContent("gemini", text),
           usage: {
             tokensIn: Number(json?.usageMetadata?.promptTokenCount ?? 0),
             tokensOut: Number(json?.usageMetadata?.candidatesTokenCount ?? 0),
@@ -95,10 +96,18 @@ export function createGeminiProvider(input: {
         };
       } catch (error) {
         if (error instanceof AiProviderError) throw error;
+        if (error instanceof DOMException && error.name === "AbortError") {
+          throw new AiProviderError({
+            provider: "gemini",
+            message: `Gemini request timed out after ${timeoutMs}ms`,
+            category: "timeout",
+            retryable: true,
+          });
+        }
         throw new AiProviderError({
           provider: "gemini",
           message: error instanceof Error ? error.message : "Gemini request failed",
-          category: "network_or_parse_error",
+          category: "network_error",
           retryable: true,
         });
       } finally {

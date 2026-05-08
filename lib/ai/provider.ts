@@ -65,6 +65,34 @@ export function parseRetryAfter(value: string | null): number | null {
   return Math.max(0, Math.ceil((date.getTime() - Date.now()) / 1000));
 }
 
+export function parseProviderJsonContent(provider: AiProviderId, content: string): unknown {
+  const trimmed = content.trim();
+  const candidates = [trimmed];
+  const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  if (fenced?.[1]) candidates.push(fenced[1].trim());
+
+  const firstBrace = trimmed.indexOf("{");
+  const lastBrace = trimmed.lastIndexOf("}");
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    candidates.push(trimmed.slice(firstBrace, lastBrace + 1));
+  }
+
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch {
+      // Try the next extraction strategy.
+    }
+  }
+
+  throw new AiProviderError({
+    provider,
+    message: `${provider} response was not valid JSON`,
+    category: "json_parse_error",
+    retryable: true,
+  });
+}
+
 export function normalizeProviderPreference(
   preference: AiProviderPreference,
 ): AiProviderId[] {

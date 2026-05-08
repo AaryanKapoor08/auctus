@@ -3,7 +3,7 @@
 **Last Updated:** 2026-05-08
 **Current Gate:** G15 — Enrichment Outputs in Funding UX
 **Branch:** `main`
-**Status:** G13-G15 code is implemented and locally verified; production AI workflow runner is pushed. Gemini API Gemma smoke now selects `gemma-4-31b-it` but failed 5/5 with provider 500/429/local abort errors, so a timeout/retry hardening patch is being pushed before the next rerun. G15 remains open pending real enriched-row browser proof.
+**Status:** G13-G15 code is implemented and locally verified; production AI workflow runner is pushed. Gemini API Gemma now selects `gemma-4-31b-it`, but real runs still fail before enrichment output is written. Timeout/retry hardening is pushed, and provider parsing/error classification is ready to push before the next rerun. G15 remains open pending real enriched-row browser proof.
 
 ## Read First
 
@@ -44,6 +44,14 @@
   - Gemini default request timeout 30s -> 120s.
   - OpenRouter default request timeout 30s -> 60s.
   - queue now uses provider `Retry-After` when scheduling retryable failed jobs.
+- Investigated the follow-up Gemma `max_rows=1` smoke:
+  - latest run still failed 1/1 as `network_or_parse_error`.
+  - provider adapter previously grouped timeout, fetch, and JSON parsing together, making the next fix ambiguous.
+- Added provider parsing/error-classification hardening:
+  - strict JSON parser now accepts fenced JSON and text-wrapped JSON object responses.
+  - timeout failures are categorized as `timeout`.
+  - fetch failures are categorized as `network_error`.
+  - invalid provider JSON is categorized as `json_parse_error`.
 
 ## Verification Run
 
@@ -71,6 +79,9 @@
 - `npm test -- --run test/unit/ai-queue.test.ts` => 1 file / 5 tests passed.
 - `npm run lint` => success with 20 known legacy demo warnings only.
 - `npm run build` => success.
+- `npm test -- --run test/unit/ai-provider.test.ts test/unit/ai-queue.test.ts` => 2 files / 9 tests passed.
+- `npm run lint` => success with 20 known legacy demo warnings only.
+- `npm run build` => success.
 
 ## Manual Blockers
 
@@ -82,7 +93,7 @@
 
 Do not start G16 yet. First close the G15 manual proof:
 
-1. Push the Gemma timeout/retry hardening commit.
+1. Push the provider parsing/error-classification hardening commit.
 2. Wait until the current failed-retryable Gemma jobs are eligible again, then manually trigger `.github/workflows/ai-enrichment.yml` with `provider=gemini`, `max_rows=1`.
 3. If that enriches, rerun with `provider=gemini`, `max_rows=5` and inspect the visible rows for quality.
 4. If prompt-v2 quality is acceptable, run enough batches to reach >= 50 current-version enriched rows with `needs_review=false`.

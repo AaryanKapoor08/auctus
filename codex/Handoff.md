@@ -69,7 +69,7 @@
 
 ## Exact Next Action
 
-Commit and push the G16/G17 implementation. After that, either:
+Push the G16/G17 implementation. After that, either:
 
 1. re-create/sign in `aaryankapoor008@gmail.com` and browser-check `/admin/review` plus `/admin/runs`; or
 2. run real Gemini embeddings with `NODE_OPTIONS=--conditions=react-server npx tsx jobs/ai-enrich.ts --mode embeddings --provider gemini --max-rows 50` until one role reaches >= 80% coverage; or

@@ -3,7 +3,7 @@
 **Last Updated:** 2026-05-08
 **Current Gate:** G15 — Enrichment Outputs in Funding UX
 **Branch:** `main`
-**Status:** G13-G15 code is implemented and locally verified; production AI workflow runner is pushed. Gemini API Gemma now selects `gemma-4-31b-it`, but real runs still fail before enrichment output is written. Timeout/retry hardening is pushed, and provider parsing/error classification is ready to push before the next rerun. G15 remains open pending real enriched-row browser proof.
+**Status:** G13-G15 code is implemented and locally verified; production AI workflow runner is pushed. Gemini API Gemma now selects `gemma-4-31b-it`, but real runs still produce zero enriched rows. After timeout/retry, parser, and Gemma JSON-mode fixes, the latest `max_rows=1` run advanced to a validator failure. Per user request, pause Gemma/G15 proof work for now and carry it as an explicit blocker. G15 remains open pending real enriched-row browser proof.
 
 ## Read First
 
@@ -59,6 +59,11 @@
   - `gemma-*` models no longer send `generationConfig.responseMimeType`.
   - Gemini models still request JSON mode.
   - Gemma output is parsed by the tolerant JSON parser added above.
+- Latest user rerun after the Gemma JSON-mode fallback:
+  - workflow used `provider=gemini`, `model=gemma-4-31b-it`, `max_rows=1`.
+  - Supabase run row showed `status=failed`, `rows_attempted=1`, `rows_enriched=0`, `rows_needs_review=0`, `rows_failed=1`.
+  - screenshot showed `error_summary.by_validator`, not HTTP/network/parse, so Gemma likely returned parseable JSON that failed local validation or missed required combined task outputs.
+  - User explicitly asked to stop working this for now and document the fix path.
 
 ## Verification Run
 
@@ -97,18 +102,23 @@
 
 - Real AI provider quality proof is not complete: first run proved the queue writes rows, but only 1/25 enriched and the result was too thin. Prompt v2 must be rerun.
 - G15 browser proof on real enriched rows is pending. Need at least one G14 real enrichment cycle producing >= 50 enriched rows, then verify one visible row and one deliberate `needs_review=true` hidden row.
+- Gemini API Gemma 4 is not currently producing valid persisted enrichment for the combined-call schema. Current state after fixes: provider reaches validator stage, then fails. Do not count Gemma runs toward G15 until at least one row writes current-version `funding_ai_enrichment` rows with `needs_review=false`.
 - Existing external auth/browser blockers from prior gates remain: Google OAuth/email-password proof and multi-role browser walkthrough.
 
 ## Exact Next Action
 
-Do not start G16 yet. First close the G15 manual proof:
+User wants to stop Gemma/G15 proof work for now and continue next session toward G16/G17/finalization. Preserve this caveat: by the gate rules, G16 should not start until G15 is complete unless the next session explicitly records G15 real-provider proof as a deferred manual blocker.
 
-1. Push the Gemma structured-output fallback commit.
-2. Wait until the current failed-retryable Gemma jobs are eligible again, then manually trigger `.github/workflows/ai-enrichment.yml` with `provider=gemini`, `max_rows=1`.
-3. If that enriches, rerun with `provider=gemini`, `max_rows=5` and inspect the visible rows for quality.
-4. If prompt-v2 quality is acceptable, run enough batches to reach >= 50 current-version enriched rows with `needs_review=false`.
-5. Browser-check a visible enriched funding row and a row with `needs_review=true` to confirm the AI surface is hidden.
-6. Record the manual proof and commit reference in `codex/SoloProgress.md`.
+If returning to Gemma later, fix in this order:
+
+1. Query validator/quarantine detail for the latest failed job:
+   - `ai_enrichment_runs.error_summary`
+   - `ai_enrichment_jobs.last_error`
+   - `ai_enrichment_quarantine.redacted_payload`
+2. Improve validation observability without logging full provider payloads: record missing task names and Zod issue paths/categories in `error_summary.by_validator`.
+3. If Gemma is omitting fields/tasks, either tighten the prompt for `gemma-*` specifically or run a narrower Gemma task set first (`summary` + `checklist`) instead of the full combined task set.
+4. If Gemma still fails validator, switch G15 proof back to Gemini Flash/OpenRouter/Nemotron or a paid Gemini model for the required 50-row proof.
+5. Only after rows exist, run the website query for current `needs_review=false` summary rows and browser-check visible/hidden AI surfaces.
 
 ## Assumptions To Preserve
 

@@ -45,7 +45,7 @@ export function createOpenRouterProvider(input: {
     model: input.model,
     async enrich(providerInput: EnrichmentProviderInput): Promise<ProviderResult> {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), input.timeoutMs ?? 30_000);
+      const timer = setTimeout(() => controller.abort(), input.timeoutMs ?? 60_000);
 
       try {
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {

@@ -266,6 +266,7 @@ export async function runMockableEnrichmentQueue(input: {
 
     let finalRows: AiEnrichmentRowInput[] | null = null;
     let lastError = "no provider available";
+    let retryAfterSeconds: number | null = null;
 
     for (const provider of providerOrder) {
       try {
@@ -337,6 +338,7 @@ export async function runMockableEnrichmentQueue(input: {
         } else {
           incrementError(result.errorSummary.by_provider, error.provider, error.category);
           lastError = error.message;
+          retryAfterSeconds = error.retryAfterSeconds;
           if (!error.retryable) break;
         }
       }
@@ -360,7 +362,7 @@ export async function runMockableEnrichmentQueue(input: {
         ...job,
         status: permanent ? "failed_permanent" : "failed_retryable",
         attempt_count: attemptCount,
-        next_attempt_at: permanent ? job.next_attempt_at : nextRetryAt(now, attemptCount),
+        next_attempt_at: permanent ? job.next_attempt_at : nextRetryAt(now, attemptCount, retryAfterSeconds),
         last_error: lastError,
       });
     }

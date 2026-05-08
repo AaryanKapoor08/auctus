@@ -1,9 +1,9 @@
 # Auctus V2 Handoff
 
-**Last Updated:** 2026-05-06
+**Last Updated:** 2026-05-08
 **Current Gate:** G15 — Enrichment Outputs in Funding UX
 **Branch:** `main`
-**Status:** G13-G15 code is implemented and locally verified; production AI workflow runner is pushed. First real Gemini smoke proved plumbing but failed quality/coverage, so G15 remains open pending prompt-v2 rerun and real enriched-row browser proof.
+**Status:** G13-G15 code is implemented and locally verified; production AI workflow runner is pushed. Gemini API Gemma smoke now selects `gemma-4-31b-it` but failed 5/5 with provider 500/429/local abort errors, so a timeout/retry hardening patch is being pushed before the next rerun. G15 remains open pending real enriched-row browser proof.
 
 ## Read First
 
@@ -36,6 +36,14 @@
   - generic one-line checklist output is hidden.
   - funding detail pages show best-fit applicant and eligibility signals.
   - active shell/footer copy now says `Auctus`, not `Auctus AI`.
+- Investigated the user-triggered Gemini API Gemma smoke:
+  - workflow correctly used `model=gemma-4-31b-it`.
+  - latest Gemma run showed `status=failed`, `rows_attempted=5`, `rows_enriched=0`, `rows_failed=5`.
+  - job errors included Gemini `500`, Gemini `429`, and local aborts.
+- Added runtime hardening for slower/free Gemma provider runs:
+  - Gemini default request timeout 30s -> 120s.
+  - OpenRouter default request timeout 30s -> 60s.
+  - queue now uses provider `Retry-After` when scheduling retryable failed jobs.
 
 ## Verification Run
 
@@ -60,6 +68,9 @@
 - `npm run lint` => success with 20 known legacy demo warnings only.
 - `npm run build` => success.
 - Active app `Auctus AI` grep outside frozen demo/archive paths => no matches.
+- `npm test -- --run test/unit/ai-queue.test.ts` => 1 file / 5 tests passed.
+- `npm run lint` => success with 20 known legacy demo warnings only.
+- `npm run build` => success.
 
 ## Manual Blockers
 
@@ -71,11 +82,12 @@
 
 Do not start G16 yet. First close the G15 manual proof:
 
-1. Push the prompt-v2 quality hardening commit if not already pushed.
-2. Manually trigger `.github/workflows/ai-enrichment.yml` for a smaller real run first (`provider=openrouter`, `max_rows=5`, or Gemini after rate limits cool down) and inspect the visible rows for quality.
-3. If prompt-v2 quality is acceptable, run enough batches to reach >= 50 current-version enriched rows with `needs_review=false`.
-4. Browser-check a visible enriched funding row and a row with `needs_review=true` to confirm the AI surface is hidden.
-5. Record the manual proof and commit reference in `codex/SoloProgress.md`.
+1. Push the Gemma timeout/retry hardening commit.
+2. Wait until the current failed-retryable Gemma jobs are eligible again, then manually trigger `.github/workflows/ai-enrichment.yml` with `provider=gemini`, `max_rows=1`.
+3. If that enriches, rerun with `provider=gemini`, `max_rows=5` and inspect the visible rows for quality.
+4. If prompt-v2 quality is acceptable, run enough batches to reach >= 50 current-version enriched rows with `needs_review=false`.
+5. Browser-check a visible enriched funding row and a row with `needs_review=true` to confirm the AI surface is hidden.
+6. Record the manual proof and commit reference in `codex/SoloProgress.md`.
 
 ## Assumptions To Preserve
 

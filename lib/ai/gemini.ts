@@ -45,7 +45,7 @@ export function createGeminiProvider(input: {
     model: input.model,
     async enrich(providerInput: EnrichmentProviderInput): Promise<ProviderResult> {
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), input.timeoutMs ?? 30_000);
+      const timer = setTimeout(() => controller.abort(), input.timeoutMs ?? 120_000);
 
       try {
         const response = await fetch(

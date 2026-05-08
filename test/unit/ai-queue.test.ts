@@ -114,6 +114,34 @@ describe("runMockableEnrichmentQueue", () => {
     expect(result.errorSummary.by_provider.gemini.rate_limit).toBe(1);
   });
 
+  it("uses provider retry-after when scheduling failed retryable jobs", async () => {
+    const gemini: AiProvider = {
+      id: "gemini",
+      model: "gemini-test",
+      async enrich() {
+        throw new AiProviderError({
+          provider: "gemini",
+          message: "rate limited",
+          category: "rate_limit",
+          retryable: true,
+          retryAfterSeconds: 120,
+        });
+      },
+    };
+
+    const result = await runMockableEnrichmentQueue({
+      jobs: [job({ provider_preference: "gemini-only" })],
+      fundingById: new Map([[funding.id, funding]]),
+      providers: { gemini },
+      budget,
+      now,
+    });
+
+    expect(result.status).toBe("failed");
+    expect(result.updatedJobs[0].status).toBe("failed_retryable");
+    expect(result.updatedJobs[0].next_attempt_at).toBe("2026-05-06T12:02:00.000Z");
+  });
+
   it("escalates valid but low-confidence Gemini output to OpenRouter", async () => {
     const lowConfidenceGemini: AiProvider = {
       id: "gemini",

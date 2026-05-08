@@ -182,7 +182,11 @@ function taskOutputToRow(input: {
     };
   }
 
-  return { ...base, data_quality_flags: output.insights };
+  if (output.task_type === "radar") {
+    return { ...base, data_quality_flags: output.insights };
+  }
+
+  return base;
 }
 
 async function callAndValidate(input: {

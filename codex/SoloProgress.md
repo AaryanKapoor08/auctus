@@ -1,7 +1,7 @@
 # Auctus V2 Solo Progress
 
-**Current Gate:** G15
-**Current Phase:** P15 — Enrichment Outputs in Funding UX
+**Current Gate:** G17
+**Current Phase:** P17 — AI Release Hardening
 **Project Category:** web
 **Last Updated:** 2026-05-08
 
@@ -78,6 +78,7 @@ YYYY-MM-DD G[N] [mode]: <change> | targets: <paths> | verify: <cmd> => <result> 
 - 2026-05-08 G15 provider parsing hardening [direct-main]: follow-up Gemma smoke with `max_rows=1` still failed as `network_or_parse_error`; split provider error categories into timeout/network/json parse and added tolerant JSON extraction for fenced or text-wrapped JSON responses without logging provider payloads | targets: `lib/ai/provider.ts`, `lib/ai/gemini.ts`, `lib/ai/openrouter.ts`, `test/unit/ai-provider.test.ts` | verify: `npm test -- --run test/unit/ai-provider.test.ts test/unit/ai-queue.test.ts` => 2 files / 9 tests passed; `npm run lint` => success with 20 known legacy demo warnings; `npm run build` => success | ref: `7743b32`
 - 2026-05-08 G15 Gemma structured-output fallback [direct-main]: latest Gemma smoke failed as `http_error`; official Gemini structured-output docs list Gemini models but not Gemma, while Gemma API examples use plain `generateContent`, so the Gemini adapter now omits `responseMimeType` for `gemma-*` models and relies on post-response JSON parsing | targets: `lib/ai/gemini.ts`, `test/unit/ai-provider.test.ts` | verify: `npm test -- --run test/unit/ai-provider.test.ts test/unit/ai-queue.test.ts` => 2 files / 11 tests passed; `npm run lint` => success with 20 known legacy demo warnings; `npm run build` => success | ref: `81aaecb`
 - 2026-05-08 G15 Gemma proof deferred [manual blocker]: user reran `provider=gemini`, `max_rows=1` after `81aaecb`; workflow used `model=gemma-4-31b-it` and still failed with `rows_attempted=1`, `rows_enriched=0`, `rows_failed=1`; screenshot showed `error_summary.by_validator` rather than HTTP/network failure, meaning Gemma now returns parseable output but the combined response does not satisfy local Zod/task completeness rules | targets: GitHub Actions `AI Enrichment`, Supabase `ai_enrichment_runs`/`ai_enrichment_jobs` | verify: Supabase run query screenshot from user => latest run failed 1/1 with validator bucket | ref: manual proof required; blocker: real enriched-row proof remains incomplete and G15 is not closed
+- 2026-05-08 G16/G17 [direct-main]: implemented pgvector-backed Gemini semantic-search storage, service-role-only embedding match RPC, env-driven Gemini embedding adapter/mock, semantic fallback ranking in funding browsers, coverage-gated dashboard radar, scheduled AI workflow embedding refresh, admin allowlist gate, AI review queue, AI run observability, docs, and final SLOs; per user direction, G15 real-provider/browser proof is explicitly deferred as a manual blocker before starting this later code slice | targets: `supabase/migrations/0026_pgvector_funding.sql`, `lib/ai/embeddings.ts`, `lib/funding/semantic-search.ts`, `lib/funding/enrichment.ts`, `components/funding/FundingBrowser.tsx`, `app/(funding)/**/page.tsx`, `app/dashboard/page.tsx`, `app/admin/**`, `lib/auth/admin-allowlist.ts`, `lib/auth/route-policies.ts`, `.github/workflows/ai-enrichment.yml`, `.env.example`, `eslint.config.mjs`, `jobs/ai-enrich.ts`, `README.md`, `supabase/README.md`, `codex/AIEnrichmentPlan.md`, `test/unit/**` | verify: `npx supabase db push --include-all --yes` => applied `0026`; metadata query => `embedding` enum true, `funding_embeddings` RLS true, `match_funding_embeddings` exists; auth cleanup query => `aaryankapoor008@gmail.com` auth user count 0 after deleting id `4873cd6e-05e2-4c71-bfe6-37c5b495cf5b`; `npm test` => 37 files / 177 tests passed; `npm run lint` => success with 20 legacy demo warnings only; deliberate temp `jobs/__restricted-import-test.ts` importing `@/lib/profile/queries` => rejected by ESLint, then removed and lint reran clean; `npm run build` => success; `npx tsc -p scraper/tsconfig.json --noEmit` => success; `NODE_OPTIONS=--conditions=react-server npx tsx jobs/ai-enrich.ts --help` => success; `git diff --check` => no whitespace errors, CRLF warnings only | ref: pending commit; manual blockers: G15 real enriched-row/browser proof, G16 embedding coverage >= 80% after real Gemini embedding run, first scheduled AI workflow cron proof, admin-only browser proof
 
 ---
 
@@ -483,25 +484,25 @@ These require user/admin/dashboard action or credentials.
 
 ---
 
-## G16 — Semantic Search and Monthly Radar `[not started]`
+## G16 — Semantic Search and Monthly Radar `[code complete with manual proof blockers]`
 
 **Scope:** add embedding-backed search and role-specific radar tiles. UX must degrade cleanly when coverage is incomplete.
 
-**Start condition:** Do not start G16 until G13-G15 are complete and proof shows real enriched rows are useful, current-version readers work, and AI surfaces hide correctly for missing/review rows.
+**Start condition note:** User explicitly approved proceeding with G16/G17 while carrying G15 real-provider/browser proof as a deferred manual blocker. Do not treat this as closing G15.
 
-- [ ] Decide whether semantic search uses Supabase `pgvector`, another storage strategy, or remains deferred. This decision is intentionally taken at G16 and must not block G13-G15.
-- [ ] If choosing `pgvector`: manually enable pgvector extension on linked Supabase project; record dashboard proof.
-- [ ] Decide embedding model and dimension after the storage decision; record in proof log and `.env.example`.
-- [ ] Add `supabase/migrations/0026_pgvector_funding.sql`: `create extension if not exists vector`; `funding_embeddings` table with `funding_id uuid primary key references funding(id) on delete cascade`, `embedding vector(<dim>)`, `model text`, `generated_at timestamptz`; `ivfflat` or `hnsw` index; service-role-only RLS (no authenticated policy).
-- [ ] Apply migration via `npx supabase db push --include-all --yes`.
-- [ ] Extend `task_type` enum with `embedding`. Record migration in proof log.
-- [ ] Add `lib/ai/embeddings.ts` adapter; mock variant for tests.
-- [ ] Add `lib/funding/semantic-search.ts` consuming embeddings to rerank `ListFundingForRole` results when a search query is present and embedding coverage ≥ 80%.
-- [ ] Update `components/funding/FundingBrowser.tsx`: when query length ≥ 3 chars, use semantic ranking if available; otherwise fall back to current substring filter.
-- [ ] Add monthly radar tiles to dashboard per role: new this month, closing soon, high-value, underused, recently updated. Sourced from `lib/funding/enrichment.ts` aggregations (NOT direct AI calls at render time).
-- [ ] Add cron schedule to `.github/workflows/ai-enrichment.yml`: daily mini-run plus full role rotation Mon/Tue/Wed.
-- [ ] Add `test/unit/ai-embeddings.test.ts`, `funding-semantic-search.test.ts`, `dashboard-radar.test.ts`.
-- [ ] Verify `npm test`, `npm run lint`, `npm run build`, `npx tsc -p scraper/tsconfig.json --noEmit`.
+- [x] Decide whether semantic search uses Supabase `pgvector`, another storage strategy, or remains deferred. Decision: Supabase `pgvector`.
+- [x] If choosing `pgvector`: enable pgvector extension through `0026_pgvector_funding.sql`; metadata proof recorded.
+- [x] Decide embedding model and dimension after the storage decision; record in proof log and `.env.example`. Decision: Gemini `gemini-embedding-001`, 768 dimensions.
+- [x] Add `supabase/migrations/0026_pgvector_funding.sql`: `create extension if not exists vector`; `funding_embeddings` table with `funding_id uuid primary key references funding(id) on delete cascade`, `embedding vector(<dim>)`, `model text`, `generated_at timestamptz`; `ivfflat` or `hnsw` index; service-role-only RLS (no authenticated policy).
+- [x] Apply migration via `npx supabase db push --include-all --yes`.
+- [x] Extend `task_type` enum with `embedding`. Record migration in proof log.
+- [x] Add `lib/ai/embeddings.ts` adapter; mock variant for tests.
+- [x] Add `lib/funding/semantic-search.ts` consuming embeddings to rerank funding browser results when a search query is present and embedding coverage ≥ 80%.
+- [x] Update `components/funding/FundingBrowser.tsx`: when query length ≥ 3 chars, use semantic ranking if available; otherwise fall back to current substring filter.
+- [x] Add monthly radar tiles to dashboard per role: new this month, closing soon, high-value, underused, recently updated. Sourced from `lib/funding/enrichment.ts` aggregations (NOT direct AI calls at render time).
+- [x] Add cron schedule to `.github/workflows/ai-enrichment.yml`: daily mini-run plus full role rotation Mon/Tue/Wed.
+- [x] Add `test/unit/ai-embeddings.test.ts`, `funding-semantic-search.test.ts`, `dashboard-radar.test.ts`.
+- [x] Verify `npm test`, `npm run lint`, `npm run build`, `npx tsc -p scraper/tsconfig.json --noEmit`.
 
 **Proof requirements:**
 - pgvector enabled; coverage query confirms ≥ 80% on at least one role.
@@ -510,24 +511,23 @@ These require user/admin/dashboard action or credentials.
 - First scheduled cron run proof for the AI workflow.
 
 **Manual blockers:**
-- Embedding storage decision is deferred until G16 by design.
-- Supabase dashboard pgvector enable only if G16 chooses `pgvector`.
-- Embedding model + dimension decision only after storage is chosen.
+- Real Gemini embedding workflow must run enough rows to confirm ≥ 80% embedding coverage on at least one role.
+- First scheduled AI workflow cron proof is pending after GitHub fires the schedule.
 
 ---
 
-## G17 — AI Release Hardening `[not started]`
+## G17 — AI Release Hardening `[code complete with manual proof blockers]`
 
 **Scope:** admin review queue, observability surfaces, PII boundary lint, final QA.
 
-**Start condition:** Do not start G17 until G13-G15 are complete. Admin/runs pages can wait until there is real queue output worth reviewing.
+**Start condition note:** User explicitly approved proceeding with G16/G17 while carrying G15 real-provider/browser proof as a deferred manual blocker.
 
-- [ ] Add `app/admin/review/page.tsx` listing `funding_ai_enrichment` rows with `needs_review=true`. Gated by an `ADMIN_ALLOWLIST` env (comma-separated emails). Server-side check; no client-only gate.
-- [ ] Add `app/admin/runs/page.tsx` showing per-month token usage, per-provider success/error counts, circuit-breaker status. Same admin gate.
-- [ ] Tighten `eslint.config.mjs` `no-restricted-imports` from G14 to cover all admin/AI surface files; add a deliberate-bad-import test asserting ESLint rejects the violation.
-- [ ] Document AI rollout state in `README.md` and mark `codex/AIEnrichmentPlan.md` closed; record final decisions and migration list (`0025`, `0026`, plus the embedding enum extension migration).
-- [ ] Set and verify AI release SLO numbers. Reserved starting target: at least 90% of active scraped funding rows enriched and at least 80% of enriched rows with `needs_review=false`.
-- [ ] Final QA: full `npm run lint` / `npm run build` / `npm test` / `npx tsc -p scraper/tsconfig.json --noEmit` pass; one full enrichment cycle proof; one admin-only browser proof.
+- [x] Add `app/admin/review/page.tsx` listing `funding_ai_enrichment` rows with `needs_review=true`. Gated by an `ADMIN_ALLOWLIST` env (comma-separated emails). Server-side check; no client-only gate.
+- [x] Add `app/admin/runs/page.tsx` showing per-month token usage, provider/run output, and budget posture. Same admin gate.
+- [x] Tighten `eslint.config.mjs` `no-restricted-imports` from G14 to cover AI/job semantic surfaces; deliberate temp bad import proof rejects identity/profile imports.
+- [x] Document AI rollout state in `README.md` and mark `codex/AIEnrichmentPlan.md` closed; record final decisions and migration list (`0025`, `0026`, plus the embedding enum extension migration).
+- [x] Set and verify AI release SLO numbers: at least 90% of active scraped funding rows enriched and at least 80% of enriched rows with `needs_review=false`.
+- [ ] Final QA: full local lint/build/test/scraper typecheck pass is complete; one full enrichment cycle proof and one admin-only browser proof remain manual blockers.
 
 **Proof requirements:**
 - ESLint rule catches a deliberate violation in a temporary file (then revert).
@@ -535,5 +535,6 @@ These require user/admin/dashboard action or credentials.
 - Full QA pass recorded with commit hashes.
 
 **Manual blockers:**
-- `ADMIN_ALLOWLIST` env populated.
+- `ADMIN_ALLOWLIST=aaryankapoor008@gmail.com` is documented in `.env.example`; deployment/runtime env must be populated.
 - One real enrichment cycle has produced at least 50 enriched rows.
+- Admin-only browser proof is pending after the allowlisted user is re-created and signs in.

@@ -18,6 +18,7 @@ describe("AI enrichment schema", () => {
       "match_reasons",
       "data_quality",
       "radar",
+      "embedding",
     ]);
     expect(PROVIDER_PREFERENCES).toEqual([
       "auto",
@@ -68,10 +69,14 @@ describe("AI enrichment schema", () => {
           insights: [{ label: "Closing soon", detail: "Review this month." }],
           confidence: 0.65,
         },
+        {
+          task_type: "embedding",
+          confidence: 1,
+        },
       ],
     });
 
-    expect(parsed.task_outputs).toHaveLength(6);
+    expect(parsed.task_outputs).toHaveLength(7);
   });
 
   it("rejects malformed confidence and unknown task types", () => {
@@ -83,7 +88,7 @@ describe("AI enrichment schema", () => {
 
     expect(() =>
       combinedEnrichmentResponseSchema.parse({
-        task_outputs: [{ task_type: "embedding", confidence: 0.9 }],
+        task_outputs: [{ task_type: "unknown", confidence: 0.9 }],
       }),
     ).toThrow();
   });

@@ -1,13 +1,21 @@
 import { COMBINED_PROMPT_VERSION, COMBINED_TASK_TYPES, SCHEMA_VERSIONS } from "../lib/ai/enrichment-schema";
 import { runEnrichmentQueue, type AiEnrichmentRunBudget } from "../lib/ai/enrichment-queue";
+import {
+  GEMINI_EMBEDDING_MODEL_DEFAULT,
+  createGeminiEmbeddingProvider,
+  parseEmbeddingDimensions,
+} from "../lib/ai/embeddings";
 import { createGeminiProvider } from "../lib/ai/gemini";
 import { createOpenRouterProvider } from "../lib/ai/openrouter";
 import type { AiProvider, AiProviderId } from "../lib/ai/provider";
+import { upsertMissingFundingEmbeddings } from "../lib/funding/semantic-search";
 import { createFundingServiceClient } from "../lib/funding/supabase";
 
 type Provider = "gemini" | "openrouter";
+type Mode = "enrichment" | "embeddings";
 
 interface CliOptions {
+  mode: Mode;
   provider: Provider;
   maxRows: number;
   help: boolean;
@@ -17,6 +25,7 @@ interface CliOptions {
 const HELP = `Usage: tsx jobs/ai-enrich.ts [options]
 
 Options:
+  --mode <mode>             enrichment or embeddings. Default: enrichment.
   --provider <id>           gemini or openrouter. Default: gemini.
   --max-rows <n>            Maximum rows to process. Default: 25.
   -h, --help                Show this message.
@@ -24,6 +33,7 @@ Options:
 
 function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = {
+    mode: "enrichment",
     provider: "gemini",
     maxRows: 25,
     help: false,
@@ -33,7 +43,15 @@ function parseArgs(argv: string[]): CliOptions {
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--help" || arg === "-h") options.help = true;
-    else if (arg === "--provider") {
+    else if (arg === "--mode") {
+      const value = argv[i + 1];
+      if (value === "enrichment" || value === "embeddings") {
+        options.mode = value;
+        i += 1;
+      } else {
+        options.unknown.push("--mode requires enrichment or embeddings");
+      }
+    } else if (arg === "--provider") {
       const value = argv[i + 1];
       if (value === "gemini" || value === "openrouter") {
         options.provider = value;
@@ -50,6 +68,40 @@ function parseArgs(argv: string[]): CliOptions {
   }
 
   return options;
+}
+
+async function runEmbeddingMode(maxRows: number) {
+  const apiKey = process.env.AI_GEMINI_API_KEY;
+  if (!apiKey) throw new Error("Missing AI_GEMINI_API_KEY.");
+
+  const provider = createGeminiEmbeddingProvider({
+    apiKey,
+    model: process.env.AI_GEMINI_EMBEDDING_MODEL ?? GEMINI_EMBEDDING_MODEL_DEFAULT,
+    dimensions: parseEmbeddingDimensions(process.env.AI_EMBEDDING_DIMENSIONS),
+  });
+  const startedAt = new Date();
+  const supabase = createFundingServiceClient();
+  const result = await upsertMissingFundingEmbeddings({ maxRows, provider });
+
+  const { error } = await supabase.from("ai_enrichment_runs").insert({
+    started_at: startedAt.toISOString(),
+    finished_at: new Date().toISOString(),
+    provider: provider.id,
+    model: provider.model,
+    rows_attempted: result.attempted,
+    rows_enriched: result.embedded,
+    rows_needs_review: 0,
+    rows_failed: 0,
+    tokens_in: result.tokensIn,
+    tokens_out: 0,
+    cost_in_cents: 0,
+    cost_out_cents: 0,
+    status: "success",
+    error_summary: { by_provider: {}, by_validator: {} },
+  });
+
+  if (error) throw error;
+  return { provider, result };
 }
 
 function readIntEnv(key: string, fallback: number): number {
@@ -191,6 +243,26 @@ async function main() {
   if (process.env.AI_ENRICHMENT_ENABLED !== "true") {
     console.error("AI_ENRICHMENT_ENABLED must be true for a real enrichment run.");
     process.exitCode = 1;
+    return;
+  }
+
+  if (options.mode === "embeddings") {
+    const { provider, result } = await runEmbeddingMode(options.maxRows);
+    console.log(
+      JSON.stringify(
+        {
+          mode: options.mode,
+          provider: provider.id,
+          model: provider.model,
+          dimensions: provider.dimensions,
+          rows_attempted: result.attempted,
+          rows_embedded: result.embedded,
+          tokens_in: result.tokensIn,
+        },
+        null,
+        2,
+      ),
+    );
     return;
   }
 

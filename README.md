@@ -20,6 +20,7 @@ V2 is implemented end to end on `main`:
 - ETL pipeline (`scraper/`) for six locked official-source modules, with normalize, dedupe, expire, run-tracking, and data-quality checks.
 - Funding-side RLS: public active funding reads, owner-and-current-role preferences, service-role-only writes/metadata.
 - Composed dashboard (funding summaries, upcoming deadlines, forum activity) consuming only the published runtime contracts.
+- Offline AI enrichment storage, provider queueing, optional Gemini semantic search via `pgvector`, dashboard radar fallback, and admin-only AI review/run pages.
 
 The legacy demo routes are isolated under `app/(demo)/**` and stay mounted to keep the chatbot working. They are explicitly outside the V2 surface.
 
@@ -94,6 +95,18 @@ Apply database migrations:
 supabase db push
 ```
 
+Run a real AI enrichment batch from the repo root after provider secrets are configured:
+
+```bash
+NODE_OPTIONS=--conditions=react-server npx tsx jobs/ai-enrich.ts --provider gemini --max-rows 25
+```
+
+Refresh Gemini semantic embeddings:
+
+```bash
+NODE_OPTIONS=--conditions=react-server npx tsx jobs/ai-enrich.ts --mode embeddings --provider gemini --max-rows 50
+```
+
 The migration set on `main`:
 
 | File | Purpose |
@@ -112,6 +125,8 @@ The migration set on `main`:
 | `0022_canonical_funding_filters.sql` | canonical funding filter backfill |
 | `0023_research_social_sciences_tags.sql` | research social-sciences tag backfill |
 | `0024_public_funding_reads.sql` | public active funding reads for guest discovery |
+| `0025_ai_enrichment.sql` | AI enrichment rows, queue/run/quarantine tables, content hash |
+| `0026_pgvector_funding.sql` | `pgvector` funding embeddings and service-role match RPC |
 
 ## Important Project Docs
 

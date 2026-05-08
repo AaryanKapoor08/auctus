@@ -97,6 +97,7 @@ export default function FundingBrowser({
   recommendedCategories = [],
   showPersonalizationPrompt = false,
   enrichmentByFundingId = {},
+  semanticRankedIds = [],
 }: {
   role: Role;
   items: FundingItem[];
@@ -108,6 +109,7 @@ export default function FundingBrowser({
   recommendedCategories?: string[];
   showPersonalizationPrompt?: boolean;
   enrichmentByFundingId?: Record<string, FundingEnrichmentBundle>;
+  semanticRankedIds?: string[];
 }) {
   const filters = FUNDING_FILTERS[role];
   const categoryFilter = filters.find((filter) => filter.key === "category");
@@ -147,6 +149,10 @@ export default function FundingBrowser({
     () => new Set(profileCategories.map(normalize)),
     [profileCategories],
   );
+  const semanticRank = useMemo(
+    () => new Map(semanticRankedIds.map((id, index) => [id, index])),
+    [semanticRankedIds],
+  );
 
   const tagCounts = useMemo(() => {
     return Object.fromEntries(
@@ -170,8 +176,10 @@ export default function FundingBrowser({
 
     const filtered = items.filter((item) => {
       const tags = itemTags(item);
+      const semanticMatch =
+        search.trim().length >= 3 && semanticRank.has(item.id);
       return (
-        matchesSearch(item, search) &&
+        (matchesSearch(item, search) || semanticMatch) &&
         Array.from(activeTagsByGroup.values()).every((groupTags) =>
           groupTags.some((tag) => tags.has(tag)),
         ) &&
@@ -194,10 +202,15 @@ export default function FundingBrowser({
 
       const bScore = relevanceScore(b, [...profileCategories, ...selectedTags]);
       const aScore = relevanceScore(a, [...profileCategories, ...selectedTags]);
+      if (search.trim().length >= 3 && semanticRank.size > 0) {
+        const bRank = semanticRank.get(b.id) ?? Number.POSITIVE_INFINITY;
+        const aRank = semanticRank.get(a.id) ?? Number.POSITIVE_INFINITY;
+        if (aRank !== bRank) return aRank - bRank;
+      }
       if (bScore !== aScore) return bScore - aScore;
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
-  }, [deadline, items, optionGroupByValue, profileCategories, search, selectedTags, sort]);
+  }, [deadline, items, optionGroupByValue, profileCategories, search, selectedTags, semanticRank, sort]);
 
   useEffect(() => {
     const query = toQueryString({ search, selectedTags, deadline, sort });

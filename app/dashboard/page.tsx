@@ -24,7 +24,7 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { getSession } from "@/lib/session/get-session";
 import { GetFundingSummariesForUser, ListFundingForRole } from "@/lib/funding/queries";
-import { getEnrichmentForFundingIds } from "@/lib/funding/enrichment";
+import { getEnrichmentForFundingIds, getFundingRadarForRole } from "@/lib/funding/enrichment";
 import { listThreads } from "@/lib/forum/queries";
 import {
   EXPIRING_DEADLINE_WINDOW_DAYS,
@@ -218,11 +218,12 @@ export default async function DashboardPage() {
   }
 
   const asOf = new Date();
-  const [fundingSummaries, allRoleFunding, threads, roleProfile] = await Promise.all([
+  const [fundingSummaries, allRoleFunding, threads, roleProfile, fundingRadar] = await Promise.all([
     GetFundingSummariesForUser(session.user_id, FUNDING_CANDIDATE_LIMIT),
     ListFundingForRole({ role: session.role, status: "active", limit: FUNDING_INVENTORY_LIMIT }),
     listThreads({ limit: 5 }),
     getRoleProfile(session.user_id),
+    getFundingRadarForRole(session.role, { asOf }),
   ]);
   const enrichmentByFundingId = await getEnrichmentForFundingIds(
     fundingSummaries.slice(0, TOP_MATCHES_LIMIT).map((item) => item.id),
@@ -446,6 +447,30 @@ export default async function DashboardPage() {
           </section>
 
           <aside className="space-y-6">
+            {fundingRadar.insights.length > 0 && (
+              <Card
+                className="border border-gray-200"
+                header={
+                  <div className="flex items-center gap-2">
+                    <Target className="h-5 w-5 text-gray-700" />
+                    <h2 className="text-xl font-bold text-gray-950">Funding radar</h2>
+                  </div>
+                }
+              >
+                <dl className="space-y-3">
+                  {fundingRadar.insights.map((insight) => (
+                    <div key={insight.key} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                      <dt className="flex items-center justify-between gap-3">
+                        <span className="text-sm font-medium text-gray-700">{insight.label}</span>
+                        <span className="text-lg font-bold text-gray-950">{insight.value}</span>
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-600">{insight.detail}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </Card>
+            )}
+
             <Card
               className="border border-gray-200"
               header={

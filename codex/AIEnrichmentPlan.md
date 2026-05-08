@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-05
 **Decision:** Remove the legacy chatbot as the AI placeholder. Auctus should present AI as offline enrichment and discovery intelligence, not as a live assistant.
-**Review status:** Updated after Claude gap review and provider-limit review on 2026-05-05; ambiguity-resolution pass on 2026-05-05.
+**Review status:** Implementation plan closed locally on 2026-05-08 for G13-G17. G15 real-provider/browser proof remains a deferred manual blocker; Gemma proof work is intentionally paused.
 
 ## Product Direction
 
@@ -379,7 +379,7 @@ Examples:
 - Indigenous nursing bursary
 - early career partnership grant
 
-Embedding storage is intentionally deferred to G16. The decision will be made only after G13-G15 prove the enrichment core and visible funding UX. Preferred direction is Supabase `pgvector`, but enabling it may require dashboard/admin proof and must not block G13-G15.
+Embedding storage decision: G16 uses Supabase `pgvector` with Gemini `gemini-embedding-001` at 768 dimensions. Raw vectors are service-role-only; public search pages receive ranked active funding IDs only after server-side coverage checks.
 
 6. Application prep checklist
 
@@ -473,9 +473,9 @@ GitHub Actions secrets required for real runs: configure `AI_GEMINI_API_KEY` and
 7. Radar surface: dashboard tile first, `/radar` later only if needed.
 8. Exact cost cap value: choose the G14 starting `AI_MONTHLY_COST_BUDGET_CENTS` before enabling real provider runs.
 
-## Release SLO Placeholder
+## Release SLO
 
-G17 sets the final numbers, but reserve the release criterion now: target at least 90% of active scraped funding rows enriched and at least 80% of enriched rows with `needs_review = false` before calling the first AI release complete.
+First AI release criterion: at least 90% of active scraped funding rows enriched and at least 80% of enriched rows with `needs_review = false`. Current code supports the measurement and hides incomplete surfaces, but production proof is still blocked by real-provider quality and browser verification.
 
 ## Sources Checked
 

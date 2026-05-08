@@ -15,6 +15,11 @@ on:
         description: "Maximum funding rows to enrich"
         required: true
         default: "25"
+  schedule:
+    - cron: "15 5 * * *"
+    - cron: "45 6 * * 1"
+    - cron: "45 6 * * 2"
+    - cron: "45 6 * * 3"
 
 jobs:
   ai-enrichment:
@@ -27,6 +32,8 @@ jobs:
       AI_GEMINI_API_KEY: ${{ secrets.AI_GEMINI_API_KEY }}
       AI_OPENROUTER_API_KEY: ${{ secrets.AI_OPENROUTER_API_KEY }}
       AI_GEMINI_MODEL: ${{ vars.AI_GEMINI_MODEL }}
+      AI_GEMINI_EMBEDDING_MODEL: ${{ vars.AI_GEMINI_EMBEDDING_MODEL }}
+      AI_EMBEDDING_DIMENSIONS: ${{ vars.AI_EMBEDDING_DIMENSIONS }}
       AI_OPENROUTER_MODEL: ${{ vars.AI_OPENROUTER_MODEL }}
       AI_ENRICHMENT_ENABLED: ${{ vars.AI_ENRICHMENT_ENABLED }}
       AI_MONTHLY_TOKEN_BUDGET: ${{ vars.AI_MONTHLY_TOKEN_BUDGET }}
@@ -47,4 +54,7 @@ jobs:
         run: npm ci
 
       - name: Run enrichment
-        run: npx tsx jobs/ai-enrich.ts --provider "${{ inputs.provider }}" --max-rows "${{ inputs.max_rows }}"
+        run: npx tsx jobs/ai-enrich.ts --provider "${{ inputs.provider || 'gemini' }}" --max-rows "${{ inputs.max_rows || '50' }}"
+
+      - name: Refresh semantic embeddings
+        run: npx tsx jobs/ai-enrich.ts --mode embeddings --provider gemini --max-rows "${{ inputs.max_rows || '50' }}"

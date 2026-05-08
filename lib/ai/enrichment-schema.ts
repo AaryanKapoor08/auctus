@@ -9,6 +9,7 @@ export const TASK_TYPES = [
   "match_reasons",
   "data_quality",
   "radar",
+  "embedding",
 ] as const;
 
 export type AiTaskType = (typeof TASK_TYPES)[number];
@@ -56,6 +57,7 @@ export const SCHEMA_VERSIONS: Record<AiTaskType, number> = {
   match_reasons: 1,
   data_quality: 1,
   radar: 1,
+  embedding: 1,
 };
 
 export const CONFIDENCE_NEEDS_REVIEW_THRESHOLD = 0.6;
@@ -125,6 +127,11 @@ export const radarOutputSchema = z.object({
   confidence: confidenceSchema,
 });
 
+export const embeddingOutputSchema = z.object({
+  task_type: z.literal("embedding"),
+  confidence: confidenceSchema,
+});
+
 export const taskOutputSchema = z.discriminatedUnion("task_type", [
   summaryOutputSchema,
   tagsOutputSchema,
@@ -132,6 +139,7 @@ export const taskOutputSchema = z.discriminatedUnion("task_type", [
   matchReasonsOutputSchema,
   dataQualityOutputSchema,
   radarOutputSchema,
+  embeddingOutputSchema,
 ]);
 
 export type AiTaskOutput = z.infer<typeof taskOutputSchema>;

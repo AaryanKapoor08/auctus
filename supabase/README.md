@@ -10,6 +10,14 @@ Copy `.env.example` to `.env.local` and fill in:
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
+AI_ENRICHMENT_ENABLED=false
+AI_GEMINI_API_KEY=
+AI_GEMINI_MODEL=gemini-2.5-flash
+AI_GEMINI_EMBEDDING_MODEL=gemini-embedding-001
+AI_EMBEDDING_DIMENSIONS=768
+AI_OPENROUTER_API_KEY=
+AI_OPENROUTER_MODEL=nvidia/nemotron-3-super-120b-a12b
+ADMIN_ALLOWLIST=aaryankapoor008@gmail.com
 ```
 
 Do not commit `.env.local` or real secrets.
@@ -60,8 +68,12 @@ supabase db push
 | `0005_forum.sql` | identity (forum tables, `mark_reply_helpful`) | G9 |
 | `0010_rls_identity.sql` | identity RLS | G9 |
 | `0020_rls_funding.sql` | funding RLS | G11 |
+| `0025_ai_enrichment.sql` | funding AI enrichment | G13 |
+| `0026_pgvector_funding.sql` | funding semantic search | G16 |
 
 `0010_rls_identity.sql` must be applied before `0020_rls_funding.sql` because the funding RLS join reads `profiles.role`. When `db push` reports out-of-order migrations, use `supabase db push --include-all` to sync.
+
+`0026_pgvector_funding.sql` enables the `vector` extension, stores raw vectors in `funding_embeddings`, and grants the semantic match RPC only to `service_role`. Public pages only receive ranked funding IDs after server-side checks.
 
 ### Data-quality checks
 

@@ -11,7 +11,12 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    files: ["lib/ai/**/*.ts", "scraper/ai-enrich.ts"],
+    files: [
+      "lib/ai/**/*.ts",
+      "lib/funding/semantic-search.ts",
+      "jobs/**/*.ts",
+      "scraper/ai-enrich.ts",
+    ],
     rules: {
       "no-restricted-imports": [
         "error",

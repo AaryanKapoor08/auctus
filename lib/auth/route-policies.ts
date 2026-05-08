@@ -15,6 +15,7 @@ export const authPolicies: RoutePolicyRegistry = [
   { path: "/profile", allowed_roles: null, require_auth: true },
   { path: "/forum", allowed_roles: null, require_auth: true },
   { path: "/dashboard", allowed_roles: null, require_auth: true },
+  { path: "/admin", allowed_roles: null, require_auth: true },
   { path: "/", allowed_roles: null, require_auth: false },
 ];
 

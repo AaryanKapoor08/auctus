@@ -12,6 +12,10 @@ const sql = readFileSync(
   join(process.cwd(), "supabase/migrations/0025_ai_enrichment.sql"),
   "utf8",
 );
+const pgvectorSql = readFileSync(
+  join(process.cwd(), "supabase/migrations/0026_pgvector_funding.sql"),
+  "utf8",
+);
 const readerSql = readFileSync(
   join(process.cwd(), "lib/funding/enrichment.ts"),
   "utf8",
@@ -28,7 +32,7 @@ describe("0025_ai_enrichment.sql", () => {
 
   it("declares the locked enum values expected by runtime constants", () => {
     for (const taskType of TASK_TYPES) {
-      expect(sql).toContain(`'${taskType}'`);
+      expect(`${sql}\n${pgvectorSql}`).toContain(`'${taskType}'`);
     }
     for (const preference of PROVIDER_PREFERENCES) {
       expect(sql).toContain(`'${preference}'`);
@@ -72,6 +76,6 @@ describe("funding enrichment readers", () => {
     expect(readerSql).toContain("row.prompt_version === COMBINED_PROMPT_VERSION");
     expect(readerSql).toContain("row.schema_version === SCHEMA_VERSIONS[row.task_type]");
     expect(readerSql).toContain("!row.needs_review");
-    expect(COMBINED_PROMPT_VERSION).toBe(1);
+    expect(COMBINED_PROMPT_VERSION).toBe(2);
   });
 });

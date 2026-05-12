@@ -3,9 +3,7 @@ import FundingBrowser, {
   type FundingBrowserSortOption,
 } from "@/components/funding/FundingBrowser";
 import { ListFundingForRole } from "@/lib/funding/queries";
-import { getEnrichmentForRole } from "@/lib/funding/enrichment";
 import { getRecommendedFundingTags } from "@/lib/funding/recommended-tags";
-import { getSemanticSearchRankingForRole } from "@/lib/funding/semantic-search";
 import { getSession } from "@/lib/session/get-session";
 
 type SearchParams = Promise<{
@@ -38,12 +36,10 @@ export default async function ScholarshipsPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const [items, recommendedTags, session, enrichmentByFundingId, semanticRanking] = await Promise.all([
+  const [items, recommendedTags, session] = await Promise.all([
     ListFundingForRole({ role: "student" }),
     getRecommendedFundingTags("student"),
     getSession(),
-    getEnrichmentForRole("student"),
-    getSemanticSearchRankingForRole({ role: "student", query: params.search }),
   ]);
 
   return (
@@ -70,8 +66,6 @@ export default async function ScholarshipsPage({
           initialSort={parseSort(params.sort)}
           recommendedCategories={recommendedTags}
           showPersonalizationPrompt={!session}
-          enrichmentByFundingId={enrichmentByFundingId}
-          semanticRankedIds={semanticRanking.rankedIds}
         />
       </div>
     </div>

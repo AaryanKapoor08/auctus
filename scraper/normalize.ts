@@ -1,4 +1,4 @@
-import type { FundingItem } from "../build/contracts/funding.js";
+import type { FundingItem } from "../contracts/funding.js";
 import { canonicalFundingTags, primaryFundingCategory } from "./canonical-tags.js";
 import type { ScrapedFunding } from "./types.js";
 

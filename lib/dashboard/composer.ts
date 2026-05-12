@@ -1,6 +1,4 @@
 import type { FundingSummary } from "@contracts/funding";
-import type { Role } from "@contracts/role";
-import type { FundingEnrichmentBundle } from "@/lib/funding/enrichment";
 import type { ForumThread } from "@/lib/forum/queries";
 
 export const EXPIRING_DEADLINE_WINDOW_DAYS = 30;
@@ -59,26 +57,8 @@ export function selectUpcomingDeadlines(
 
 export interface DashboardData {
   topMatches: FundingSummary[];
-  topMatchReasons: Record<string, string>;
   upcomingDeadlines: FundingSummary[];
   recentThreads: ForumThread[];
-}
-
-function roleLabel(role: Role) {
-  if (role === "business") return "business";
-  if (role === "student") return "student";
-  return "research";
-}
-
-export function renderMatchReason(input: {
-  role: Role;
-  bundle: FundingEnrichmentBundle | null | undefined;
-}): string | null {
-  const templates = input.bundle?.match_reasons?.match_reason_templates;
-  const template = templates?.[input.role] ?? templates?.default;
-  if (typeof template !== "string") return null;
-
-  return template.replaceAll("{role}", roleLabel(input.role));
 }
 
 export function composeDashboard(input: {
@@ -86,8 +66,6 @@ export function composeDashboard(input: {
   candidateDeadlines: FundingSummary[];
   threads: ForumThread[];
   asOf: Date;
-  role?: Role;
-  enrichmentByFundingId?: Record<string, FundingEnrichmentBundle>;
   forumLimit?: number;
 }): DashboardData {
   const {
@@ -95,27 +73,11 @@ export function composeDashboard(input: {
     candidateDeadlines,
     threads,
     asOf,
-    role,
-    enrichmentByFundingId = {},
     forumLimit = 5,
   } = input;
-  const topMatchReasons = role
-    ? Object.fromEntries(
-        topMatches
-          .map((item) => [
-            item.id,
-            renderMatchReason({
-              role,
-              bundle: enrichmentByFundingId[item.id],
-            }),
-          ] as const)
-          .filter((entry): entry is readonly [string, string] => Boolean(entry[1])),
-      )
-    : {};
 
   return {
     topMatches,
-    topMatchReasons,
     upcomingDeadlines: selectUpcomingDeadlines(candidateDeadlines, asOf),
     recentThreads: threads.slice(0, forumLimit),
   };

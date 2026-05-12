@@ -28,14 +28,10 @@ function formatDeadline(deadline: string | null) {
 export default function FundingCard({
   item,
   href,
-  enrichment,
 }: {
   item: FundingItem;
   href: string;
-  enrichment?: { summary: string } | null;
 }) {
-  const subtitle = enrichment?.summary ?? item.provider;
-
   return (
     <Link
       href={href}
@@ -47,7 +43,7 @@ export default function FundingCard({
           <h2 className="mt-3 line-clamp-2 text-lg font-semibold text-gray-900 transition group-hover:text-primary-700">
             {item.name}
           </h2>
-          <p className="mt-1 line-clamp-2 text-sm text-gray-600">{subtitle}</p>
+          <p className="mt-1 line-clamp-2 text-sm text-gray-600">{item.provider}</p>
         </div>
         <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-gray-400 transition group-hover:translate-x-0.5 group-hover:text-gray-700" />
       </div>

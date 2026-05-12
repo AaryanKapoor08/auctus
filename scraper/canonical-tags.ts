@@ -1,4 +1,4 @@
-import type { FundingType } from "../build/contracts/funding.js";
+import type { FundingType } from "../contracts/funding.js";
 import type { ScrapedFunding } from "./types.js";
 
 export type CanonicalFundingInput = Pick<

@@ -5,7 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname),
-      "@contracts": path.resolve(__dirname, "build/contracts"),
+      "@contracts": path.resolve(__dirname, "contracts"),
       "server-only": path.resolve(__dirname, "test/shims/server-only.ts"),
     },
   },

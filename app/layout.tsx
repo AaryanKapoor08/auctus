@@ -4,7 +4,6 @@ import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import ChatbotWrapper from "@/components/demo/ChatbotWrapper";
 import { Providers } from "./providers";
 import { getSession } from "@/lib/session/get-session";
 
@@ -42,7 +41,6 @@ export default async function RootLayout({
             <Navbar initialSession={session} />
             <main className="min-h-screen">{children}</main>
             <Footer />
-            <ChatbotWrapper />
           </Providers>
         </ErrorBoundary>
       </body>

@@ -1,4 +1,4 @@
-import type { FundingType } from "../build/contracts/funding.js";
+import type { FundingType } from "../contracts/funding.js";
 
 export type SourceRole = "business" | "student" | "professor";
 

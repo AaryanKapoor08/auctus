@@ -1,49 +1,29 @@
 # Auctus
 
-Auctus is a web product in development for Canadian funding discovery.
+Auctus is a Next.js app for Canadian funding discovery. It supports three account types:
 
-The goal of V2 is to support three user types from the start:
+- businesses looking for grants and support programs
+- students looking for scholarships and bursaries
+- professors looking for research funding
 
-1. businesses looking for grants and support programs
-2. students looking for scholarships and related funding
-3. professors looking for research funding
+## Features
 
-## Current Status
-
-V2 is implemented end to end on `main`:
-
-- Supabase auth (Google OAuth + email/password), profiles, and role-aware route protection.
-- Per-role onboarding, persistence, and `getRoleProfile` runtime.
-- Unified funding model with role-specific listings, detail pages, filters, and DB-backed preferences.
-- Per-role match scoring wired into `GetFundingSummariesForUser`.
-- Persisted forum (threads, replies, helpful votes) with identity RLS.
-- ETL pipeline (`scraper/`) for six locked official-source modules, with normalize, dedupe, expire, run-tracking, and data-quality checks.
-- Funding-side RLS: public active funding reads, owner-and-current-role preferences, service-role-only writes/metadata.
-- Composed dashboard (funding summaries, upcoming deadlines, forum activity) consuming only the published runtime contracts.
-- Offline AI enrichment storage, provider queueing, optional Gemini semantic search via `pgvector`, dashboard radar fallback, and admin-only AI review/run pages.
-
-The legacy demo routes are isolated under `app/(demo)/**` and stay mounted to keep the chatbot working. They are explicitly outside the V2 surface.
-
-Active funding rows are intentionally public-readable so guests can browse before sign-up. Do not add private sponsor notes, internal review data, or role-private fields to `funding`; store private funding metadata in a separate service-role-only table.
-
-Active planning and execution docs live in the [`build/`](build) folder. The active solo tracker is `codex/SoloProgress.md`.
+- Supabase authentication and profile onboarding
+- Role-specific funding pages for grants, scholarships, and research funding
+- Saved funding preferences and profile-based match scoring
+- Funding detail pages with official application links
+- Community forum with threads, replies, and helpful votes
+- Dashboard with recommended funding, upcoming deadlines, profile details, and forum activity
+- Scraper package for ingesting official Canadian funding sources
 
 ## Tech Stack
 
-The current application uses:
-
-1. Next.js 16
-2. React 19
-3. TypeScript 5
-4. Tailwind CSS 4
-5. ESLint 9
-
-The planned V2 platform adds:
-
-1. Supabase for auth, database, and row level security
-2. GitHub Actions for CI and ETL runs
-3. a separate `scraper/` package for ingestion
-4. Vitest for test coverage
+- Next.js 16
+- React 19
+- TypeScript 5
+- Tailwind CSS 4
+- Supabase
+- Vitest
 
 ## Local Development
 
@@ -53,22 +33,24 @@ Install dependencies:
 npm install
 ```
 
+Create `.env.local` from `.env.example` and fill in the Supabase values:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
 Start the development server:
 
 ```bash
 npm run dev
 ```
 
-Create a production build:
+Build for production:
 
 ```bash
 npm run build
-```
-
-Start the production server:
-
-```bash
-npm run start
 ```
 
 Run the test suite:
@@ -77,80 +59,59 @@ Run the test suite:
 npm test
 ```
 
-Run the scraper bootstrap (no DB writes):
+Run linting:
 
 ```bash
-cd scraper && npm install && npx tsx index.ts --bootstrap-only
+npm run lint
 ```
 
-Run a real scrape against the linked Supabase project (requires `NEXT_PUBLIC_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` in env):
+## Database
 
-```bash
-cd scraper && npx tsx index.ts
-```
-
-Apply database migrations:
+Apply migrations with the Supabase CLI:
 
 ```bash
 supabase db push
 ```
 
-Run a real AI enrichment batch from the repo root after provider secrets are configured:
-
-```bash
-NODE_OPTIONS=--conditions=react-server npx tsx jobs/ai-enrich.ts --provider gemini --max-rows 25
-```
-
-Refresh Gemini semantic embeddings:
-
-```bash
-NODE_OPTIONS=--conditions=react-server npx tsx jobs/ai-enrich.ts --mode embeddings --provider gemini --max-rows 50
-```
-
-The migration set on `main`:
+Current migrations:
 
 | File | Purpose |
 |---|---|
 | `0000_init.sql` | bootstrap no-op |
-| `0001_profiles_base.sql` | `profiles` table + auth.user trigger |
-| `0002_role_profiles.sql` | `business_profiles`, `student_profiles`, `professor_profiles` |
-| `0003_funding.sql` | `funding`, `funding_preferences`, enums, indexes |
-| `0004_scrape_metadata.sql` | `funding_sources` (seeded with six locked sources), `scrape_runs` |
-| `0005_forum.sql` | `threads`, `replies`, `reply_helpful_votes`, `mark_reply_helpful` |
-| `0010_rls_identity.sql` | identity RLS |
+| `0001_profiles_base.sql` | profiles table and auth trigger |
+| `0002_role_profiles.sql` | role-specific profile tables |
+| `0003_funding.sql` | funding and funding preferences |
+| `0004_scrape_metadata.sql` | funding sources and scrape runs |
+| `0005_forum.sql` | forum threads, replies, and helpful votes |
+| `0010_rls_identity.sql` | identity and forum row-level security |
 | `0011_profile_match_tags.sql` | profile-derived match tags |
-| `0012_restrict_profile_email_select.sql` | profile email select hardening |
-| `0020_rls_funding.sql` | funding RLS baseline (role-aware reads, service-role writes) |
-| `0021_funding_tag_taxonomy.sql` | canonical funding tag taxonomy |
+| `0012_restrict_profile_email_select.sql` | profile email access hardening |
+| `0020_rls_funding.sql` | funding row-level security |
+| `0021_funding_tag_taxonomy.sql` | canonical funding tags |
 | `0022_canonical_funding_filters.sql` | canonical funding filter backfill |
-| `0023_research_social_sciences_tags.sql` | research social-sciences tag backfill |
-| `0024_public_funding_reads.sql` | public active funding reads for guest discovery |
-| `0025_ai_enrichment.sql` | AI enrichment rows, queue/run/quarantine tables, content hash |
-| `0026_pgvector_funding.sql` | `pgvector` funding embeddings and service-role match RPC |
+| `0023_research_social_sciences_tags.sql` | research tag backfill |
+| `0024_public_funding_reads.sql` | public active funding reads |
 
-## Important Project Docs
+## Scraper
 
-If you are trying to understand the project, start here:
+Bootstrap the scraper package:
 
-1. [`build/productvision.md`](build/productvision.md)  
-   Full project context, product direction, architecture, and pending decisions.
+```bash
+cd scraper
+npm install
+npx tsx index.ts --bootstrap-only
+```
 
-2. [`build/gameplan.md`](build/gameplan.md)  
-   The committed V2 scope.
+Run a dry scrape without database writes:
 
-3. [`build/shared/buildflow.md`](build/shared/buildflow.md)  
-   The master phase tracker for the two developer workflow.
+```bash
+cd scraper
+npx tsx index.ts --dry-run
+```
 
-4. [`build/shared/ownership.md`](build/shared/ownership.md)  
-   Folder, route, migration, and domain ownership.
+Run a real scrape with Supabase environment variables configured:
 
-5. [`claude/ProjectSummary.md`](claude/ProjectSummary.md)  
-   Broader product vision and architectural intent.
-
-## Repository Notes
-
-The `build/` folder is the active planning and execution layer for V2.
-
-The `claude/` folder contains earlier project context and legacy planning material.
-
-The existing app still contains demo era code and content. V2 is the effort to move that into a real multi role product with clear domain boundaries.
+```bash
+cd scraper
+npx tsx index.ts
+```

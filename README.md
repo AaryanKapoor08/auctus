@@ -9,7 +9,7 @@ Auctus is a Next.js app for Canadian funding discovery. It supports three accoun
 ## Features
 
 - Supabase authentication and profile onboarding
-- Role-specific funding pages for grants, scholarships, and research funding
+- Role specific funding pages for grants, scholarships, and research funding
 - Saved funding preferences and profile-based match scoring
 - Funding detail pages with official application links
 - Community forum with threads, replies, and helpful votes

@@ -52,9 +52,13 @@ function formatCost(cents: number) {
 export default async function AdminRunsPage() {
   await requireAdmin();
   const supabase = createAdminClient();
+  const monthStart = new Date();
+  monthStart.setUTCDate(1);
+  monthStart.setUTCHours(0, 0, 0, 0);
   const { data, error } = await supabase
     .from("ai_enrichment_runs")
     .select("*")
+    .gte("started_at", monthStart.toISOString())
     .order("started_at", { ascending: false })
     .limit(50);
 

@@ -123,6 +123,21 @@ describe("forum queries", () => {
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/dashboard");
   });
 
+  it("rejects thread categories outside the published forum taxonomy", async () => {
+    const insert = vi.fn().mockReturnThis();
+    mocks.createClient.mockResolvedValue({
+      from: vi.fn(() => ({ insert })),
+    });
+
+    const form = new FormData();
+    form.set("title", "Hidden admin topic");
+    form.set("content", "This should not be accepted.");
+    form.set("category", "Admin");
+
+    await expect(createThread(form)).rejects.toThrow("Invalid forum category");
+    expect(insert).not.toHaveBeenCalled();
+  });
+
   it("marks replies helpful through the RPC instead of direct row updates", async () => {
     const rpc = vi.fn().mockResolvedValue({ data: 1, error: null });
     mocks.createClient.mockResolvedValue({ rpc });

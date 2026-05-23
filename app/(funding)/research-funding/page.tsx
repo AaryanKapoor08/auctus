@@ -4,6 +4,10 @@ import FundingBrowser, {
 } from "@/components/funding/FundingBrowser";
 import { ListFundingForRole } from "@/lib/funding/queries";
 import { getRecommendedFundingTags } from "@/lib/funding/recommended-tags";
+import {
+  getSemanticSearchRankingForRole,
+  rankFundingItemsBySemanticIds,
+} from "@/lib/funding/semantic-search";
 import { getSession } from "@/lib/session/get-session";
 
 type SearchParams = Promise<{
@@ -36,11 +40,19 @@ export default async function ResearchFundingPage({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const [items, recommendedTags, session] = await Promise.all([
+  const [items, recommendedTags, session, semanticRanking] = await Promise.all([
     ListFundingForRole({ role: "professor" }),
     getRecommendedFundingTags("professor"),
     getSession(),
+    getSemanticSearchRankingForRole({
+      role: "professor",
+      query: params.search,
+      limit: 100,
+    }),
   ]);
+  const rankedItems = semanticRanking.enabled
+    ? rankFundingItemsBySemanticIds(items, semanticRanking.rankedIds)
+    : items;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -53,18 +65,19 @@ export default async function ResearchFundingPage({
             </p>
           </div>
           <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 shadow-sm">
-            <span className="font-semibold text-gray-900">{items.length}</span> available
+            <span className="font-semibold text-gray-900">{rankedItems.length}</span> available
           </div>
         </div>
         <FundingBrowser
           role="professor"
-          items={items}
+          items={rankedItems}
           basePath="/research-funding"
           initialSearch={params.search}
           initialCategories={toArray(params.category)}
           initialDeadline={parseDeadline(params.deadline)}
           initialSort={parseSort(params.sort)}
           recommendedCategories={recommendedTags}
+          semanticRankedIds={semanticRanking.enabled ? semanticRanking.rankedIds : []}
           showPersonalizationPrompt={!session}
         />
       </div>

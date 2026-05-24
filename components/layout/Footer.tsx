@@ -8,12 +8,33 @@ export default function Footer() {
   const pathname = usePathname();
   const isLanding = pathname === "/";
 
-  const footerLinks = [
+  const footerLinks: { name: string; href: string }[] = [
     { name: "Grants", href: "/grants" },
     { name: "Scholarships", href: "/scholarships" },
     { name: "Research", href: "/research-funding" },
     { name: "Forum", href: "/forum" },
   ];
+  const footerSections = [
+    ["Product", footerLinks],
+    [
+      "Account",
+      [
+        { name: "Dashboard", href: "/dashboard" },
+        { name: "Profile", href: "/profile" },
+        { name: "Sign in", href: "/sign-in" },
+        { name: "Create profile", href: "/sign-up" },
+      ],
+    ],
+    [
+      "Data",
+      [
+        { name: "Grant sources", href: "/grants" },
+        { name: "Scholarship sources", href: "/scholarships" },
+        { name: "Research sources", href: "/research-funding" },
+        { name: "Community notes", href: "/forum" },
+      ],
+    ],
+  ] satisfies [string, typeof footerLinks][];
 
   return (
     <footer className="relative overflow-hidden bg-[var(--auc-ink)] text-white">
@@ -27,7 +48,7 @@ export default function Footer() {
           <div className="mb-16 grid gap-10 md:grid-cols-[1.4fr_1fr] md:gap-16">
             <div>
               <p className="mono text-xs font-bold uppercase tracking-[0.08em] text-white/55">
-                Ready · 90s · Free forever
+                Public browsing · Real records
               </p>
               <h2 className="display mt-4 text-5xl leading-[0.92] tracking-[-0.035em] md:text-[5.75rem]">
                 Stop scrolling.<br />
@@ -49,28 +70,7 @@ export default function Footer() {
               </div>
             </div>
             <div className="grid grid-cols-2 content-start gap-6 pt-2 text-sm sm:grid-cols-3">
-              {[
-                ["Product", footerLinks],
-                [
-                  "Auctus",
-                  [
-                    { name: "About", href: "/" },
-                    { name: "Sources", href: "/grants" },
-                    { name: "Press", href: "/" },
-                    { name: "Careers", href: "/" },
-                    { name: "Contact", href: "/" },
-                  ],
-                ],
-                [
-                  "Legal",
-                  [
-                    { name: "Privacy", href: "/" },
-                    { name: "Terms", href: "/" },
-                    { name: "Data", href: "/" },
-                    { name: "Accessibility", href: "/" },
-                  ],
-                ],
-              ].map(([heading, links]) => (
+              {footerSections.map(([heading, links]) => (
                 <div key={heading as string}>
                   <p className="mono text-xs font-bold uppercase tracking-[0.08em] text-white/45">
                     {heading as string}
@@ -101,7 +101,7 @@ export default function Footer() {
 
           {isLanding ? (
             <div className="mono text-[0.68rem] font-bold uppercase tracking-[0.06em] text-white/45">
-              Indexed daily · Real records · Live opportunities
+              Active records · Provider links · Live opportunities
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-center gap-5">

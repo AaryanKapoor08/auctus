@@ -1,8 +1,14 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { FundingItem } from "@contracts/funding";
+import MarqueeBelt from "@/components/layout/MarqueeBelt";
 import { getSession } from "@/lib/session/get-session";
 import { ListFundingForRole } from "@/lib/funding/queries";
+import { getFundingSiteStats } from "@/lib/funding/site-stats";
+import {
+  buildFundingMetricTickerItems,
+  formatFundingStatCurrency,
+} from "@/lib/funding/site-stats-shared";
 import { listThreads } from "@/lib/forum/queries";
 
 function formatAmount(item: FundingItem) {
@@ -38,38 +44,6 @@ function fundingLabel(item: FundingItem) {
   if (item.type === "business_grant") return "Grant";
   if (item.type === "scholarship") return "Scholarship";
   return "Research";
-}
-
-function uniqueProviders(items: FundingItem[]) {
-  return new Set(items.map((item) => item.provider).filter(Boolean)).size;
-}
-
-function maxListedAmount(items: FundingItem[]) {
-  const max = Math.max(0, ...items.map((item) => item.amount_max ?? item.amount_min ?? 0));
-  return max > 0 ? `$${max.toLocaleString("en-CA")}` : "Varies";
-}
-
-function MarqueeStrip({
-  items,
-  slow = false,
-}: {
-  items: string[];
-  slow?: boolean;
-}) {
-  return (
-    <div className="auc-marquee">
-      <div className={`auc-marquee-track mono text-[0.8rem] font-black uppercase tracking-[0.06em] ${slow ? "slow" : ""}`}>
-        {[0, 1].map((round) =>
-          items.map((item) => (
-            <span key={`${round}-${item}`} className="inline-flex items-center gap-5">
-              <span>* {item}</span>
-              <span className="opacity-55">+</span>
-            </span>
-          )),
-        )}
-      </div>
-    </div>
-  );
 }
 
 function SectionLabel({ children }: { children: ReactNode }) {
@@ -188,49 +162,50 @@ function AutomateSection() {
 }
 
 export default async function Home() {
-  const [session, businessGrants, scholarships, researchFunding, threads] = await Promise.all([
+  const [session, fundingStats, businessGrants, scholarships, researchFunding, threads] = await Promise.all([
     getSession(),
-    ListFundingForRole({ role: "business" }),
-    ListFundingForRole({ role: "student" }),
-    ListFundingForRole({ role: "professor" }),
+    getFundingSiteStats(),
+    ListFundingForRole({ role: "business", limit: 1 }),
+    ListFundingForRole({ role: "student", limit: 1 }),
+    ListFundingForRole({ role: "professor", limit: 1 }),
     listThreads({ limit: 4 }),
   ]);
 
-  const allFunding = [...businessGrants, ...scholarships, ...researchFunding];
-  const totalOpportunities = allFunding.length;
+  const totalOpportunities = fundingStats.totalOpen;
   const previewItems = [businessGrants[0], scholarships[0], researchFunding[0]].filter(
     Boolean,
   ) as FundingItem[];
-  const sourceCount = uniqueProviders(allFunding);
-  const topAmount = maxListedAmount(allFunding);
+  const sourceCount = fundingStats.providerCount;
+  const topAmount = formatFundingStatCurrency(fundingStats.maxListedAmount);
+  const metricTickerItems = buildFundingMetricTickerItems(fundingStats);
 
   const lanes = [
     {
       number: "01",
       label: "BUSINESSES",
       href: "/grants",
-      count: businessGrants.length,
+      count: fundingStats.byType.business_grant,
       body: "Federal, provincial, growth, digital, export, innovation and founder-support programs.",
       accent: "text-[var(--auc-purple)]",
-      tags: ["Digital", "Growth", "Federal", "Women"],
+      tags: fundingStats.topTagsByType.business_grant,
     },
     {
       number: "02",
       label: "STUDENTS",
       href: "/scholarships",
-      count: scholarships.length,
+      count: fundingStats.byType.scholarship,
       body: "Scholarships, bursaries, graduate awards, field-specific funding and student prizes.",
       accent: "text-[var(--auc-coral)]",
-      tags: ["Graduate", "Merit", "STEM", "Need"],
+      tags: fundingStats.topTagsByType.scholarship,
     },
     {
       number: "03",
       label: "RESEARCHERS",
       href: "/research-funding",
-      count: researchFunding.length,
+      count: fundingStats.byType.research_grant,
       body: "Council grants, partnerships, equipment, training and research-area funds.",
       accent: "text-[#5f8300]",
-      tags: ["SSHRC", "NSERC", "Partnership", "Equipment"],
+      tags: fundingStats.topTagsByType.research_grant,
     },
   ];
 
@@ -339,15 +314,7 @@ export default async function Home() {
       </section>
 
       <div className="mt-20">
-        <MarqueeStrip
-          items={[
-            `${totalOpportunities.toLocaleString("en-CA")} open opportunities`,
-            `${sourceCount.toLocaleString("en-CA")} providers indexed`,
-            `${businessGrants.length.toLocaleString("en-CA")} grants`,
-            `${scholarships.length.toLocaleString("en-CA")} scholarships`,
-            `${researchFunding.length.toLocaleString("en-CA")} research funds`,
-          ]}
-        />
+        <MarqueeBelt items={metricTickerItems} ariaLabel="Current funding totals" />
       </div>
 
       <section id="opportunities" className="auc-reference-section pt-24">
@@ -433,7 +400,7 @@ export default async function Home() {
       </section>
 
       <div className="mt-24">
-        <MarqueeStrip
+        <MarqueeBelt
           slow
           items={[
             "AI summaries when available",

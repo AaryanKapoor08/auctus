@@ -173,6 +173,97 @@ describe("runMockableEnrichmentQueue", () => {
 
     expect(result.status).toBe("success");
     expect(result.enrichmentRows[0].model).toBe("openrouter-mock");
+    expect(result.tokensIn).toBe(201);
+    expect(result.tokensOut).toBe(121);
     expect(result.errorSummary.by_provider.gemini.escalated_low_confidence).toBe(1);
+  });
+
+  it("counts repair-call usage when validation repair succeeds", async () => {
+    let calls = 0;
+    const repairingProvider: AiProvider = {
+      id: "gemini",
+      model: "gemini-test",
+      async enrich() {
+        calls += 1;
+        if (calls === 1) {
+          return {
+            provider: "gemini",
+            model: "gemini-test",
+            output: { task_outputs: [{ task_type: "summary", confidence: 0.9 }] },
+            usage: { tokensIn: 5, tokensOut: 6, costInCents: 1, costOutCents: 2 },
+          };
+        }
+
+        return {
+          provider: "gemini",
+          model: "gemini-test",
+          output: {
+            task_outputs: [
+              {
+                task_type: "summary",
+                summary: "Repaired",
+                eligibility_bullets: ["Eligible applicants should review criteria."],
+                best_fit_applicant: "Applicants aligned with the program.",
+                confidence: 0.9,
+              },
+            ],
+          },
+          usage: { tokensIn: 7, tokensOut: 8, costInCents: 3, costOutCents: 4 },
+        };
+      },
+    };
+
+    const result = await runMockableEnrichmentQueue({
+      jobs: [job({ task_types: ["summary"], provider_preference: "gemini-only" })],
+      fundingById: new Map([[funding.id, funding]]),
+      providers: { gemini: repairingProvider },
+      budget,
+      now,
+    });
+
+    expect(result.status).toBe("success");
+    expect(result.enrichmentRows).toHaveLength(1);
+    expect(result.tokensIn).toBe(7);
+    expect(result.tokensOut).toBe(8);
+    expect(result.costInCents).toBe(3);
+    expect(result.costOutCents).toBe(4);
+  });
+
+  it("does not mark a repaired job complete when requested tasks are still missing", async () => {
+    const incompleteProvider: AiProvider = {
+      id: "gemini",
+      model: "gemini-test",
+      async enrich() {
+        return {
+          provider: "gemini",
+          model: "gemini-test",
+          output: {
+            task_outputs: [
+              {
+                task_type: "summary",
+                summary: "Only summary",
+                eligibility_bullets: ["Review criteria."],
+                best_fit_applicant: "Applicants.",
+                confidence: 0.9,
+              },
+            ],
+          },
+          usage: { tokensIn: 3, tokensOut: 4, costInCents: 0, costOutCents: 0 },
+        };
+      },
+    };
+
+    const result = await runMockableEnrichmentQueue({
+      jobs: [job({ task_types: ["summary", "tags"], provider_preference: "gemini-only" })],
+      fundingById: new Map([[funding.id, funding]]),
+      providers: { gemini: incompleteProvider },
+      budget,
+      now,
+    });
+
+    expect(result.status).toBe("failed");
+    expect(result.enrichmentRows).toHaveLength(0);
+    expect(result.updatedJobs[0].status).toBe("failed_retryable");
+    expect(result.updatedJobs[0].last_error).toBe("missing task output: tags");
   });
 });

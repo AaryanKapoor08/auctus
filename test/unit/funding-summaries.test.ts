@@ -115,6 +115,32 @@ describe("GetFundingSummariesForUser", () => {
     expect(summaries[1].match_score).toBe(25);
   });
 
+  it("scores the candidate set before applying the requested summary limit", async () => {
+    const perfect = {
+      ...baseItem,
+      id: "funding-2",
+      name: "Older Perfect Grant",
+      eligibility: {
+        province: "NB",
+        revenue_min: 100000,
+        revenue_max: 300000,
+        employees_max: 25,
+        industry: "technology",
+      },
+      created_at: "2026-01-01T00:00:00.000Z",
+    };
+    mocks.getRoleProfile.mockResolvedValue(businessProfile);
+    mocks.createFundingReadClient.mockResolvedValue({
+      from: vi.fn(() => createQuery([baseItem, perfect])),
+    });
+
+    const summaries = await GetFundingSummariesForUser("user-1", 1);
+
+    expect(summaries).toHaveLength(1);
+    expect(summaries[0].id).toBe("funding-2");
+    expect(summaries[0].match_score).toBe(100);
+  });
+
   it("uses onboarding match tags to boost relevant funding summaries", async () => {
     mocks.getRoleProfile.mockResolvedValue(businessProfile);
     mocks.getProfileMatchTags.mockResolvedValue(["Digital", "STEM"]);

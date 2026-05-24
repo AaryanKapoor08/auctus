@@ -1,9 +1,17 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   buildFundingEmbeddingText,
   rankFundingItemsBySemanticIds,
   toVectorLiteral,
 } from "@/lib/funding/semantic-search";
+
+const fundingPageSources = [
+  "app/(funding)/grants/page.tsx",
+  "app/(funding)/scholarships/page.tsx",
+  "app/(funding)/research-funding/page.tsx",
+].map((path) => readFileSync(join(process.cwd(), path), "utf8"));
 
 describe("funding semantic search helpers", () => {
   it("builds provider input only from public funding fields", () => {
@@ -35,5 +43,13 @@ describe("funding semantic search helpers", () => {
 
   it("rejects vectors that do not fit the locked pgvector dimension", () => {
     expect(() => toVectorLiteral([0.1, 0.2])).toThrow(/768/);
+  });
+
+  it("wires server-side semantic rankings into every funding browser", () => {
+    for (const source of fundingPageSources) {
+      expect(source).toContain("getSemanticSearchRankingForRole");
+      expect(source).toContain("rankFundingItemsBySemanticIds");
+      expect(source).toContain("semanticRankedIds=");
+    }
   });
 });

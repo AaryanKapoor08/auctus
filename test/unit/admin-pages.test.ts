@@ -35,4 +35,9 @@ describe("admin pages", () => {
       runsPageSource.indexOf("createAdminClient()"),
     );
   });
+
+  it("scopes run observability to the current month before totaling budgets", () => {
+    expect(runsPageSource).toContain("monthStart.setUTCDate(1)");
+    expect(runsPageSource).toContain('.gte("started_at", monthStart.toISOString())');
+  });
 });

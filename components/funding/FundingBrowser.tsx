@@ -28,8 +28,13 @@ function itemTags(item: FundingItem) {
   );
 }
 
-function matchesSearch(item: FundingItem, search: string) {
+function matchesSearch(
+  item: FundingItem,
+  search: string,
+  semanticRankedIdSet: Set<string>,
+) {
   if (!search) return true;
+  if (semanticRankedIdSet.has(item.id)) return true;
 
   const query = normalize(search);
   const haystack = [
@@ -94,6 +99,7 @@ export default function FundingBrowser({
   initialDeadline = "all",
   initialSort = "relevance",
   recommendedCategories = [],
+  semanticRankedIds = [],
   showPersonalizationPrompt = false,
 }: {
   role: Role;
@@ -104,6 +110,7 @@ export default function FundingBrowser({
   initialDeadline?: DeadlineFilter;
   initialSort?: SortOption;
   recommendedCategories?: string[];
+  semanticRankedIds?: string[];
   showPersonalizationPrompt?: boolean;
 }) {
   const filters = FUNDING_FILTERS[role];
@@ -144,6 +151,14 @@ export default function FundingBrowser({
     () => new Set(profileCategories.map(normalize)),
     [profileCategories],
   );
+  const semanticOrder = useMemo(
+    () => new Map(semanticRankedIds.map((id, index) => [id, index])),
+    [semanticRankedIds],
+  );
+  const semanticRankedIdSet = useMemo(
+    () => new Set(semanticRankedIds),
+    [semanticRankedIds],
+  );
   const tagCounts = useMemo(() => {
     return Object.fromEntries(
       options.map((option) => [
@@ -167,7 +182,7 @@ export default function FundingBrowser({
     const filtered = items.filter((item) => {
       const tags = itemTags(item);
       return (
-        matchesSearch(item, search) &&
+        matchesSearch(item, search, semanticRankedIdSet) &&
         Array.from(activeTagsByGroup.values()).every((groupTags) =>
           groupTags.some((tag) => tags.has(tag)),
         ) &&
@@ -188,12 +203,28 @@ export default function FundingBrowser({
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
       }
 
+      if (semanticOrder.size > 0 && search.trim().length > 0) {
+        const ai = semanticOrder.get(a.id) ?? Number.POSITIVE_INFINITY;
+        const bi = semanticOrder.get(b.id) ?? Number.POSITIVE_INFINITY;
+        if (ai !== bi) return ai - bi;
+      }
+
       const bScore = relevanceScore(b, [...profileCategories, ...selectedTags]);
       const aScore = relevanceScore(a, [...profileCategories, ...selectedTags]);
       if (bScore !== aScore) return bScore - aScore;
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
-  }, [deadline, items, optionGroupByValue, profileCategories, search, selectedTags, sort]);
+  }, [
+    deadline,
+    items,
+    optionGroupByValue,
+    profileCategories,
+    search,
+    selectedTags,
+    semanticOrder,
+    semanticRankedIdSet,
+    sort,
+  ]);
 
   useEffect(() => {
     const query = toQueryString({ search, selectedTags, deadline, sort });

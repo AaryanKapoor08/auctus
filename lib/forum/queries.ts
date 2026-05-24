@@ -105,6 +105,16 @@ function parseTags(value: FormDataEntryValue | null) {
     .slice(0, 5);
 }
 
+function parseCategory(value: FormDataEntryValue | null) {
+  const category = String(value ?? "").trim();
+
+  if (!FORUM_CATEGORIES.includes(category as (typeof FORUM_CATEGORIES)[number])) {
+    throw new Error("Invalid forum category");
+  }
+
+  return category;
+}
+
 async function requireSession() {
   const session = await getSession();
 
@@ -199,9 +209,9 @@ export async function createThread(formData: FormData) {
   const session = await requireSession();
   const title = String(formData.get("title") ?? "").trim();
   const content = String(formData.get("content") ?? "").trim();
-  const category = String(formData.get("category") ?? "").trim();
+  const category = parseCategory(formData.get("category"));
 
-  if (!title || !content || !category) {
+  if (!title || !content) {
     throw new Error("Title, category, and content are required");
   }
 

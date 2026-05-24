@@ -15,6 +15,7 @@ import { getProfileMatchTags, getRoleProfile } from "@/lib/profile/queries";
 import { buildIlikeOrFilter } from "@/lib/supabase/postgrest-filters";
 
 const MAX_CATEGORY_FILTERS = 12;
+const SUMMARY_MATCH_CANDIDATE_LIMIT = 100;
 
 function toFundingSummary(
   item: FundingItem,
@@ -115,11 +116,12 @@ export const GetFundingSummariesForUser: GetFundingSummariesForUserContract = as
   const items = await ListFundingForRole({
     role: roleProfile.role,
     status: "active",
-    limit,
+    limit: Math.max(limit, SUMMARY_MATCH_CANDIDATE_LIMIT),
   });
   const profileTags = await getProfileMatchTags(user_id);
 
   return items
     .map((item) => toFundingSummary(item, scoreFor(roleProfile, item, profileTags)))
-    .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0));
+    .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0))
+    .slice(0, limit);
 };

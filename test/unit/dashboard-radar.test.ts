@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import type { FundingItem } from "@contracts/funding";
 import {
   RADAR_COVERAGE_THRESHOLD,
@@ -50,6 +52,11 @@ const summaryBundle: FundingEnrichmentBundle = {
   },
 };
 
+const dashboardPageSource = readFileSync(
+  join(process.cwd(), "app/dashboard/page.tsx"),
+  "utf8",
+);
+
 describe("dashboard funding radar", () => {
   it("hides radar when current enrichment coverage is below threshold", () => {
     const radar = buildFundingRadar({
@@ -81,5 +88,11 @@ describe("dashboard funding radar", () => {
       "underused",
       "recently_updated",
     ]);
+  });
+
+  it("wires coverage-gated radar into the dashboard page", () => {
+    expect(dashboardPageSource).toContain("getFundingRadarForRole");
+    expect(dashboardPageSource).toContain("fundingRadar.insights.length > 0");
+    expect(dashboardPageSource).toContain("Funding radar");
   });
 });

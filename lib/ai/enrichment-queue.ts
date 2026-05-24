@@ -117,6 +117,24 @@ function incrementError(
   };
 }
 
+function addProviderUsage(result: QueueRunResult, providerResult: ProviderResult) {
+  result.tokensIn += providerResult.usage.tokensIn;
+  result.tokensOut += providerResult.usage.tokensOut;
+  result.costInCents += providerResult.usage.costInCents;
+  result.costOutCents += providerResult.usage.costOutCents;
+}
+
+function findMissingTask(
+  outputs: AiTaskOutput[],
+  taskTypes: string[],
+): string | null {
+  return (
+    taskTypes.find(
+      (taskType) => !outputs.some((output) => output.task_type === taskType),
+    ) ?? null
+  );
+}
+
 function taskOutputToRow(input: {
   output: AiTaskOutput;
   fundingId: string;
@@ -279,11 +297,9 @@ export async function runMockableEnrichmentQueue(input: {
           funding,
           taskTypes: job.task_types,
         });
+        addProviderUsage(result, call.providerResult);
 
-        const missingTask = job.task_types.find(
-          (taskType) =>
-            !call.parsed.task_outputs.some((output) => output.task_type === taskType),
-        );
+        const missingTask = findMissingTask(call.parsed.task_outputs, job.task_types);
         if (missingTask) {
           throw new Error(`missing task output: ${missingTask}`);
         }
@@ -296,10 +312,6 @@ export async function runMockableEnrichmentQueue(input: {
           continue;
         }
 
-        result.tokensIn += call.providerResult.usage.tokensIn;
-        result.tokensOut += call.providerResult.usage.tokensOut;
-        result.costInCents += call.providerResult.usage.costInCents;
-        result.costOutCents += call.providerResult.usage.costOutCents;
         finalRows = call.parsed.task_outputs.map((output) =>
           taskOutputToRow({
             output,
@@ -311,6 +323,10 @@ export async function runMockableEnrichmentQueue(input: {
         );
         break;
       } catch (error) {
+        if (error instanceof Error) {
+          lastError = error.message;
+        }
+
         if (!(error instanceof AiProviderError)) {
           try {
             const repairCall = await callAndValidate({
@@ -319,6 +335,16 @@ export async function runMockableEnrichmentQueue(input: {
               taskTypes: job.task_types,
               repairMode: true,
             });
+            addProviderUsage(result, repairCall.providerResult);
+
+            const missingTask = findMissingTask(
+              repairCall.parsed.task_outputs,
+              job.task_types,
+            );
+            if (missingTask) {
+              throw new Error(`missing task output: ${missingTask}`);
+            }
+
             finalRows = repairCall.parsed.task_outputs.map((output) =>
               taskOutputToRow({
                 output,

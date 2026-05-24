@@ -1,8 +1,9 @@
+import Link from "next/link";
+import { ArrowLeft, ExternalLink } from "lucide-react";
 import type { FundingItem } from "@contracts/funding";
-import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
 import type { FundingEnrichmentBundle } from "@/lib/funding/enrichment";
+import { formatFundingAmount, formatFundingDeadline } from "./FundingCard";
 
 export default function FundingDetail({
   item,
@@ -16,117 +17,225 @@ export default function FundingDetail({
   const applicationUrl = getSafeExternalUrl(item.application_url);
   const summary = enrichment?.summary;
   const checklist = getUsefulChecklist(item, enrichment);
+  const route = getFundingRoute(item);
+  const categoryChips = Array.from(
+    new Set([item.category, ...item.tags].filter(Boolean) as string[]),
+  );
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-10">
-      <Card className="border border-gray-200">
-        <div className="space-y-6">
-          <div className="flex flex-wrap gap-2">
-            <Badge color="gray">{item.category ?? "General"}</Badge>
-            <Badge variant="success">{item.deadline ?? "Rolling deadline"}</Badge>
-          </div>
+    <div className="auc-page min-h-screen">
+      <div className="auc-reference-section py-12">
+        <Link href={route.href} className="mono inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.06em] text-[var(--auc-muted)] hover:text-[var(--auc-ink)]">
+          <ArrowLeft className="h-4 w-4" />
+          Back to {route.label}
+        </Link>
 
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <span className={`mono rounded px-3 py-1.5 text-xs font-black uppercase tracking-[0.06em] ${route.badgeClass}`}>
+            {route.kind}
+          </span>
+          <span className="mono rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-paper)] px-3 py-1.5 text-xs font-black text-[var(--auc-coral)]">
+            Deadline · {formatFundingDeadline(item.deadline)}
+          </span>
+        </div>
+
+        <h1 className="display mt-5 max-w-5xl text-5xl leading-[0.95] tracking-[-0.035em] md:text-7xl">
+          {item.name}
+        </h1>
+        <p className="mt-4 text-lg font-medium text-[var(--auc-ink-2)]">{item.provider}</p>
+
+        <div className="mt-9 grid gap-8 lg:grid-cols-[minmax(0,1.45fr)_360px] lg:items-start">
           <div>
-            <h1 className="text-3xl font-semibold text-gray-900">
-              {item.name}
-            </h1>
-            <p className="mt-2 text-gray-600">{item.provider}</p>
+            {summary?.summary ? (
+              <section className="rounded-[14px] border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] p-5 shadow-[4px_4px_0_var(--auc-ink)]">
+                <div className="mono text-[0.68rem] font-black uppercase tracking-[0.08em] text-[var(--auc-ink)]">
+                  Auctus AI · Overview
+                </div>
+                <h2 className="sr-only">Overview</h2>
+                <p className="mt-3 text-base leading-7 text-[var(--auc-ink)]">
+                  {summary.summary}
+                </p>
+              </section>
+            ) : item.description ? (
+              <section className="auc-card-flat bg-[var(--auc-paper)] p-6 text-base leading-8 text-[var(--auc-ink-2)]">
+                {item.description}
+              </section>
+            ) : null}
+
+            {summary?.best_fit_applicant ? (
+              <DetailSection title="Good fit for">
+                <p className="text-base leading-7 text-[var(--auc-ink-2)]">
+                  {summary.best_fit_applicant}
+                </p>
+              </DetailSection>
+            ) : null}
+
+            {summary?.eligibility_bullets.length ? (
+              <DetailSection title="Eligibility signals">
+                <ul className="grid gap-3">
+                  {summary.eligibility_bullets.map((bullet) => (
+                    <li key={bullet} className="flex gap-3 text-sm leading-6 text-[var(--auc-ink-2)]">
+                      <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 border-[var(--auc-ink)] bg-white text-xs font-black text-[var(--auc-ink)]">
+                        ✓
+                      </span>
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
+              </DetailSection>
+            ) : null}
+
+            {item.requirements.length > 0 ? (
+              <DetailSection title="Requirements">
+                <ul className="grid gap-3">
+                  {item.requirements.map((requirement) => (
+                    <li key={requirement} className="flex gap-3 text-sm leading-6 text-[var(--auc-ink-2)]">
+                      <span className="mono mt-1 text-xs font-bold text-[var(--auc-muted)]">-</span>
+                      {requirement}
+                    </li>
+                  ))}
+                </ul>
+              </DetailSection>
+            ) : null}
+
+            {checklist.length > 0 ? (
+              <DetailSection title="Application prep checklist" badge="AI">
+                <p className="mb-3 text-sm text-[var(--auc-muted)]">
+                  Preparation guidance, not legal or financial advice.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {checklist.map((step) => (
+                    <span
+                      key={step}
+                      className="mono rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] px-3 py-2 text-xs font-black text-[var(--auc-ink)]"
+                    >
+                      ✓ {step}
+                    </span>
+                  ))}
+                </div>
+              </DetailSection>
+            ) : null}
           </div>
 
-          {summary?.summary ? (
-            <section>
-              <h2 className="text-lg font-semibold text-gray-900">
-                Overview
-              </h2>
-              <p className="mt-3 text-base leading-7 text-gray-700">
-                {summary.summary}
-              </p>
+          <aside className="space-y-4 lg:sticky lg:top-32">
+            <div className="auc-card p-5">
+              <div className="auc-label">Amount</div>
+              <div className="display mt-2 text-4xl leading-none">{formatFundingAmount(item)}</div>
 
-              {summary.best_fit_applicant ? (
-                <div className="mt-4">
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Good fit for
-                  </h3>
-                  <p className="mt-1 text-sm leading-6 text-gray-700">
-                    {summary.best_fit_applicant}
-                  </p>
-                </div>
-              ) : null}
+              <div className="mt-5 flex justify-between gap-4 border-t border-[var(--auc-rule)] pt-4">
+                <span className="auc-label">Deadline</span>
+                <span className="mono text-xs font-black text-[var(--auc-coral)]">
+                  {formatFundingDeadline(item.deadline)}
+                </span>
+              </div>
 
-              {summary.eligibility_bullets.length > 0 ? (
-                <div className="mt-4">
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Eligibility signals
-                  </h3>
-                  <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-gray-700">
-                    {summary.eligibility_bullets.map((bullet) => (
-                      <li key={bullet}>{bullet}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </section>
-          ) : item.description ? (
-            <p className="text-base leading-7 text-gray-700">
-              {item.description}
-            </p>
-          ) : null}
-
-          <section>
-            <h2 className="text-lg font-semibold text-gray-900">
-              Requirements
-            </h2>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-gray-700">
-              {item.requirements.map((requirement) => (
-                <li key={requirement}>{requirement}</li>
-              ))}
-            </ul>
-          </section>
-
-          {checklist.length > 0 ? (
-            <section>
-              <h2 className="text-lg font-semibold text-gray-900">
-                Application prep checklist
-              </h2>
-              <p className="mt-2 text-sm text-gray-600">
-                Preparation guidance, not legal or financial advice.
-              </p>
-              <ul className="mt-3 list-disc space-y-2 pl-5 text-gray-700">
-                {checklist.map((step) => (
-                  <li key={step}>{step}</li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {applicationUrl && (
-            <a href={applicationUrl} target="_blank" rel="noreferrer">
-              <Button variant="primary">Apply</Button>
-            </a>
-          )}
-
-          {showPersonalizationPrompt && (
-            <div className="rounded-lg border border-primary-100 bg-primary-50 p-4">
-              <p className="text-sm font-semibold text-gray-900">
-                Want Auctus to sort opportunities around you?
-              </p>
-              <p className="mt-1 text-sm text-gray-700">
-                Sign in to customize filters, match funding to your profile, and keep a cleaner shortlist.
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <a href="/sign-in">
-                  <Button variant="outline">Sign in</Button>
+              {applicationUrl ? (
+                <a href={applicationUrl} target="_blank" rel="noreferrer" className="mt-5 block">
+                  <Button className="w-full justify-between gap-3">
+                    Apply on provider site
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
                 </a>
-                <a href="/sign-up">
-                  <Button variant="primary">Customize matches</Button>
-                </a>
+              ) : (
+                <div className="mt-5 rounded-lg border border-[var(--auc-rule)] bg-[var(--auc-bg)] p-3 text-sm text-[var(--auc-muted)]">
+                  No safe external application link is listed for this record.
+                </div>
+              )}
+              <div className="mono mt-3 text-center text-[0.65rem] font-bold uppercase tracking-[0.06em] text-[var(--auc-muted)]">
+                External links open in a new tab
               </div>
             </div>
-          )}
+
+            {showPersonalizationPrompt && (
+              <div className="rounded-[14px] border-2 border-[var(--auc-purple)] bg-[var(--auc-purple-soft)] p-4">
+                <div className="mono text-[0.68rem] font-black uppercase tracking-[0.08em] text-[var(--auc-purple-deep)]">
+                  Guest prompt
+                </div>
+                <p className="mt-2 text-sm leading-6 text-[var(--auc-ink)]">
+                  Sign in to create a role profile and see how opportunities rank against your background.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link href="/sign-in">
+                    <Button size="sm" variant="outline">Sign in</Button>
+                  </Link>
+                  <Link href="/sign-up">
+                    <Button size="sm">Create profile</Button>
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {categoryChips.length > 0 && (
+              <div className="auc-card-flat p-4">
+                <div className="auc-label mb-3">Categories</div>
+                <div className="flex flex-wrap gap-2">
+                  {categoryChips.map((chip) => (
+                    <span
+                      key={chip}
+                      className="mono rounded border border-[var(--auc-rule)] px-2 py-1 text-[0.68rem] font-bold text-[var(--auc-ink-2)]"
+                    >
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </aside>
         </div>
-      </Card>
+      </div>
     </div>
   );
+}
+
+function DetailSection({
+  title,
+  badge,
+  children,
+}: {
+  title: string;
+  badge?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-9">
+      <div className="mb-4 flex items-center gap-3">
+        <h2 className="auc-label">{title}</h2>
+        {badge && (
+          <span className="mono rounded bg-[var(--auc-ink)] px-2 py-1 text-[0.62rem] font-black text-[var(--auc-lime)]">
+            {badge}
+          </span>
+        )}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function getFundingRoute(item: FundingItem) {
+  if (item.type === "business_grant") {
+    return {
+      href: "/grants",
+      label: "business grants",
+      kind: "Grant",
+      badgeClass: "bg-[var(--auc-purple-soft)] text-[var(--auc-purple-deep)]",
+    };
+  }
+
+  if (item.type === "scholarship") {
+    return {
+      href: "/scholarships",
+      label: "scholarships",
+      kind: "Scholarship",
+      badgeClass: "bg-[var(--auc-coral-soft)] text-[#912f26]",
+    };
+  }
+
+  return {
+    href: "/research-funding",
+    label: "research funding",
+    kind: "Research",
+    badgeClass: "bg-[var(--auc-lime-soft)] text-[#40570b]",
+  };
 }
 
 function getSafeExternalUrl(value: string | null) {

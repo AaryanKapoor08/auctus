@@ -15,24 +15,25 @@ export default function NewThreadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-3xl px-6">
+    <div className="auc-page min-h-screen py-12">
+      <div className="mx-auto max-w-[820px] px-4">
         <Link
           href="/forum"
-          className="mb-6 inline-flex items-center gap-2 text-gray-600 transition-colors hover:text-gray-900"
+          className="mono mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.06em] text-[var(--auc-muted)] transition-colors hover:text-[var(--auc-ink)]"
         >
           <ArrowLeft className="h-5 w-5" />
           <span className="font-medium">Back to forum</span>
         </Link>
 
-        <div className="mb-6">
-          <h1 className="text-4xl font-bold text-gray-900">Create thread</h1>
-          <p className="mt-2 text-lg text-gray-600">
-            Share a question, funding note, or collaboration opportunity.
+        <div className="mb-7">
+          <h1 className="display text-6xl leading-none tracking-[-0.03em]">Start a thread</h1>
+          <p className="mt-4 text-lg leading-8 text-[var(--auc-ink-2)]">
+            Keep it specific. The community is most helpful when the title names
+            a real funding program or shared question.
           </p>
         </div>
 
-        <Card className="border border-gray-200">
+        <Card className="shadow-[6px_6px_0_var(--auc-ink)]">
           <form action={submitThread} className="space-y-5">
             <Input
               name="title"
@@ -42,12 +43,12 @@ export default function NewThreadPage() {
               placeholder="What do you want to discuss?"
             />
 
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-[var(--auc-ink)]">
               Category
               <select
                 name="category"
                 required
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="auc-field mt-1 w-full px-3 py-2"
               >
                 <option value="">Select a category</option>
                 {FORUM_CATEGORIES.map((category) => (
@@ -58,14 +59,14 @@ export default function NewThreadPage() {
               </select>
             </label>
 
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-bold text-[var(--auc-ink)]">
               Content
               <textarea
                 name="content"
                 required
                 rows={10}
-                placeholder="Add enough detail for others to respond usefully."
-                className="mt-1 w-full resize-none rounded-lg border border-gray-300 px-4 py-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Share the context, what you have tried, and what answer would help."
+                className="auc-field mt-1 w-full resize-none px-4 py-3"
               />
             </label>
 
@@ -73,10 +74,10 @@ export default function NewThreadPage() {
               name="tags"
               label="Tags"
               helperText="Optional. Separate up to five tags with commas."
-              placeholder="grant, collaboration, hiring"
+              placeholder="CDAP, Stream 2, Advisor"
             />
 
-            <div className="flex justify-end gap-3 border-t border-gray-200 pt-5">
+            <div className="flex justify-end gap-3 border-t border-[var(--auc-rule)] pt-5">
               <Link href="/forum">
                 <Button type="button" variant="outline">
                   Cancel

@@ -1,8 +1,7 @@
-import { MessageSquare, Clock } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import Link from "next/link";
-import Badge from "@/components/ui/Badge";
-import { cn } from "@/lib/utils";
 import type { Role } from "@contracts/role";
+import { cn } from "@/lib/utils";
 
 interface ThreadCardProps {
   id: string;
@@ -21,14 +20,16 @@ interface ThreadCardProps {
   onClick?: () => void;
 }
 
-const categoryColors: Record<string, "blue" | "green" | "purple" | "orange" | "yellow" | "red" | "gray"> = {
-  "Ask for Help": "blue",
-  "Collaboration Opportunities": "green",
-  "Hiring & Local Talent": "purple",
-  "Marketplace": "orange",
-  "Business Ideas": "yellow",
-  "Announcements": "red",
-};
+function initials(name: string) {
+  return (
+    name
+      .split(/[\s.]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "A"
+  );
+}
 
 export default function ThreadCard({
   id,
@@ -42,50 +43,37 @@ export default function ThreadCard({
   href,
   onClick,
 }: ThreadCardProps) {
-  const categoryColor = (categoryColors[category] || "gray") as "blue" | "green" | "purple" | "orange" | "yellow" | "red" | "gray";
-
   const content = (
     <div
       data-thread-id={id}
       onClick={onClick}
       className={cn(
-        "h-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200",
-        (href || onClick) && "cursor-pointer hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md",
+        "auc-card-flat h-full p-5 text-[var(--auc-ink)] shadow-[3px_3px_0_var(--auc-ink)]",
+        (href || onClick) && "auc-card-hover cursor-pointer",
       )}
     >
-      {/* Header */}
-      <div className="mb-3 flex items-start justify-between gap-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2 hover:text-primary-600 transition-colors">
-            {title}
-          </h3>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
-            <span className="font-medium">{author.name}</span>
-            <span className="text-gray-400">•</span>
-            {author.role ? (
-              <Badge variant="info" size="sm">
-                {author.role}
-              </Badge>
-            ) : (
-              <span>{author.businessName ?? "onboarding"}</span>
-            )}
-          </div>
-        </div>
-        <Badge color={categoryColor} size="sm">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <span className="mono rounded bg-[var(--auc-lime)] px-2 py-1 text-[0.68rem] font-black uppercase tracking-[0.06em] text-[var(--auc-ink)]">
           {category}
-        </Badge>
+        </span>
+        <span className="mono text-xs font-bold text-[var(--auc-muted)]">
+          {timestamp}
+        </span>
       </div>
 
-      {/* Preview */}
-      <p className="mb-4 line-clamp-2 text-sm leading-6 text-gray-600">{preview}</p>
+      <h3 className="line-clamp-2 text-lg font-black leading-tight transition-colors hover:text-[var(--auc-purple-deep)]">
+        {title}
+      </h3>
+      <p className="mt-3 line-clamp-3 text-sm leading-6 text-[var(--auc-ink-2)]">
+        {preview}
+      </p>
 
-      {/* Tags */}
       {tags.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {tags.map((tag, index) => (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {tags.map((tag) => (
             <span
-              key={index}
-              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700"
+              key={tag}
+              className="mono rounded border border-[var(--auc-rule)] px-2 py-1 text-[0.68rem] font-bold text-[var(--auc-ink-2)]"
             >
               #{tag}
             </span>
@@ -93,16 +81,25 @@ export default function ThreadCard({
         </div>
       )}
 
-      {/* Footer */}
-      <div className="flex items-center justify-between border-t border-gray-100 pt-4 text-sm text-gray-500">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-1">
-            <MessageSquare className="h-4 w-4" />
-            <span>{replyCount} {replyCount === 1 ? 'reply' : 'replies'}</span>
+      <div className="mt-5 flex items-center justify-between gap-4 border-t border-[var(--auc-rule)] pt-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--auc-purple)] text-xs font-black text-white">
+            {initials(author.name)}
+          </span>
+          <div className="min-w-0">
+            <div className="truncate text-sm font-black">{author.name}</div>
+            <div className="mono truncate text-[0.68rem] font-bold uppercase tracking-[0.04em] text-[var(--auc-muted)]">
+              {author.role ?? author.businessName ?? "onboarding"}
+            </div>
           </div>
-          <div className="flex items-center gap-1">
-            <Clock className="h-4 w-4" />
-            <span>{timestamp}</span>
+        </div>
+        <div className="shrink-0 text-right">
+          <div className="mono flex items-center gap-1 text-xs font-black">
+            <MessageSquare className="h-3.5 w-3.5" />
+            {replyCount}
+          </div>
+          <div className="mono mt-1 text-[0.62rem] font-bold uppercase tracking-[0.04em] text-[var(--auc-muted)]">
+            replies
           </div>
         </div>
       </div>

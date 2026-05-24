@@ -10,24 +10,24 @@ interface BadgeProps {
 }
 
 const Badge = ({ children, variant, color, size = "md", className }: BadgeProps) => {
-  const baseStyles = "inline-flex items-center rounded-full font-medium";
+  const baseStyles = "mono inline-flex items-center rounded-full border font-bold";
 
   const variants = {
-    default: "bg-gray-100 text-gray-800",
-    success: "bg-secondary-100 text-secondary-800",
-    warning: "bg-accent-100 text-accent-800",
+    default: "border-[var(--auc-rule-strong)] bg-[var(--auc-paper)] text-[var(--auc-ink)]",
+    success: "border-[var(--auc-ink)] bg-[var(--auc-lime)] text-[var(--auc-ink)]",
+    warning: "border-[var(--auc-rule-strong)] bg-[var(--auc-butter)] text-[var(--auc-ink)]",
     error: "bg-red-100 text-red-800",
-    info: "bg-primary-100 text-primary-800",
+    info: "border-[var(--auc-purple)] bg-[var(--auc-purple-soft)] text-[var(--auc-purple-deep)]",
   };
 
   const colors = {
-    blue: "bg-gray-800 text-white",
-    green: "bg-green-100 text-green-800",
-    purple: "bg-purple-100 text-purple-800",
-    orange: "bg-orange-100 text-orange-800",
-    yellow: "bg-yellow-100 text-yellow-800",
+    blue: "border-[var(--auc-ink)] bg-[var(--auc-ink)] text-white",
+    green: "border-[var(--auc-ink)] bg-[var(--auc-lime)] text-[var(--auc-ink)]",
+    purple: "border-[var(--auc-purple)] bg-[var(--auc-purple-soft)] text-[var(--auc-purple-deep)]",
+    orange: "border-[var(--auc-coral)] bg-[var(--auc-coral-soft)] text-[#912f26]",
+    yellow: "border-[var(--auc-rule-strong)] bg-[var(--auc-butter)] text-[var(--auc-ink)]",
     red: "bg-red-100 text-red-800",
-    gray: "bg-gray-100 text-gray-800",
+    gray: "border-[var(--auc-rule-strong)] bg-[var(--auc-paper)] text-[var(--auc-ink-2)]",
   };
 
   const sizes = {

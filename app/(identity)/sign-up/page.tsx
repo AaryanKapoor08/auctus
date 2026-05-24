@@ -109,11 +109,12 @@ export default async function SignUpPage({
   const errorMessage = getErrorMessage(params.error);
 
   return (
-    <div className="min-h-screen bg-gray-50 px-6 py-16">
-      <div className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="auc-page min-h-screen px-4 py-16">
+      <div className="auc-card mx-auto max-w-md p-6">
         <div className="mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Create your account</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <div className="auc-label">Account</div>
+          <h1 className="display mt-2 text-4xl leading-none">Create your account</h1>
+          <p className="mt-3 text-sm leading-6 text-[var(--auc-ink-2)]">
             Set up Auctus, then answer a few questions so your dashboard can show
             relevant funding.
           </p>
@@ -132,9 +133,9 @@ export default async function SignUpPage({
         </form>
 
         <div className="my-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-gray-200" />
-          <span className="text-xs font-medium uppercase text-gray-500">or</span>
-          <div className="h-px flex-1 bg-gray-200" />
+          <div className="h-px flex-1 bg-[var(--auc-rule)]" />
+          <span className="mono text-xs font-bold uppercase tracking-[0.06em] text-[var(--auc-muted)]">or</span>
+          <div className="h-px flex-1 bg-[var(--auc-rule)]" />
         </div>
 
         <form action={signUpWithEmail} className="space-y-4">
@@ -167,9 +168,9 @@ export default async function SignUpPage({
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-6 text-center text-sm text-[var(--auc-ink-2)]">
           Already have an account?{" "}
-          <Link href="/sign-in" className="font-medium text-gray-900 hover:underline">
+          <Link href="/sign-in" className="font-black text-[var(--auc-ink)] hover:underline">
             Sign in
           </Link>
         </p>

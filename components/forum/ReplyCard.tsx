@@ -1,4 +1,4 @@
-import { Clock, ThumbsUp, Trash2, User } from "lucide-react";
+import { ThumbsUp, Trash2 } from "lucide-react";
 import Image from "next/image";
 import type { Role } from "@contracts/role";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,17 @@ interface ReplyCardProps {
   isNested?: boolean;
 }
 
+function initials(name: string) {
+  return (
+    name
+      .split(/[\s.]+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "A"
+  );
+}
+
 export default function ReplyCard({
   id,
   author,
@@ -31,111 +42,74 @@ export default function ReplyCard({
   deleteAction,
   isNested = false,
 }: ReplyCardProps) {
-  return (
-    <div
-      data-reply-id={id}
+  const helpfulButton = (
+    <button
+      type={helpfulAction ? "submit" : "button"}
+      onClick={onHelpful}
       className={cn(
-        "bg-white rounded-lg border border-gray-200 p-5 transition-shadow duration-200",
-        isNested ? "ml-8 bg-gray-50" : "hover:shadow-sm"
+        "inline-flex items-center gap-2 rounded-full border-2 border-[var(--auc-ink)] px-3 py-1.5 text-sm font-bold transition",
+        helpfulCount > 0 ? "bg-[var(--auc-lime)] text-[var(--auc-ink)]" : "bg-transparent text-[var(--auc-ink)] hover:bg-[var(--auc-bg-warm)]",
       )}
     >
-      {/* Author Header */}
-      <div className="flex items-start gap-3 mb-3">
-        {/* Avatar */}
-        <div className="flex-shrink-0">
+      <ThumbsUp className="h-4 w-4" />
+      Helpful · {helpfulCount}
+    </button>
+  );
+
+  return (
+    <article
+      data-reply-id={id}
+      className={cn(
+        "auc-card-flat p-5",
+        isNested && "ml-8 bg-[var(--auc-bg-warm)]",
+      )}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
           {author.avatar ? (
             <Image
               src={author.avatar}
               alt={author.name}
               width={40}
               height={40}
-              className="w-10 h-10 rounded-full object-cover"
+              className="h-10 w-10 rounded-full object-cover"
             />
           ) : (
-            <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-              <User className="h-5 w-5 text-primary-600" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--auc-coral)] text-sm font-black text-white">
+              {initials(author.name)}
             </div>
           )}
-        </div>
-
-        {/* Author Info */}
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-gray-900">{author.name}</span>
-            <span className="text-gray-400">•</span>
-            {author.role ? (
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
-                {author.role}
-              </span>
-            ) : (
-              <span className="text-sm text-gray-600">
-                {author.businessName ?? "onboarding"}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
-            <Clock className="h-3 w-3" />
-            <span>{timestamp}</span>
+          <div className="min-w-0">
+            <div className="truncate font-black text-[var(--auc-ink)]">{author.name}</div>
+            <div className="mono mt-1 truncate text-[0.68rem] font-bold uppercase tracking-[0.04em] text-[var(--auc-muted)]">
+              {author.role ?? author.businessName ?? "onboarding"} · {timestamp}
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Reply Content */}
-      <div className="ml-13 mb-3">
-        <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-wrap">
-          {content}
-        </p>
-      </div>
-
-      {/* Footer Actions */}
-      <div className="ml-13 flex items-center gap-4">
-        {helpfulAction && (
-          <form action={helpfulAction}>
-            <button
-              type="submit"
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors duration-200",
-                helpfulCount > 0
-                  ? "bg-primary-50 text-primary-700 hover:bg-primary-100"
-                  : "text-gray-600 hover:bg-gray-100"
-              )}
-            >
-              <ThumbsUp className="h-4 w-4" />
-              <span className="font-medium">
-                {helpfulCount > 0 ? `Helpful (${helpfulCount})` : "Helpful"}
-              </span>
-            </button>
-          </form>
-        )}
-        {!helpfulAction && onHelpful && (
-          <button
-            onClick={onHelpful}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-colors duration-200",
-              helpfulCount > 0
-                ? "bg-primary-50 text-primary-700 hover:bg-primary-100"
-                : "text-gray-600 hover:bg-gray-100"
-            )}
-          >
-            <ThumbsUp className="h-4 w-4" />
-            <span className="font-medium">
-              {helpfulCount > 0 ? `Helpful (${helpfulCount})` : "Helpful"}
-            </span>
-          </button>
-        )}
         {deleteAction && (
-          <form action={deleteAction} className="ml-auto">
+          <form action={deleteAction}>
             <button
               type="submit"
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-red-700 transition-colors duration-200 hover:bg-red-50"
+              className="mono inline-flex items-center gap-1 rounded-full border border-[var(--auc-coral)] px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.06em] text-[#912f26]"
               aria-label="Delete reply"
             >
-              <Trash2 className="h-4 w-4" />
-              <span className="font-medium">Delete</span>
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete
             </button>
           </form>
         )}
       </div>
-    </div>
+
+      <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-[var(--auc-ink-2)]">
+        {content}
+      </p>
+
+      {(helpfulAction || onHelpful) && (
+        <div className="mt-4">
+          {helpfulAction && <form action={helpfulAction}>{helpfulButton}</form>}
+          {!helpfulAction && onHelpful && helpfulButton}
+        </div>
+      )}
+    </article>
   );
 }

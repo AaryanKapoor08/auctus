@@ -1,28 +1,47 @@
 import Link from "next/link";
-import { ArrowRight, Calendar, DollarSign, Tag } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import type { FundingItem } from "@contracts/funding";
-import Badge from "@/components/ui/Badge";
 
-function formatAmount(item: FundingItem) {
+export function formatFundingAmount(item: FundingItem) {
   if (item.amount_min && item.amount_max) {
-    return `$${item.amount_min.toLocaleString()} - $${item.amount_max.toLocaleString()}`;
+    return `$${item.amount_min.toLocaleString("en-CA")} - $${item.amount_max.toLocaleString("en-CA")}`;
   }
 
   if (item.amount_max) {
-    return `Up to $${item.amount_max.toLocaleString()}`;
+    return `Up to $${item.amount_max.toLocaleString("en-CA")}`;
   }
 
   return "Amount varies";
 }
 
-function formatDeadline(deadline: string | null) {
-  if (!deadline) return "Rolling deadline";
+export function formatFundingDeadline(deadline: string | null) {
+  if (!deadline) return "Rolling";
+  const date = new Date(deadline);
+  if (Number.isNaN(date.getTime())) return "Date varies";
 
   return new Intl.DateTimeFormat("en-CA", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  }).format(new Date(deadline));
+  }).format(date);
+}
+
+function kindLabel(item: FundingItem) {
+  if (item.type === "business_grant") return "Grant";
+  if (item.type === "scholarship") return "Scholarship";
+  return "Research";
+}
+
+function kindClasses(item: FundingItem) {
+  if (item.type === "business_grant") {
+    return "bg-[var(--auc-purple-soft)] text-[var(--auc-purple-deep)]";
+  }
+
+  if (item.type === "scholarship") {
+    return "bg-[var(--auc-coral-soft)] text-[#912f26]";
+  }
+
+  return "bg-[var(--auc-lime-soft)] text-[#40570b]";
 }
 
 export default function FundingCard({
@@ -35,43 +54,43 @@ export default function FundingCard({
   return (
     <Link
       href={href}
-      className="group flex h-full flex-col rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-md"
+      className="auc-card-flat auc-card-hover group flex h-full min-h-60 flex-col gap-2 p-5 text-[var(--auc-ink)] shadow-[3px_3px_0_var(--auc-ink)]"
     >
-      <div className="mb-4 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          {item.category && <Badge color="gray">{item.category}</Badge>}
-          <h2 className="mt-3 line-clamp-2 text-lg font-semibold text-gray-900 transition group-hover:text-primary-700">
-            {item.name}
-          </h2>
-          <p className="mt-1 line-clamp-2 text-sm text-gray-600">{item.provider}</p>
-        </div>
-        <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-gray-400 transition group-hover:translate-x-0.5 group-hover:text-gray-700" />
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <span className={`mono rounded px-2 py-1 text-[0.68rem] font-black uppercase tracking-[0.06em] ${kindClasses(item)}`}>
+          {kindLabel(item)}
+        </span>
+        <span className="mono rounded-full border border-[var(--auc-rule)] bg-[var(--auc-bg)] px-3 py-1 text-[0.72rem] font-black text-[var(--auc-coral)]">
+          {formatFundingDeadline(item.deadline)}
+        </span>
       </div>
 
+      <h2 className="line-clamp-2 text-lg font-black leading-tight transition group-hover:text-[var(--auc-purple-deep)]">
+        {item.name}
+      </h2>
+      <p className="mt-2 line-clamp-2 text-sm text-[var(--auc-muted)]">{item.provider}</p>
+
       {item.description && (
-        <p className="mb-5 line-clamp-3 flex-1 text-sm leading-6 text-gray-700">
+        <p className="mt-4 line-clamp-3 flex-1 text-sm leading-6 text-[var(--auc-ink-2)]">
           {item.description}
         </p>
       )}
 
-      <div className="mt-auto flex flex-wrap gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm font-semibold text-green-700">
-          <DollarSign className="h-4 w-4" />
-          {formatAmount(item)}
-        </span>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-sm font-medium text-orange-700">
-          <Calendar className="h-4 w-4" />
-          {formatDeadline(item.deadline)}
-        </span>
-        {item.tags.slice(0, 2).map((tag) => (
-          <span
-            key={tag}
-            className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700"
-          >
-            <Tag className="h-3.5 w-3.5" />
-            {tag}
-          </span>
-        ))}
+      <div className="mt-3 flex items-end justify-between gap-4 border-t border-[var(--auc-rule)] pt-4">
+        <div>
+          <div className="display text-2xl leading-none">{formatFundingAmount(item)}</div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {(item.tags.length > 0 ? item.tags : item.category ? [item.category] : []).slice(0, 2).map((tag) => (
+              <span
+                key={tag}
+                className="mono rounded border border-[var(--auc-rule)] px-2 py-1 text-[0.65rem] font-bold text-[var(--auc-ink-2)]"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <ArrowRight className="h-5 w-5 shrink-0 text-[var(--auc-ink)] transition group-hover:translate-x-0.5" />
       </div>
     </Link>
   );

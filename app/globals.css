@@ -229,6 +229,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .auc-marquee {
+  --auc-marquee-duration: 38s;
   background: var(--auc-lime);
   border-bottom: 1.5px solid var(--auc-ink);
   border-top: 1.5px solid var(--auc-ink);
@@ -238,16 +239,24 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .auc-marquee-track {
-  animation: auc-marquee 38s linear infinite;
-  display: inline-flex;
-  gap: 3rem;
-  min-width: max-content;
-  white-space: nowrap;
+  animation: auc-marquee var(--auc-marquee-duration) linear infinite;
+  display: flex;
+  width: max-content;
   will-change: transform;
 }
 
 .auc-marquee-track.slow {
-  animation-duration: 60s;
+  --auc-marquee-duration: 60s;
+}
+
+.auc-marquee-group {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 3rem;
+  min-width: max-content;
+  padding-right: 3rem;
+  white-space: nowrap;
 }
 
 .auc-label {
@@ -337,16 +346,20 @@ html {
 
 @keyframes auc-marquee {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .auc-marquee-track {
-    animation: none;
+    animation-duration: 90s;
+  }
+
+  .auc-marquee-track.slow {
+    animation-duration: 120s;
   }
 }
 

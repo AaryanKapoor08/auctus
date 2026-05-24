@@ -146,7 +146,7 @@ export default function Navbar({ initialSession }: { initialSession?: Session | 
                 </button>
 
                 {isProfileOpen && (
-                  <div className="auc-card-flat absolute right-0 mt-2 w-60 bg-[var(--auc-paper)] p-2 text-[var(--auc-ink)] shadow-[5px_5px_0_var(--auc-ink)]">
+                  <div className="auc-card-flat absolute right-0 z-10 mt-2 w-60 bg-[var(--auc-paper)] p-2 text-[var(--auc-ink)] shadow-[5px_5px_0_var(--auc-ink)]">
                     <Link
                       href={session.role ? "/profile" : "/onboarding"}
                       onClick={() => setIsProfileOpen(false)}

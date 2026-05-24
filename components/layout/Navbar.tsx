@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, UserCircle, X } from "lucide-react";
 import { useAuth } from "@/app/providers";
+import MarqueeBelt from "@/components/layout/MarqueeBelt";
 import { cn } from "@/lib/utils";
 import type { Session } from "@contracts/session";
 import { createClient } from "@/lib/supabase/client";
@@ -40,7 +41,13 @@ function getInitials(profile: NavProfile | null, session: Session | null) {
   );
 }
 
-export default function Navbar({ initialSession }: { initialSession?: Session | null }) {
+export default function Navbar({
+  initialSession,
+  tickerItems,
+}: {
+  initialSession?: Session | null;
+  tickerItems: string[];
+}) {
   const pathname = usePathname();
   const { session: clientSession, loading } = useAuth();
   const session = loading ? initialSession ?? null : clientSession;
@@ -80,15 +87,6 @@ export default function Navbar({ initialSession }: { initialSession?: Session | 
   const isActivePath = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
   const initials = getInitials(profile, session);
-  const tickerItems = [
-    "New · NSERC PGS-D opens Oct 14",
-    "CDAP renewed · live federal programs",
-    "Scholarships indexed daily",
-    "SSHRC Insight · rolling research updates",
-    "Public forum reads now open",
-    "Live opportunities from real data",
-  ];
-
   return (
     <nav className="sticky top-4 z-50 px-3 sm:px-6">
       <div className="mx-auto flex w-full max-w-[77.5rem] flex-col items-center gap-1.5">
@@ -197,18 +195,12 @@ export default function Navbar({ initialSession }: { initialSession?: Session | 
           </button>
         </div>
 
-        <div className="w-full overflow-hidden rounded-[10px] border border-[var(--auc-ink)] bg-[var(--auc-lime)] py-[7px] text-[var(--auc-ink)]">
-          <div className="auc-marquee-track mono text-xs font-black uppercase tracking-[0.06em]">
-            {[0, 1].map((round) =>
-              tickerItems.map((item) => (
-                <span key={`${round}-${item}`} className="inline-flex items-center gap-5">
-                  <span>* {item}</span>
-                  <span>+</span>
-                </span>
-              )),
-            )}
-          </div>
-        </div>
+        <MarqueeBelt
+          items={tickerItems}
+          ariaLabel="Current funding database metrics"
+          className="w-full rounded-[10px] border border-[var(--auc-ink)] py-[7px]"
+          trackClassName="text-xs"
+        />
       </div>
 
       {isMobileMenuOpen && (

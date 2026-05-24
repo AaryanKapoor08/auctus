@@ -13,6 +13,8 @@ import Footer from "@/components/layout/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Providers } from "./providers";
 import { getSession } from "@/lib/session/get-session";
+import { getFundingSiteStats } from "@/lib/funding/site-stats";
+import { buildFundingNewsTickerItems } from "@/lib/funding/site-stats-shared";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -53,7 +55,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
+  const [session, fundingStats] = await Promise.all([
+    getSession(),
+    getFundingSiteStats(),
+  ]);
+  const tickerItems = buildFundingNewsTickerItems(fundingStats);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -63,7 +69,7 @@ export default async function RootLayout({
       >
         <ErrorBoundary>
           <Providers initialSession={session}>
-            <Navbar initialSession={session} />
+            <Navbar initialSession={session} tickerItems={tickerItems} />
             <main className="min-h-screen">{children}</main>
             <Footer />
             <Analytics />

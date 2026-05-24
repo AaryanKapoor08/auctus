@@ -26,13 +26,13 @@ function SelectField({
   children: React.ReactNode;
 }) {
   return (
-    <label className="block text-sm font-medium text-gray-700">
+    <label className="block text-sm font-bold text-[var(--auc-ink)]">
       {label}
       <select
         name={name}
         defaultValue={defaultValue ?? ""}
         required={required}
-        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+        className="auc-field mt-1 w-full px-3 py-2"
       >
         {children}
       </select>
@@ -199,17 +199,17 @@ export default async function EditProfilePage({
   const formError = getFormErrorMessage(params.error);
 
   return (
-    <main className="min-h-screen bg-gray-50 py-10">
+    <main className="auc-page min-h-screen py-10">
       <div className="mx-auto max-w-3xl px-6">
         <div className="mb-8">
-          <p className="text-sm font-medium uppercase text-gray-500">Profile</p>
-          <h1 className="mt-2 text-3xl font-semibold text-gray-900">Edit profile</h1>
-          <p className="mt-2 text-gray-600">
+          <p className="auc-label">Profile</p>
+          <h1 className="display mt-2 text-5xl leading-none md:text-6xl">Edit profile</h1>
+          <p className="mt-4 text-lg leading-8 text-[var(--auc-ink-2)]">
             Keep your profile current so funding recommendations stay relevant.
           </p>
         </div>
 
-        <Card className="border border-gray-200">
+        <Card className="shadow-[6px_6px_0_var(--auc-ink)]">
           <form action={saveProfile}>
             {formError && (
               <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

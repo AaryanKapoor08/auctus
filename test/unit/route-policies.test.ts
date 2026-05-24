@@ -12,7 +12,11 @@ const registry: RoutePolicyRegistry = combineRegistries(
     { path: "/dashboard", allowed_roles: null, require_auth: true },
     { path: "/onboarding", allowed_roles: null, require_auth: true },
   ],
-  [{ path: "/grants", allowed_roles: null, require_auth: false }],
+  [
+    { path: "/grants", allowed_roles: null, require_auth: false },
+    { path: "/forum/new", allowed_roles: null, require_auth: true },
+    { path: "/forum", allowed_roles: null, require_auth: false },
+  ],
 );
 
 describe("route policies", () => {
@@ -60,6 +64,19 @@ describe("route policies", () => {
   it("allows null-role users to browse public funding before onboarding", () => {
     expect(resolveRouteDecision("/grants", null, true, registry)).toEqual({
       action: "allow",
+    });
+  });
+
+  it("allows public forum reads but protects new thread writes", () => {
+    expect(resolveRouteDecision("/forum", undefined, false, registry)).toEqual({
+      action: "allow",
+    });
+    expect(
+      resolveRouteDecision("/forum/thread-1", undefined, false, registry),
+    ).toEqual({ action: "allow" });
+    expect(resolveRouteDecision("/forum/new", undefined, false, registry)).toEqual({
+      action: "redirect",
+      location: "/sign-in",
     });
   });
 });

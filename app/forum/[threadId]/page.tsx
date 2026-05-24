@@ -55,25 +55,25 @@ export default async function ThreadDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-5xl px-6">
+    <div className="auc-page min-h-screen py-12">
+      <div className="auc-reference-section max-w-5xl">
         <Link
           href="/forum"
-          className="mb-6 inline-flex items-center gap-2 text-gray-600 transition-colors hover:text-gray-900"
+          className="mono mb-6 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.06em] text-[var(--auc-muted)] transition-colors hover:text-[var(--auc-ink)]"
         >
           <ArrowLeft className="h-5 w-5" />
           <span className="font-medium">Back to forum</span>
         </Link>
 
         <div className="space-y-6">
-          <Card className="border border-gray-200">
+          <Card className="shadow-[6px_6px_0_var(--auc-ink)]">
             <div className="mb-4 flex items-center justify-between gap-3">
-              <Badge variant="default">{thread.category}</Badge>
+              <Badge variant="success">{thread.category}</Badge>
               {canDeleteThread && (
                 <form action={removeThread}>
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50"
+                    className="mono inline-flex items-center gap-1.5 rounded-full border border-[var(--auc-coral)] bg-transparent px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.06em] text-[#912f26]"
                   >
                     <Trash2 className="h-4 w-4" />
                     Delete thread
@@ -81,9 +81,9 @@ export default async function ThreadDetailPage({ params }: PageProps) {
                 </form>
               )}
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">{thread.title}</h1>
-            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-gray-600">
-              <span className="font-medium text-gray-900">
+            <h1 className="display text-5xl leading-[0.95] tracking-[-0.03em] md:text-6xl">{thread.title}</h1>
+            <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-[var(--auc-ink-2)]">
+              <span className="font-black text-[var(--auc-ink)]">
                 {thread.author.display_name || "Unknown user"}
               </span>
               <Badge variant="info" size="sm">
@@ -101,13 +101,13 @@ export default async function ThreadDetailPage({ params }: PageProps) {
                 ))}
               </div>
             )}
-            <p className="mt-6 whitespace-pre-wrap text-gray-700">{thread.content}</p>
+            <p className="mt-6 whitespace-pre-wrap text-base leading-8 text-[var(--auc-ink-2)]">{thread.content}</p>
           </Card>
 
           <Card
-            className="border border-gray-200"
+            className="shadow-[4px_4px_0_var(--auc-ink)]"
             header={
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="display text-3xl leading-none text-[var(--auc-ink)]">
                 {replies.length} {replies.length === 1 ? "Reply" : "Replies"}
               </h2>
             }
@@ -143,35 +143,53 @@ export default async function ThreadDetailPage({ params }: PageProps) {
                       content={reply.content}
                       timestamp={formatDate(reply.created_at)}
                       helpfulCount={reply.helpful_count}
-                      helpfulAction={helpfulAction}
+                      helpfulAction={currentUserId ? helpfulAction : undefined}
                       deleteAction={canDeleteReply ? removeReply : undefined}
                     />
                   );
                 })}
               </div>
             ) : (
-              <div className="py-8 text-center text-gray-500">
-                <MessageSquare className="mx-auto mb-3 h-12 w-12 text-gray-400" />
+              <div className="py-8 text-center text-[var(--auc-muted)]">
+                <MessageSquare className="mx-auto mb-3 h-12 w-12" />
                 <p>No replies yet. Be the first to respond.</p>
               </div>
             )}
           </Card>
 
-          <Card className="border border-gray-200">
-            <h2 className="mb-4 text-xl font-semibold text-gray-900">Add a reply</h2>
-            <form action={addReply} className="space-y-4">
-              <textarea
-                name="content"
-                required
-                rows={6}
-                placeholder="Share your experience or answer..."
-                className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
-              />
-              <div className="flex justify-end">
-                <Button type="submit">Post reply</Button>
+          {currentUserId ? (
+            <Card className="shadow-[4px_4px_0_var(--auc-ink)]">
+              <h2 className="auc-label mb-4">Add a reply</h2>
+              <form action={addReply} className="space-y-4">
+                <textarea
+                  name="content"
+                  required
+                  rows={6}
+                  placeholder="Share your experience or answer..."
+                  className="auc-field w-full resize-none px-4 py-3"
+                />
+                <div className="flex justify-end">
+                  <Button type="submit">Post reply</Button>
+                </div>
+              </form>
+            </Card>
+          ) : (
+            <Card className="bg-[var(--auc-purple-soft)] shadow-[4px_4px_0_var(--auc-ink)]">
+              <h2 className="auc-label mb-3 text-[var(--auc-purple-deep)]">Join the conversation</h2>
+              <p className="text-sm leading-6 text-[var(--auc-ink)]">
+                Forum threads are public to read. Sign in to reply, mark answers helpful,
+                or start a new thread.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Link href="/sign-in">
+                  <Button size="sm" variant="outline">Sign in</Button>
+                </Link>
+                <Link href="/sign-up">
+                  <Button size="sm">Join</Button>
+                </Link>
               </div>
-            </form>
-          </Card>
+            </Card>
+          )}
         </div>
       </div>
     </div>

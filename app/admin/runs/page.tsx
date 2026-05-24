@@ -74,57 +74,58 @@ export default async function AdminRunsPage() {
   const costBudget = Number(process.env.AI_MONTHLY_COST_BUDGET_CENTS ?? 500);
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="auc-page min-h-screen">
       <div className="mx-auto max-w-6xl px-6 py-8">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-950">AI run observability</h1>
-            <p className="mt-2 text-gray-600">
+            <div className="auc-label">Admin</div>
+            <h1 className="display mt-2 text-5xl leading-none md:text-6xl">AI run observability</h1>
+            <p className="mt-4 text-lg leading-8 text-[var(--auc-ink-2)]">
               Provider reliability, token use, budget posture, and queue output.
             </p>
           </div>
-          <Link href="/admin/review" className="text-sm font-semibold text-gray-900 hover:underline">
+          <Link href="/admin/review" className="text-sm font-black text-[var(--auc-ink)] hover:underline">
             Review queue
           </Link>
         </div>
 
         <section className="mb-6 grid gap-4 md:grid-cols-3">
-          <Card className="border border-gray-200">
+          <Card>
             <div className="flex items-start gap-3">
-              <Gauge className="mt-1 h-5 w-5 text-gray-700" />
+              <Gauge className="mt-1 h-5 w-5 text-[var(--auc-ink)]" />
               <div>
-                <p className="text-sm text-gray-600">Rows enriched</p>
-                <p className="mt-1 text-3xl font-bold text-gray-950">{totals.enriched}</p>
-                <p className="mt-1 text-sm text-gray-500">{totals.attempts} attempted</p>
+                <p className="text-sm text-[var(--auc-ink-2)]">Rows enriched</p>
+                <p className="display mt-1 text-3xl leading-none text-[var(--auc-ink)]">{totals.enriched}</p>
+                <p className="mt-2 text-sm text-[var(--auc-muted)]">{totals.attempts} attempted</p>
               </div>
             </div>
           </Card>
-          <Card className="border border-gray-200">
+          <Card>
             <div className="flex items-start gap-3">
-              <Activity className="mt-1 h-5 w-5 text-gray-700" />
+              <Activity className="mt-1 h-5 w-5 text-[var(--auc-ink)]" />
               <div>
-                <p className="text-sm text-gray-600">Token budget</p>
-                <p className="mt-1 text-3xl font-bold text-gray-950">{totals.tokens.toLocaleString("en-CA")}</p>
-                <p className="mt-1 text-sm text-gray-500">of {tokenBudget.toLocaleString("en-CA")}</p>
+                <p className="text-sm text-[var(--auc-ink-2)]">Token budget</p>
+                <p className="display mt-1 text-3xl leading-none text-[var(--auc-ink)]">{totals.tokens.toLocaleString("en-CA")}</p>
+                <p className="mt-2 text-sm text-[var(--auc-muted)]">of {tokenBudget.toLocaleString("en-CA")}</p>
               </div>
             </div>
           </Card>
-          <Card className="border border-gray-200">
+          <Card>
             <div className="flex items-start gap-3">
-              <ShieldCheck className="mt-1 h-5 w-5 text-gray-700" />
+              <ShieldCheck className="mt-1 h-5 w-5 text-[var(--auc-ink)]" />
               <div>
-                <p className="text-sm text-gray-600">Cost budget</p>
-                <p className="mt-1 text-3xl font-bold text-gray-950">{formatCost(totals.cost)}</p>
-                <p className="mt-1 text-sm text-gray-500">of {formatCost(costBudget)}</p>
+                <p className="text-sm text-[var(--auc-ink-2)]">Cost budget</p>
+                <p className="display mt-1 text-3xl leading-none text-[var(--auc-ink)]">{formatCost(totals.cost)}</p>
+                <p className="mt-2 text-sm text-[var(--auc-muted)]">of {formatCost(costBudget)}</p>
               </div>
             </div>
           </Card>
         </section>
 
-        <Card className="border border-gray-200">
+        <Card>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[840px] text-left text-sm">
-              <thead className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
+              <thead className="mono border-b border-[var(--auc-rule)] text-xs uppercase tracking-[0.06em] text-[var(--auc-muted)]">
                 <tr>
                   <th className="py-3 pr-4">Status</th>
                   <th className="py-3 pr-4">Provider</th>
@@ -135,7 +136,7 @@ export default async function AdminRunsPage() {
                   <th className="py-3 pr-4">Finished</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-[var(--auc-rule)]">
                 {rows.map((row) => (
                   <tr key={row.id}>
                     <td className="py-3 pr-4">
@@ -144,24 +145,24 @@ export default async function AdminRunsPage() {
                         <p className="mt-1 text-xs text-gray-500">{row.aborted_reason}</p>
                       )}
                     </td>
-                    <td className="py-3 pr-4 text-gray-600">
+                    <td className="py-3 pr-4 text-[var(--auc-ink-2)]">
                       {row.provider ?? "unknown"}
-                      <p className="mt-1 text-xs text-gray-500">{row.model ?? "No model recorded"}</p>
+                      <p className="mt-1 text-xs text-[var(--auc-muted)]">{row.model ?? "No model recorded"}</p>
                     </td>
-                    <td className="py-3 pr-4 text-gray-600">
+                    <td className="py-3 pr-4 text-[var(--auc-ink-2)]">
                       {row.rows_enriched}/{row.rows_attempted}
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-[var(--auc-muted)]">
                         {row.rows_needs_review} review · {row.rows_failed} failed
                       </p>
                     </td>
-                    <td className="py-3 pr-4 text-gray-600">
+                    <td className="py-3 pr-4 text-[var(--auc-ink-2)]">
                       {(row.tokens_in + row.tokens_out).toLocaleString("en-CA")}
                     </td>
-                    <td className="py-3 pr-4 text-gray-600">
+                    <td className="py-3 pr-4 text-[var(--auc-ink-2)]">
                       {formatCost(row.cost_in_cents + row.cost_out_cents)}
                     </td>
-                    <td className="py-3 pr-4 text-gray-600">{formatDate(row.started_at)}</td>
-                    <td className="py-3 pr-4 text-gray-600">{formatDate(row.finished_at)}</td>
+                    <td className="py-3 pr-4 text-[var(--auc-ink-2)]">{formatDate(row.started_at)}</td>
+                    <td className="py-3 pr-4 text-[var(--auc-ink-2)]">{formatDate(row.finished_at)}</td>
                   </tr>
                 ))}
               </tbody>

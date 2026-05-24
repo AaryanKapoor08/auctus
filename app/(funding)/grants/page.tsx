@@ -43,19 +43,25 @@ export default async function GrantsPage({
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="auc-page min-h-screen pb-20">
+      <section className="auc-reference-section pb-6 pt-14">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900">Business grants</h1>
-            <p className="mt-2 text-lg text-gray-600">
-              Funding opportunities for growth, hiring, exports, and operations.
+            <div className="auc-label">01 · Business funding</div>
+            <h1 className="display mt-3 text-6xl leading-[0.92] tracking-[-0.035em] md:text-8xl">Business grants</h1>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--auc-ink-2)]">
+              Funding opportunities for growth, hiring, exports, digital adoption, innovation, and operations.
             </p>
           </div>
-          <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 shadow-sm">
-            <span className="font-semibold text-gray-900">{items.length}</span> available
+          <div className="rounded-[14px] bg-[var(--auc-ink)] px-5 py-4 text-white">
+            <span className="display text-4xl leading-none">{items.length.toLocaleString("en-CA")}</span>
+            <span className="mono ml-2 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-white/60">
+              loaded
+            </span>
           </div>
         </div>
+      </section>
+      <div className="auc-reference-section">
         <FundingBrowser
           role="business"
           items={items}

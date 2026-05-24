@@ -17,6 +17,7 @@ const eslintConfig = defineConfig([
     "auctus-frontend/**",
     "out/**",
     "build/**",
+    "design/**",
     "next-env.d.ts",
   ]),
 ]);

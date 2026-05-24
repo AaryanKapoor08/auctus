@@ -23,17 +23,17 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+      "inline-flex items-center justify-center rounded-full border-2 font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-[var(--auc-bg)] disabled:cursor-not-allowed disabled:opacity-50";
 
     const variants = {
       primary:
-        "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-900",
+        "border-[var(--auc-ink)] bg-[var(--auc-ink)] text-white hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--auc-ink)]",
       secondary:
-        "bg-secondary-500 text-white hover:bg-secondary-600 focus:ring-secondary-500",
+        "border-[var(--auc-ink)] bg-[var(--auc-lime)] text-[var(--auc-ink)] hover:-translate-y-0.5 hover:shadow-[3px_3px_0_var(--auc-ink)]",
       outline:
-        "border-2 border-gray-900 text-gray-900 hover:bg-gray-50 focus:ring-gray-900",
+        "border-[var(--auc-ink)] bg-transparent text-[var(--auc-ink)] hover:bg-[var(--auc-paper)]",
       ghost:
-        "text-gray-700 hover:bg-gray-100 focus:ring-gray-500",
+        "border-transparent bg-transparent text-[var(--auc-ink)] hover:bg-[rgba(14,14,16,0.06)]",
     };
 
     const sizes = {

@@ -10,15 +10,15 @@ interface CardProps {
 
 const Card = ({ children, className, header, footer }: CardProps) => {
   return (
-    <div className={cn("bg-white rounded-lg shadow-sm", className)}>
+    <div className={cn("auc-card-flat", className)}>
       {header && (
-        <div className="px-6 py-4 border-b border-gray-200">
+        <div className="border-b border-[var(--auc-rule)] px-6 py-4">
           {header}
         </div>
       )}
       <div className="p-6">{children}</div>
       {footer && (
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+        <div className="rounded-b-[12px] border-t border-[var(--auc-rule)] bg-[var(--auc-bg-warm)] px-6 py-4">
           {footer}
         </div>
       )}

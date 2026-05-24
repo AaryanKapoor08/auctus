@@ -16,6 +16,10 @@ export type FundingSiteStats = {
   sourceCount: number;
   maxListedAmount: number | null;
   byType: Record<FundingType, number>;
+  rollingByType: Record<FundingType, number>;
+  withDeadlinesByType: Record<FundingType, number>;
+  upcoming30ByType: Record<FundingType, number>;
+  maxListedAmountByType: Record<FundingType, number | null>;
   topTagsByType: Record<FundingType, string[]>;
   quality: {
     activePastDeadlineCount: number;
@@ -55,6 +59,26 @@ export const EMPTY_FUNDING_SITE_STATS: FundingSiteStats = {
     scholarship: 0,
     research_grant: 0,
   },
+  rollingByType: {
+    business_grant: 0,
+    scholarship: 0,
+    research_grant: 0,
+  },
+  withDeadlinesByType: {
+    business_grant: 0,
+    scholarship: 0,
+    research_grant: 0,
+  },
+  upcoming30ByType: {
+    business_grant: 0,
+    scholarship: 0,
+    research_grant: 0,
+  },
+  maxListedAmountByType: {
+    business_grant: null,
+    scholarship: null,
+    research_grant: null,
+  },
   topTagsByType: {
     business_grant: [],
     scholarship: [],
@@ -82,6 +106,16 @@ function isPastDeadline(deadline: string | null, asOf: Date) {
   return parsed < normalizeDateOnly(asOf);
 }
 
+function daysUntilDeadline(deadline: string | null, asOf: Date) {
+  if (!deadline) return null;
+
+  const parsed = new Date(`${deadline}T00:00:00.000Z`);
+  if (Number.isNaN(parsed.getTime())) return null;
+
+  const today = normalizeDateOnly(asOf).getTime();
+  return Math.ceil((parsed.getTime() - today) / 86_400_000);
+}
+
 function selectDisplayTags(
   type: FundingType,
   counts: Map<string, number>,
@@ -104,6 +138,12 @@ export function aggregateFundingFactRows(
   const sources = new Set<string>();
   const tagCountsByType = new Map<FundingType, Map<string, number>>();
   const byType = { ...EMPTY_FUNDING_SITE_STATS.byType };
+  const rollingByType = { ...EMPTY_FUNDING_SITE_STATS.rollingByType };
+  const withDeadlinesByType = { ...EMPTY_FUNDING_SITE_STATS.withDeadlinesByType };
+  const upcoming30ByType = { ...EMPTY_FUNDING_SITE_STATS.upcoming30ByType };
+  const maxListedAmountByType = {
+    ...EMPTY_FUNDING_SITE_STATS.maxListedAmountByType,
+  };
   let maxListedAmount: number | null = null;
   let activePastDeadlineCount = 0;
   let invalidAmountRangeCount = 0;
@@ -114,6 +154,11 @@ export function aggregateFundingFactRows(
 
   for (const row of rows) {
     byType[row.type] += 1;
+    if (row.deadline) {
+      withDeadlinesByType[row.type] += 1;
+    } else {
+      rollingByType[row.type] += 1;
+    }
 
     if (row.provider) providers.add(row.provider);
     if (row.scraped_from) sources.add(row.scraped_from);
@@ -122,6 +167,15 @@ export function aggregateFundingFactRows(
     if (amount > 0) {
       maxListedAmount =
         maxListedAmount === null ? amount : Math.max(maxListedAmount, amount);
+      maxListedAmountByType[row.type] =
+        maxListedAmountByType[row.type] === null
+          ? amount
+          : Math.max(maxListedAmountByType[row.type] ?? 0, amount);
+    }
+
+    const daysUntil = daysUntilDeadline(row.deadline, asOf);
+    if (daysUntil !== null && daysUntil >= 0 && daysUntil <= 30) {
+      upcoming30ByType[row.type] += 1;
     }
 
     if (
@@ -150,6 +204,10 @@ export function aggregateFundingFactRows(
     sourceCount: sources.size,
     maxListedAmount,
     byType,
+    rollingByType,
+    withDeadlinesByType,
+    upcoming30ByType,
+    maxListedAmountByType,
     topTagsByType: {
       business_grant: selectDisplayTags(
         "business_grant",

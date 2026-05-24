@@ -52,6 +52,22 @@ describe("funding site stats", () => {
       scholarship: 1,
       research_grant: 1,
     });
+    expect(stats.rollingByType.scholarship).toBe(1);
+    expect(stats.withDeadlinesByType).toEqual({
+      business_grant: 1,
+      scholarship: 0,
+      research_grant: 1,
+    });
+    expect(stats.upcoming30ByType).toEqual({
+      business_grant: 0,
+      scholarship: 0,
+      research_grant: 0,
+    });
+    expect(stats.maxListedAmountByType).toEqual({
+      business_grant: 100000,
+      scholarship: 25000,
+      research_grant: 500000,
+    });
   });
 
   it("selects only tags that exist in the current funding facts", () => {
@@ -95,6 +111,7 @@ describe("funding site stats", () => {
       activePastDeadlineCount: 1,
       invalidAmountRangeCount: 1,
     });
+    expect(stats.upcoming30ByType.business_grant).toBe(0);
     expect(stats.totalOpen).toBe(4);
   });
 

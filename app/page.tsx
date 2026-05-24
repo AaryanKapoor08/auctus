@@ -73,7 +73,12 @@ function StepBlock({
   );
 }
 
-function AutomateSection() {
+function AutomateSection({ featuredItem }: { featuredItem: FundingItem | null }) {
+  const featuredHref = featuredItem ? fundingHref(featuredItem) : "/grants";
+  const featuredType = featuredItem ? fundingLabel(featuredItem).toUpperCase() : "FUNDING";
+  const featuredCategory =
+    featuredItem?.category?.toUpperCase() ?? featuredItem?.provider.toUpperCase() ?? "LIVE DATA";
+
   return (
     <section className="auc-reference-section grid gap-10 pt-28 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
       <div>
@@ -112,38 +117,49 @@ function AutomateSection() {
 
       <div className="auc-card relative overflow-hidden p-6">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <div className="auc-label">Auctus AI · live detail support</div>
+          <div className="auc-label">Live record · provider first</div>
           <div className="mono inline-flex items-center gap-2 text-[0.68rem] font-bold text-[var(--auc-muted)]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#10c966]" />
-            DATA-GATED
+            CURRENT
           </div>
         </div>
         <div className="grid gap-4 rounded-[14px] border-2 border-[var(--auc-ink)] bg-[var(--auc-bg)] p-4 sm:grid-cols-[1fr_auto] sm:items-center">
           <div>
             <div className="mb-2 flex gap-2">
               <span className="mono rounded bg-[var(--auc-purple-soft)] px-2 py-1 text-[0.62rem] font-black text-[var(--auc-purple-deep)]">
-                RESEARCH
+                {featuredType}
               </span>
               <span className="mono rounded bg-[var(--auc-coral-soft)] px-2 py-1 text-[0.62rem] font-black text-[#912f26]">
-                SUMMARY
+                {featuredCategory}
               </span>
             </div>
-            <div className="text-lg font-black leading-snug">Detail pages stay provider-first.</div>
+            <div className="text-lg font-black leading-snug">
+              {featuredItem?.name ?? "Detail pages stay provider-first."}
+            </div>
             <div className="mt-2 flex flex-wrap gap-4 text-sm text-[var(--auc-ink-2)]">
-              <span className="display text-sm">$200,000</span>
-              <span className="font-bold text-[var(--auc-coral)]">● Oct 1</span>
-              <span className="mono text-[0.68rem] text-[var(--auc-muted)]">CURRENT · REVIEWED</span>
+              <span className="display text-sm">
+                {featuredItem ? formatAmount(featuredItem) : "Amount varies"}
+              </span>
+              <span className="font-bold text-[var(--auc-coral)]">
+                * {featuredItem ? formatDeadline(featuredItem.deadline) : "Rolling"}
+              </span>
+              <span className="mono text-[0.68rem] text-[var(--auc-muted)]">
+                {featuredItem?.provider ?? "Provider record"}
+              </span>
             </div>
           </div>
-          <button className="auc-btn-loop inline-flex items-center justify-center gap-2 rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] px-4 py-3 text-sm font-black shadow-[0_3px_0_var(--auc-ink)]">
+          <Link
+            href={featuredHref}
+            className="auc-btn-loop inline-flex items-center justify-center gap-2 rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] px-4 py-3 text-sm font-black shadow-[0_3px_0_var(--auc-ink)]"
+          >
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--auc-ink)] text-[0.7rem] text-[var(--auc-lime)]">
               ✦
             </span>
-            Summarize
-          </button>
+            Open detail
+          </Link>
         </div>
         <div className="auc-summary-loop relative mt-3 rounded-[14px] border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] p-5 shadow-[4px_4px_0_var(--auc-ink)]">
-          <div className="auc-label text-[var(--auc-ink)] opacity-70">AI summary · 1.4s</div>
+          <div className="auc-label text-[var(--auc-ink)] opacity-70">Display policy</div>
           <p className="mt-2 text-sm leading-6">
             Current enrichment appears only when reviewed and useful. The original
             amount, deadline, requirements, and provider application link remain visible.
@@ -412,7 +428,7 @@ export default async function Home() {
         />
       </div>
 
-      <AutomateSection />
+      <AutomateSection featuredItem={previewItems[0] ?? null} />
 
       <section id="community" className="auc-reference-section grid gap-12 pt-28 lg:grid-cols-[1fr_1.1fr] lg:items-center">
         <div>

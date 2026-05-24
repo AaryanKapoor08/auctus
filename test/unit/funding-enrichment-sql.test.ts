@@ -59,7 +59,7 @@ describe("0025_ai_enrichment.sql", () => {
     expect(sql).toContain('create policy "funding_ai_enrichment public select"');
     expect(sql).toContain("to anon, authenticated");
     expect(sql).toContain("and f.status = 'active'");
-    expect(sql).not.toMatch(/create policy .*on public\.ai_enrichment_jobs/s);
+    expect(sql).not.toMatch(/create policy [\s\S]*on public\.ai_enrichment_jobs/);
   });
 
   it("documents run accounting, budget aborts, and quarantine bounds", () => {

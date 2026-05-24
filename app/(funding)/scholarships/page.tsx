@@ -55,19 +55,22 @@ export default async function ScholarshipsPage({
     : items;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="auc-page min-h-screen pb-20">
+      <section className="auc-reference-section pb-6 pt-14">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900">Scholarships</h1>
-            <p className="mt-2 text-lg text-gray-600">
-              Scholarships, bursaries, and awards aligned to your studies.
+            <div className="auc-label">02 · Student funding</div>
+            <h1 className="display mt-3 text-6xl leading-[0.92] tracking-[-0.035em] md:text-8xl">Scholarships</h1>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--auc-ink-2)]">
+              Scholarships, bursaries, graduate awards, field-specific funding, and student prizes.
             </p>
           </div>
           <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 shadow-sm">
             <span className="font-semibold text-gray-900">{rankedItems.length}</span> available
           </div>
         </div>
+      </section>
+      <div className="auc-reference-section">
         <FundingBrowser
           role="student"
           items={rankedItems}

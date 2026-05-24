@@ -13,6 +13,10 @@ describe("forum and identity RLS migrations", () => {
     join(root, "supabase/migrations/0012_restrict_profile_email_select.sql"),
     "utf8",
   );
+  const publicForumSql = readFileSync(
+    join(root, "supabase/migrations/0027_public_forum_reads.sql"),
+    "utf8",
+  );
 
   it("defines helpful votes through a duplicate-safe security definer function", () => {
     const sql = readFileSync(
@@ -42,8 +46,8 @@ describe("forum and identity RLS migrations", () => {
     expect(profileEmailSql).toContain("revoke select on public.profiles from authenticated");
     expect(profileEmailSql).toContain("0010_rls_identity.sql");
     expect(profileEmailSql).toContain("grant select (");
-    expect(profileEmailSql).not.toMatch(/grant select \([^)]*email[^)]*\) on public\.profiles to authenticated/s);
-    expect(profileEmailSql).toMatch(/email,\s+avatar_url/s);
+    expect(profileEmailSql).not.toMatch(/grant select \([^)]*email[^)]*\) on public\.profiles to authenticated/);
+    expect(profileEmailSql).toMatch(/email,\s+avatar_url/);
     expect(profileEmailSql).toContain("on public.profiles to service_role");
   });
 
@@ -51,5 +55,18 @@ describe("forum and identity RLS migrations", () => {
     expect(profileEmailSql).toMatch(
       /grant select \(\s+id,\s+role,\s+display_name,\s+avatar_url,\s+created_at,\s+updated_at\s+\) on public\.profiles to authenticated;/,
     );
+  });
+
+  it("allows public forum reads without granting public forum writes or profile emails", () => {
+    expect(publicForumSql).toContain("threads public read");
+    expect(publicForumSql).toContain("replies public read");
+    expect(publicForumSql).toContain("to anon, authenticated");
+    expect(publicForumSql).toContain("grant select on public.threads to anon");
+    expect(publicForumSql).toContain("grant select on public.replies to anon");
+    expect(publicForumSql).toMatch(
+      /grant select \(\s+id,\s+role,\s+display_name,\s+avatar_url,\s+created_at,\s+updated_at\s+\) on public\.profiles to anon;/,
+    );
+    expect(publicForumSql).not.toMatch(/for\s+(insert|update|delete)\s+to\s+anon/i);
+    expect(publicForumSql).not.toMatch(/email/);
   });
 });

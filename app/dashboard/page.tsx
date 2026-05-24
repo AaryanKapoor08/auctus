@@ -193,15 +193,15 @@ function StatCard({
   detail: string;
 }) {
   return (
-    <Card className="border border-gray-200">
+    <Card>
       <div className="flex items-start gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gray-900 text-white">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--auc-ink)] text-white">
           <Icon className="h-5 w-5" />
         </div>
         <div>
-          <p className="text-sm font-medium text-gray-600">{label}</p>
-          <p className="mt-1 text-3xl font-bold text-gray-950">{value}</p>
-          <p className="mt-1 text-sm text-gray-500">{detail}</p>
+          <p className="text-sm font-bold text-[var(--auc-ink-2)]">{label}</p>
+          <p className="display mt-1 text-3xl leading-none text-[var(--auc-ink)]">{value}</p>
+          <p className="mt-2 text-sm text-[var(--auc-muted)]">{detail}</p>
         </div>
       </div>
     </Card>
@@ -255,22 +255,22 @@ export default async function DashboardPage() {
   const profileHighlights = getProfileHighlights(roleProfile);
 
   return (
-    <main className="min-h-screen bg-slate-50">
+    <main className="auc-page min-h-screen">
       <div className="mx-auto max-w-7xl px-6 py-8">
-        <header className="mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+        <header className="auc-card mb-8 overflow-hidden p-0">
           <div className="grid gap-6 p-6 lg:grid-cols-[1fr_340px] lg:p-8">
             <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] px-3 py-1 text-sm font-black text-[var(--auc-ink)]">
                 <RoleIcon className="h-4 w-4" />
                 {roleCopy.eyebrow}
               </div>
-              <h1 className="text-4xl font-bold tracking-normal text-gray-950">
+              <h1 className="display text-5xl leading-none text-[var(--auc-ink)] md:text-6xl">
                 {roleCopy.title}
               </h1>
-              <p className="mt-3 max-w-2xl text-lg text-gray-600">
+              <p className="mt-4 max-w-2xl text-lg leading-8 text-[var(--auc-ink-2)]">
                 Welcome back, {displayName}. {roleCopy.description}
               </p>
-              <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+              <div className="mt-5 flex flex-wrap items-center gap-3 text-sm font-bold text-[var(--auc-ink-2)]">
                 <span className="inline-flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   {currentDate}
@@ -282,12 +282,12 @@ export default async function DashboardPage() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-              <p className="text-sm font-medium text-gray-600">Best current match</p>
-              <p className="mt-2 text-4xl font-bold text-gray-950">
+            <div className="rounded-[14px] border-2 border-[var(--auc-ink)] bg-[var(--auc-bg)] p-4">
+              <p className="auc-label">Best current match</p>
+              <p className="display mt-2 text-5xl leading-none text-[var(--auc-ink)]">
                 {bestScore === null || bestScore === undefined ? "New" : `${bestScore}%`}
               </p>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-3 text-sm leading-6 text-[var(--auc-ink-2)]">
                 {data.topMatches[0]?.name ?? "Complete your profile to improve recommendations."}
               </p>
               <Link href={fundingHomeRoute} className="mt-5 block">
@@ -330,38 +330,37 @@ export default async function DashboardPage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
           <section className="space-y-6">
             <Card
-              className="border border-gray-200"
               header={
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-950">Recommended for you</h2>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <h2 className="display text-3xl leading-none text-[var(--auc-ink)]">Recommended for you</h2>
+                    <p className="mt-2 text-sm text-[var(--auc-ink-2)]">
                       Ranked from your onboarding profile and available funding tags.
                     </p>
                   </div>
-                  <Link href={fundingHomeRoute} className="text-sm font-semibold text-gray-900 hover:underline">
+                  <Link href={fundingHomeRoute} className="text-sm font-black text-[var(--auc-ink)] hover:underline">
                     View all
                   </Link>
                 </div>
               }
             >
               {data.topMatches.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-gray-300 p-6 text-sm text-gray-600">
+                <div className="rounded-lg border border-dashed border-[var(--auc-rule-strong)] p-6 text-sm text-[var(--auc-ink-2)]">
                   No matches yet. Update your profile details to improve recommendations.
                 </div>
               ) : (
                 <ul className="space-y-3">
                   {data.topMatches.map((item) => (
-                    <li key={item.id} className="rounded-lg border border-gray-200 bg-white p-4">
+                    <li key={item.id} className="rounded-lg border border-[var(--auc-rule)] bg-white p-4">
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div className="min-w-0">
                           <Link
                             href={fundingHref(item)}
-                            className="text-lg font-semibold text-gray-950 hover:underline"
+                            className="text-lg font-black text-[var(--auc-ink)] hover:underline"
                           >
                             {item.name}
                           </Link>
-                          <p className="mt-1 text-sm text-gray-600">{item.provider}</p>
+                          <p className="mt-1 text-sm text-[var(--auc-muted)]">{item.provider}</p>
                           <div className="mt-3 flex flex-wrap gap-2">
                             <Badge variant={scoreVariant(item.match_score)}>
                               {item.match_score === null ? "Unscored" : `${item.match_score}% match`}
@@ -372,7 +371,7 @@ export default async function DashboardPage() {
                         </div>
                         <Link
                           href={fundingHref(item)}
-                          className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50"
+                          className="inline-flex shrink-0 items-center gap-2 rounded-full border-2 border-[var(--auc-ink)] px-3 py-2 text-sm font-black text-[var(--auc-ink)] hover:bg-[var(--auc-bg-warm)]"
                         >
                           Details
                           <ArrowUpRight className="h-4 w-4" />
@@ -385,31 +384,30 @@ export default async function DashboardPage() {
             </Card>
 
             <Card
-              className="border border-gray-200"
-              header={<h2 className="text-2xl font-bold text-gray-950">Deadline outlook</h2>}
+              header={<h2 className="display text-3xl leading-none text-[var(--auc-ink)]">Deadline outlook</h2>}
             >
               {data.upcomingDeadlines.length === 0 ? (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
-                    <p className="font-semibold text-gray-950">{NO_UPCOMING_DEADLINES_TEXT}</p>
-                    <p className="mt-2 text-sm text-gray-600">
+                    <p className="font-black text-[var(--auc-ink)]">{NO_UPCOMING_DEADLINES_TEXT}</p>
+                    <p className="mt-2 text-sm text-[var(--auc-ink-2)]">
                       Nothing in your track closes within the next {EXPIRING_DEADLINE_WINDOW_DAYS} days.
                     </p>
                   </div>
-                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
-                    <p className="text-sm font-medium text-gray-600">Next known deadlines</p>
+                  <div className="rounded-lg border border-[var(--auc-rule)] bg-[var(--auc-bg)] p-4">
+                    <p className="text-sm font-bold text-[var(--auc-ink-2)]">Next known deadlines</p>
                     {nextDeadlines.length === 0 ? (
-                      <p className="mt-2 text-sm text-gray-600">
+                      <p className="mt-2 text-sm text-[var(--auc-ink-2)]">
                         Most visible opportunities are rolling or do not publish a deadline.
                       </p>
                     ) : (
                       <ul className="mt-3 space-y-2">
                         {nextDeadlines.slice(0, 3).map(({ item, days }) => (
                           <li key={item.id} className="text-sm">
-                            <Link href={fundingHref(item)} className="font-medium text-gray-950 hover:underline">
+                            <Link href={fundingHref(item)} className="font-black text-[var(--auc-ink)] hover:underline">
                               {item.name}
                             </Link>
-                            <p className="text-gray-600">
+                            <p className="text-[var(--auc-ink-2)]">
                               {formatDate(item.deadline)} · {days === 0 ? "today" : `${days} days`}
                             </p>
                           </li>
@@ -421,12 +419,12 @@ export default async function DashboardPage() {
               ) : (
                 <ul className="grid gap-3 md:grid-cols-2">
                   {data.upcomingDeadlines.slice(0, 4).map((item) => (
-                    <li key={item.id} className="rounded-lg border border-orange-100 bg-orange-50/70 p-4">
-                      <Link href={fundingHref(item)} className="font-semibold text-gray-950 hover:underline">
+                    <li key={item.id} className="rounded-lg border border-[var(--auc-coral)] bg-[var(--auc-coral-soft)] p-4">
+                      <Link href={fundingHref(item)} className="font-black text-[var(--auc-ink)] hover:underline">
                         {item.name}
                       </Link>
-                      <p className="mt-1 text-sm text-gray-600">{item.provider}</p>
-                      <p className="mt-3 text-sm font-semibold text-orange-700">
+                      <p className="mt-1 text-sm text-[var(--auc-ink-2)]">{item.provider}</p>
+                      <p className="mt-3 text-sm font-black text-[#912f26]">
                         Due {formatDate(item.deadline)}
                       </p>
                     </li>
@@ -438,19 +436,18 @@ export default async function DashboardPage() {
 
           <aside className="space-y-6">
             <Card
-              className="border border-gray-200"
               header={
                 <div className="flex items-center gap-2">
-                  <UserRound className="h-5 w-5 text-gray-700" />
-                  <h2 className="text-xl font-bold text-gray-950">Matching profile</h2>
+                  <UserRound className="h-5 w-5 text-[var(--auc-ink)]" />
+                  <h2 className="display text-2xl leading-none text-[var(--auc-ink)]">Matching profile</h2>
                 </div>
               }
             >
               <dl className="space-y-3">
                 {profileHighlights.map(([label, value]) => (
-                  <div key={label} className="flex justify-between gap-4 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-                    <dt className="text-sm text-gray-600">{label}</dt>
-                    <dd className="max-w-44 text-right text-sm font-medium text-gray-950">{value}</dd>
+                  <div key={label} className="flex justify-between gap-4 border-b border-[var(--auc-rule)] pb-3 last:border-0 last:pb-0">
+                    <dt className="text-sm text-[var(--auc-ink-2)]">{label}</dt>
+                    <dd className="max-w-44 text-right text-sm font-black text-[var(--auc-ink)]">{value}</dd>
                   </div>
                 ))}
               </dl>
@@ -460,31 +457,30 @@ export default async function DashboardPage() {
             </Card>
 
             <Card
-              className="border border-gray-200"
               header={
                 <div className="flex items-center gap-2">
-                  <Building2 className="h-5 w-5 text-gray-700" />
-                  <h2 className="text-xl font-bold text-gray-950">Opportunity mix</h2>
+                  <Building2 className="h-5 w-5 text-[var(--auc-ink)]" />
+                  <h2 className="display text-2xl leading-none text-[var(--auc-ink)]">Opportunity mix</h2>
                 </div>
               }
             >
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-lg bg-gray-50 p-3">
-                  <p className="text-gray-600">With deadlines</p>
-                  <p className="mt-1 text-2xl font-bold text-gray-950">
+                <div className="rounded-lg bg-[var(--auc-bg)] p-3">
+                  <p className="text-[var(--auc-ink-2)]">With deadlines</p>
+                  <p className="display mt-1 text-3xl leading-none text-[var(--auc-ink)]">
                     {allRoleFunding.length - rollingCount}
                   </p>
                 </div>
-                <div className="rounded-lg bg-gray-50 p-3">
-                  <p className="text-gray-600">Rolling</p>
-                  <p className="mt-1 text-2xl font-bold text-gray-950">{rollingCount}</p>
+                <div className="rounded-lg bg-[var(--auc-bg)] p-3">
+                  <p className="text-[var(--auc-ink-2)]">Rolling</p>
+                  <p className="display mt-1 text-3xl leading-none text-[var(--auc-ink)]">{rollingCount}</p>
                 </div>
               </div>
               <div className="mt-4">
-                <p className="text-sm font-medium text-gray-700">Top tags in your track</p>
+                <p className="text-sm font-bold text-[var(--auc-ink)]">Top tags in your track</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {topTags.length === 0 ? (
-                    <span className="text-sm text-gray-600">No tags available yet.</span>
+                    <span className="text-sm text-[var(--auc-ink-2)]">No tags available yet.</span>
                   ) : (
                     topTags.map(([tag, count]) => (
                       <Badge key={tag} color="gray">
@@ -528,29 +524,28 @@ export default async function DashboardPage() {
             )}
 
             <Card
-              className="border border-gray-200"
               header={
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-gray-700" />
-                  <h2 className="text-xl font-bold text-gray-950">Forum activity</h2>
+                  <MessageSquare className="h-5 w-5 text-[var(--auc-ink)]" />
+                  <h2 className="display text-2xl leading-none text-[var(--auc-ink)]">Forum activity</h2>
                 </div>
               }
             >
               {data.recentThreads.length === 0 ? (
                 <div className="space-y-3">
-                  <p className="text-sm text-gray-600">No forum activity yet.</p>
-                  <Link href="/forum/new" className="text-sm font-semibold text-gray-900 hover:underline">
+                  <p className="text-sm text-[var(--auc-ink-2)]">No forum activity yet.</p>
+                  <Link href="/forum/new" className="text-sm font-black text-[var(--auc-ink)] hover:underline">
                     Start a thread
                   </Link>
                 </div>
               ) : (
                 <ul className="space-y-3">
                   {data.recentThreads.slice(0, 4).map((thread) => (
-                    <li key={thread.id} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-                      <Link href={`/forum/${thread.id}`} className="font-medium text-gray-950 hover:underline">
+                    <li key={thread.id} className="border-b border-[var(--auc-rule)] pb-3 last:border-0 last:pb-0">
+                      <Link href={`/forum/${thread.id}`} className="font-black text-[var(--auc-ink)] hover:underline">
                         {thread.title}
                       </Link>
-                      <p className="mt-1 text-xs text-gray-600">
+                      <p className="mt-1 text-xs text-[var(--auc-muted)]">
                         {thread.category} · {thread.reply_count} repl{thread.reply_count === 1 ? "y" : "ies"}
                       </p>
                     </li>

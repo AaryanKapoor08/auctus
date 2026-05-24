@@ -29,32 +29,36 @@ export default async function ForumPage({
   if (params.search) baseParams.set("search", params.search);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="auc-page min-h-screen pb-20">
+      <div className="auc-reference-section py-14">
+        <div className="mb-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900">Community forum</h1>
-            <p className="mt-2 text-lg text-gray-600">
-              Ask questions, share funding context, and coordinate with other members.
+            <div className="auc-label">04 · Forum</div>
+            <h1 className="display mt-3 text-6xl leading-[0.92] tracking-[-0.035em] md:text-8xl">Community forum</h1>
+            <p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--auc-ink-2)]">
+              Real notes from people who have applied. Compare reviewer feedback,
+              share templates, and tag the questions that actually got answered.
             </p>
           </div>
           <Link href="/forum/new">
-            <Button className="flex items-center gap-2">
-              <Plus className="h-5 w-5" />
-              New Thread
+            <Button className="gap-2 px-5 py-4">
+              New thread
+              <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--auc-lime)] text-[var(--auc-ink)]">
+                <Plus className="h-4 w-4" />
+              </span>
             </Button>
           </Link>
         </div>
 
-        <form className="mb-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <form className="auc-card-flat mb-4 p-4">
           <div className="flex flex-col gap-4 md:flex-row">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-[var(--auc-muted)]" />
               <input
                 name="search"
                 defaultValue={params.search}
-                placeholder="Search threads..."
-                className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Search threads, authors, tags..."
+                className="auc-field w-full py-2 pl-10 pr-4"
               />
               {params.category && (
                 <input type="hidden" name="category" value={params.category} />
@@ -70,10 +74,10 @@ export default async function ForumPage({
           <Link
             href={params.search ? `?${baseParams.toString()}` : "?"}
             className={cn(
-              "rounded-full border px-3 py-1.5 text-sm font-medium transition",
+              "rounded-full border-2 px-4 py-2 text-sm font-bold transition",
               !params.category
-                ? "border-gray-900 bg-gray-900 text-white"
-                : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
+                ? "border-[var(--auc-ink)] bg-[var(--auc-ink)] text-white"
+                : "border-[var(--auc-rule-strong)] bg-[var(--auc-paper)] text-[var(--auc-ink)] hover:bg-[var(--auc-bg-warm)]",
             )}
           >
             All
@@ -88,10 +92,10 @@ export default async function ForumPage({
                 key={category}
                 href={`?${query.toString()}`}
                 className={cn(
-                  "rounded-full border px-3 py-1.5 text-sm font-medium transition",
+                  "rounded-full border-2 px-4 py-2 text-sm font-bold transition",
                   active
-                    ? "border-gray-900 bg-gray-900 text-white shadow-sm"
-                    : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50",
+                    ? "border-[var(--auc-ink)] bg-[var(--auc-ink)] text-white"
+                    : "border-[var(--auc-rule-strong)] bg-[var(--auc-paper)] text-[var(--auc-ink)] hover:bg-[var(--auc-bg-warm)]",
                 )}
               >
                 {category}
@@ -101,7 +105,7 @@ export default async function ForumPage({
           {(params.search || params.category) && (
             <Link
               href="?"
-              className="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100"
+              className="mono inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[0.68rem] font-black uppercase tracking-[0.06em] text-[var(--auc-coral)]"
             >
               <X className="h-3.5 w-3.5" />
               Clear
@@ -110,7 +114,7 @@ export default async function ForumPage({
         </div>
 
         {threads.length > 0 ? (
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-4 lg:grid-cols-2">
             {threads.map((thread) => (
               <ThreadCard
                 key={thread.id}
@@ -130,10 +134,10 @@ export default async function ForumPage({
             ))}
           </div>
         ) : (
-          <div className="rounded-lg border border-gray-200 bg-white p-12 text-center">
-            <Search className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-            <h2 className="text-lg font-semibold text-gray-900">No threads found</h2>
-            <p className="mt-2 text-gray-600">
+          <div className="auc-card-flat border-dashed p-12 text-center">
+            <Search className="mx-auto mb-4 h-12 w-12 text-[var(--auc-muted)]" />
+            <h2 className="display text-3xl leading-tight text-[var(--auc-ink)]">No threads found</h2>
+            <p className="mt-3 text-[var(--auc-ink-2)]">
               Start a discussion or adjust the current filters.
             </p>
             <Link href="/forum/new" className="mt-6 inline-flex">

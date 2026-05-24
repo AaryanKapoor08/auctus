@@ -37,12 +37,12 @@ function SelectField({
   children: React.ReactNode;
 }) {
   return (
-    <label className="block text-sm font-medium text-gray-700">
+    <label className="block text-sm font-bold text-[var(--auc-ink)]">
       {label}
       <select
         name={name}
         required={required}
-        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+        className="auc-field mt-1 w-full px-3 py-2"
       >
         {children}
       </select>
@@ -207,13 +207,15 @@ export default async function OnboardingRolePage({ params, searchParams }: PageP
   const formError = getFormErrorMessage(error);
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="auc-page min-h-screen px-4 py-12">
+      <div className="mx-auto max-w-3xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-gray-900">{labels[role].title}</h1>
-        <p className="mt-2 text-gray-600">{labels[role].description}</p>
+        <div className="auc-label">Onboarding</div>
+        <h1 className="display mt-2 text-5xl leading-none md:text-6xl">{labels[role].title}</h1>
+        <p className="mt-4 text-lg leading-8 text-[var(--auc-ink-2)]">{labels[role].description}</p>
       </div>
 
-      <form action={completeOnboarding} className="rounded-lg border border-gray-200 bg-white p-6">
+      <form action={completeOnboarding} className="auc-card p-6">
         {formError && (
           <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {formError}
@@ -228,6 +230,7 @@ export default async function OnboardingRolePage({ params, searchParams }: PageP
           <Button type="submit">Complete onboarding</Button>
         </div>
       </form>
+      </div>
     </div>
   );
 }

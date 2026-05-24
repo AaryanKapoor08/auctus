@@ -32,10 +32,12 @@ export default async function OnboardingPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-12">
+    <div className="auc-page min-h-screen px-4 py-12">
+      <div className="mx-auto max-w-5xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-gray-900">Choose your role</h1>
-        <p className="mt-2 max-w-2xl text-gray-600">
+        <div className="auc-label">Onboarding</div>
+        <h1 className="display mt-2 text-5xl leading-none md:text-6xl">Choose your role</h1>
+        <p className="mt-4 max-w-2xl text-lg leading-8 text-[var(--auc-ink-2)]">
           Your role controls the onboarding questions and the funding routes available to you.
         </p>
       </div>
@@ -48,14 +50,15 @@ export default async function OnboardingPage() {
             <Link
               key={role.href}
               href={role.href}
-              className="rounded-lg border border-gray-200 bg-white p-6 transition hover:border-gray-900 hover:shadow-sm"
+              className="auc-card-flat auc-card-hover p-6 shadow-[3px_3px_0_var(--auc-ink)]"
             >
-              <Icon className="mb-4 h-8 w-8 text-gray-900" />
-              <h2 className="text-xl font-semibold text-gray-900">{role.title}</h2>
-              <p className="mt-2 text-sm text-gray-600">{role.description}</p>
+              <Icon className="mb-5 h-8 w-8 text-[var(--auc-ink)]" />
+              <h2 className="text-xl font-black text-[var(--auc-ink)]">{role.title}</h2>
+              <p className="mt-2 text-sm leading-6 text-[var(--auc-ink-2)]">{role.description}</p>
             </Link>
           );
         })}
+      </div>
       </div>
     </div>
   );

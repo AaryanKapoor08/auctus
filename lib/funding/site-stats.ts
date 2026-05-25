@@ -37,7 +37,7 @@ async function fetchActiveFundingFactRows(): Promise<FundingFactRow[]> {
   return rows;
 }
 
-async function loadFundingSiteStats(): Promise<FundingSiteStats> {
+export async function loadFundingSiteStats(): Promise<FundingSiteStats> {
   const rows = await fetchActiveFundingFactRows();
   return aggregateFundingFactRows(rows);
 }

@@ -6,6 +6,7 @@ import type {
   StudentProfile,
 } from "@contracts/profile";
 import { createClient } from "@/lib/supabase/server";
+import { timeServer } from "@/lib/perf/server-timing";
 
 type ProfileRow = OnboardedProfile & {
   role: "business" | "student" | "professor" | null;
@@ -25,7 +26,7 @@ function toBase(profile: PublicProfileRow, email: string): OnboardedProfile {
   };
 }
 
-export async function getRoleProfile(user_id: string): Promise<RoleProfile | null> {
+async function loadRoleProfile(user_id: string): Promise<RoleProfile | null> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -98,7 +99,11 @@ export async function getRoleProfile(user_id: string): Promise<RoleProfile | nul
   };
 }
 
-export async function getProfileMatchTags(user_id: string): Promise<string[]> {
+export async function getRoleProfile(user_id: string): Promise<RoleProfile | null> {
+  return timeServer("getRoleProfile", () => loadRoleProfile(user_id));
+}
+
+async function loadProfileMatchTags(user_id: string): Promise<string[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("profile_match_tags")
@@ -109,4 +114,8 @@ export async function getProfileMatchTags(user_id: string): Promise<string[]> {
   if (error) throw error;
 
   return data?.tags ?? [];
+}
+
+export async function getProfileMatchTags(user_id: string): Promise<string[]> {
+  return timeServer("getProfileMatchTags", () => loadProfileMatchTags(user_id));
 }

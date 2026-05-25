@@ -1,5 +1,6 @@
 import type { GetSession, Session } from "@contracts/session";
 import { createClient } from "@/lib/supabase/server";
+import { timeServer } from "@/lib/perf/server-timing";
 
 type SupabaseUser = {
   id: string;
@@ -21,7 +22,7 @@ export function mapSession(
   };
 }
 
-export const getSession: GetSession = async () => {
+async function loadSession() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -38,4 +39,8 @@ export const getSession: GetSession = async () => {
     .maybeSingle();
 
   return mapSession(user, profile);
+}
+
+export const getSession: GetSession = async () => {
+  return timeServer("getSession", loadSession);
 };

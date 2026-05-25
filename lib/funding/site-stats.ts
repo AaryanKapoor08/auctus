@@ -7,6 +7,7 @@ import {
   type FundingFactRow,
   type FundingSiteStats,
 } from "./site-stats-shared";
+import { timeServer } from "@/lib/perf/server-timing";
 
 const ACTIVE_FACT_COLUMNS =
   "type,provider,amount_min,amount_max,deadline,tags,scraped_from";
@@ -38,8 +39,10 @@ async function fetchActiveFundingFactRows(): Promise<FundingFactRow[]> {
 }
 
 export async function loadFundingSiteStats(): Promise<FundingSiteStats> {
-  const rows = await fetchActiveFundingFactRows();
-  return aggregateFundingFactRows(rows);
+  return timeServer("getFundingSiteStats", async () => {
+    const rows = await fetchActiveFundingFactRows();
+    return aggregateFundingFactRows(rows);
+  });
 }
 
 export const getFundingSiteStats = unstable_cache(

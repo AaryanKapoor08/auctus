@@ -13,6 +13,7 @@ import { getFundingTypeForRole } from "./role-mapping";
 import { scoreFor } from "@/lib/matching";
 import { getProfileMatchTags, getRoleProfile } from "@/lib/profile/queries";
 import { buildIlikeOrFilter } from "@/lib/supabase/postgrest-filters";
+import { timeServer } from "@/lib/perf/server-timing";
 
 const MAX_CATEGORY_FILTERS = 12;
 const SUMMARY_MATCH_CANDIDATE_LIMIT = 100;
@@ -43,85 +44,106 @@ function parseCategoryFilters(category: string | undefined) {
 export const ListFundingForRole: ListFundingForRoleContract = async (
   query: FundingQuery,
 ) => {
-  const supabase = await createFundingReadClient();
-  let request = supabase
-    .from("funding")
-    .select("*")
-    .eq("type", getFundingTypeForRole(query.role))
-    .eq("status", query.status ?? "active")
-    .order("created_at", { ascending: false });
+  return timeServer(
+    "ListFundingForRole",
+    async () => {
+      const supabase = await createFundingReadClient();
+      let request = supabase
+        .from("funding")
+        .select("*")
+        .eq("type", getFundingTypeForRole(query.role))
+        .eq("status", query.status ?? "active")
+        .order("created_at", { ascending: false });
 
-  for (const category of parseCategoryFilters(query.category)) {
-    request = request.contains("tags", [category]);
-  }
+      for (const category of parseCategoryFilters(query.category)) {
+        request = request.contains("tags", [category]);
+      }
 
-  if (query.search) {
-    const searchFilter = buildIlikeOrFilter(
-      ["name", "provider", "description"],
-      query.search,
-    );
+      if (query.search) {
+        const searchFilter = buildIlikeOrFilter(
+          ["name", "provider", "description"],
+          query.search,
+        );
 
-    if (searchFilter) {
-      request = request.or(searchFilter);
-    }
-  }
+        if (searchFilter) {
+          request = request.or(searchFilter);
+        }
+      }
 
-  if (query.limit) {
-    const offset = query.offset ?? 0;
-    request = request.range(offset, offset + query.limit - 1);
-  }
+      if (query.limit) {
+        const offset = query.offset ?? 0;
+        request = request.range(offset, offset + query.limit - 1);
+      }
 
-  const { data, error } = await request;
+      const { data, error } = await request;
 
-  if (error) throw error;
+      if (error) throw error;
 
-  return (data ?? []) as FundingItem[];
+      return (data ?? []) as FundingItem[];
+    },
+    {
+      role: query.role,
+      limit: query.limit ?? "all",
+      hasSearch: Boolean(query.search),
+      hasCategory: Boolean(query.category),
+    },
+  );
 };
 
 export const GetFundingById: GetFundingByIdContract = async (id) => {
-  const supabase = await createFundingReadClient();
-  const { data, error } = await supabase
-    .from("funding")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  return timeServer("GetFundingById", async () => {
+    const supabase = await createFundingReadClient();
+    const { data, error } = await supabase
+      .from("funding")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
 
-  if (error) throw error;
+    if (error) throw error;
 
-  return data as FundingItem | null;
+    return data as FundingItem | null;
+  });
 };
 
 export const GetFundingSummariesForUser: GetFundingSummariesForUserContract = async (
   user_id,
   limit = 5,
 ) => {
-  const roleProfile = await getRoleProfile(user_id);
+  return timeServer(
+    "GetFundingSummariesForUser",
+    async () => {
+      const roleProfile = await getRoleProfile(user_id);
 
-  if (!roleProfile) {
-    const supabase = await createFundingReadClient();
-    const { data, error } = await supabase
-      .from("funding")
-      .select("*")
-      .eq("status", "active")
-      .order("created_at", { ascending: false })
-      .limit(limit);
+      if (!roleProfile) {
+        const supabase = await createFundingReadClient();
+        const { data, error } = await supabase
+          .from("funding")
+          .select("*")
+          .eq("status", "active")
+          .order("created_at", { ascending: false })
+          .limit(limit);
 
-    if (error) throw error;
+        if (error) throw error;
 
-    return ((data ?? []) as FundingItem[]).map((item) =>
-      toFundingSummary(item),
-    );
-  }
+        return ((data ?? []) as FundingItem[]).map((item) =>
+          toFundingSummary(item),
+        );
+      }
 
-  const items = await ListFundingForRole({
-    role: roleProfile.role,
-    status: "active",
-    limit: Math.max(limit, SUMMARY_MATCH_CANDIDATE_LIMIT),
-  });
-  const profileTags = await getProfileMatchTags(user_id);
+      const items = await ListFundingForRole({
+        role: roleProfile.role,
+        status: "active",
+        limit: Math.max(limit, SUMMARY_MATCH_CANDIDATE_LIMIT),
+      });
+      const profileTags = await getProfileMatchTags(user_id);
 
-  return items
-    .map((item) => toFundingSummary(item, scoreFor(roleProfile, item, profileTags)))
-    .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0))
-    .slice(0, limit);
+      return items
+        .map((item) =>
+          toFundingSummary(item, scoreFor(roleProfile, item, profileTags)),
+        )
+        .sort((a, b) => (b.match_score ?? 0) - (a.match_score ?? 0))
+        .slice(0, limit);
+    },
+    { limit },
+  );
 };

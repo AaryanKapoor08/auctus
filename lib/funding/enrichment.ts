@@ -5,6 +5,7 @@ import { COMBINED_PROMPT_VERSION, SCHEMA_VERSIONS, type AiTaskType } from "@/lib
 import { createFundingReadClient } from "./supabase";
 import { getFundingTypeForRole } from "./role-mapping";
 import type { FundingItem } from "@contracts/funding";
+import { timeServer } from "@/lib/perf/server-timing";
 
 export interface FundingTaskEnrichment {
   funding_id: string;
@@ -239,22 +240,28 @@ export async function getFundingRadarForRole(
   role: Role,
   options: { asOf?: Date } = {},
 ): Promise<FundingRadar> {
-  const supabase = await createFundingReadClient();
-  const { data, error } = await supabase
-    .from("funding")
-    .select("*")
-    .eq("status", "active")
-    .eq("type", getFundingTypeForRole(role))
-    .limit(500);
+  return timeServer(
+    "getFundingRadarForRole",
+    async () => {
+      const supabase = await createFundingReadClient();
+      const { data, error } = await supabase
+        .from("funding")
+        .select("*")
+        .eq("status", "active")
+        .eq("type", getFundingTypeForRole(role))
+        .limit(500);
 
-  if (error) throw error;
-  const items = (data ?? []) as FundingItem[];
-  const enrichmentByFundingId = await getEnrichmentForFundingIds(
-    items.map((item) => item.id),
+      if (error) throw error;
+      const items = (data ?? []) as FundingItem[];
+      const enrichmentByFundingId = await getEnrichmentForFundingIds(
+        items.map((item) => item.id),
+      );
+      return buildFundingRadar({
+        items,
+        enrichmentByFundingId,
+        asOf: options.asOf ?? new Date(),
+      });
+    },
+    { role },
   );
-  return buildFundingRadar({
-    items,
-    enrichmentByFundingId,
-    asOf: options.asOf ?? new Date(),
-  });
 }

@@ -5,6 +5,7 @@ import type { Role } from "@contracts/role";
 import { createClient } from "@/lib/supabase/server";
 import { getSession } from "@/lib/session/get-session";
 import { buildIlikeOrFilter } from "@/lib/supabase/postgrest-filters";
+import { timeServer } from "@/lib/perf/server-timing";
 
 export const FORUM_CATEGORIES = [
   "Funding",
@@ -139,38 +140,44 @@ export async function listThreads({
   search?: string;
   limit?: number;
 } = {}): Promise<ForumThread[]> {
-  const supabase = await createClient();
-  let request = supabase
-    .from("threads")
-    .select(
-      "id,title,content,category,tags,created_at,updated_at,author:profiles!threads_author_id_fkey(id,display_name,role),replies(count)",
-    )
-    .order("created_at", { ascending: false });
+  return timeServer(
+    "listThreads",
+    async () => {
+      const supabase = await createClient();
+      let request = supabase
+        .from("threads")
+        .select(
+          "id,title,content,category,tags,created_at,updated_at,author:profiles!threads_author_id_fkey(id,display_name,role),replies(count)",
+        )
+        .order("created_at", { ascending: false });
 
-  if (category && category !== "All") {
-    request = request.eq("category", category);
-  }
+      if (category && category !== "All") {
+        request = request.eq("category", category);
+      }
 
-  if (search) {
-    const searchFilter = buildIlikeOrFilter(
-      ["title", "content", "category"],
-      search,
-    );
+      if (search) {
+        const searchFilter = buildIlikeOrFilter(
+          ["title", "content", "category"],
+          search,
+        );
 
-    if (searchFilter) {
-      request = request.or(searchFilter);
-    }
-  }
+        if (searchFilter) {
+          request = request.or(searchFilter);
+        }
+      }
 
-  if (limit) {
-    request = request.limit(limit);
-  }
+      if (limit) {
+        request = request.limit(limit);
+      }
 
-  const { data, error } = await request;
+      const { data, error } = await request;
 
-  if (error) throw error;
+      if (error) throw error;
 
-  return ((data ?? []) as ThreadRow[]).map(mapThread);
+      return ((data ?? []) as ThreadRow[]).map(mapThread);
+    },
+    { limit: limit ?? "all", hasSearch: Boolean(search), hasCategory: Boolean(category) },
+  );
 }
 
 export async function getThread(threadId: string): Promise<{

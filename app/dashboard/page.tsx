@@ -24,6 +24,8 @@ import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { getSession } from "@/lib/session/get-session";
 import { GetFundingSummariesForUser, ListFundingForRole } from "@/lib/funding/queries";
+import { getFundingSiteStats } from "@/lib/funding/site-stats";
+import { getFundingTypeForRole } from "@/lib/funding/role-mapping";
 import { getFundingRadarForRole } from "@/lib/funding/enrichment";
 import { listThreads } from "@/lib/forum/queries";
 import {
@@ -126,18 +128,6 @@ function daysUntil(deadline: string | null, asOf: Date): number | null {
   return Math.ceil((due - start) / (24 * 60 * 60 * 1000));
 }
 
-function getTopTags(items: FundingItem[], limit = 6) {
-  const counts = new Map<string, number>();
-  for (const item of items) {
-    for (const tag of item.tags ?? []) {
-      counts.set(tag, (counts.get(tag) ?? 0) + 1);
-    }
-  }
-  return [...counts.entries()]
-    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-    .slice(0, limit);
-}
-
 function getProfileHighlights(roleProfile: RoleProfile | null): Array<[string, string]> {
   if (!roleProfile) return [];
 
@@ -173,10 +163,16 @@ function getProfileHighlights(roleProfile: RoleProfile | null): Array<[string, s
   ];
 }
 
-function getNextDeadlines(items: FundingItem[], asOf: Date, limit = 4) {
+function getNextDeadlines(
+  items: FundingItem[],
+  asOf: Date,
+  limit = 4,
+  windowDays?: number,
+) {
   return items
     .map((item) => ({ item, days: daysUntil(item.deadline, asOf) }))
     .filter((entry): entry is { item: FundingItem; days: number } => entry.days !== null && entry.days >= 0)
+    .filter((entry) => windowDays === undefined || entry.days <= windowDays)
     .sort((a, b) => a.days - b.days)
     .slice(0, limit);
 }
@@ -218,12 +214,20 @@ export default async function DashboardPage() {
   }
 
   const asOf = new Date();
-  const [fundingSummaries, allRoleFunding, threads, roleProfile, fundingRadar] = await Promise.all([
+  const [
+    fundingSummaries,
+    allRoleFunding,
+    threads,
+    roleProfile,
+    fundingRadar,
+    fundingStats,
+  ] = await Promise.all([
     GetFundingSummariesForUser(session.user_id, FUNDING_CANDIDATE_LIMIT),
     ListFundingForRole({ role: session.role, status: "active", limit: FUNDING_INVENTORY_LIMIT }),
     listThreads({ limit: 5 }),
     getRoleProfile(session.user_id),
     getFundingRadarForRole(session.role, { asOf }),
+    getFundingSiteStats(),
   ]);
 
   const data = composeDashboard({
@@ -234,6 +238,7 @@ export default async function DashboardPage() {
   });
 
   const fundingHomeRoute = ROLE_DEFAULT_ROUTE[session.role];
+  const roleFundingType = getFundingTypeForRole(session.role);
   const roleCopy = ROLE_DASHBOARD[session.role];
   const RoleIcon = roleCopy.icon;
   const displayName = roleProfile?.base.display_name ?? session.role;
@@ -245,13 +250,18 @@ export default async function DashboardPage() {
   }).format(asOf);
   const strongMatches = fundingSummaries.filter((item) => (item.match_score ?? 0) >= 45);
   const bestScore = fundingSummaries[0]?.match_score;
-  const maxAmount = allRoleFunding.reduce<number | null>((max, item) => {
-    if (item.amount_max === null) return max;
-    return max === null ? item.amount_max : Math.max(max, item.amount_max);
-  }, null);
-  const rollingCount = allRoleFunding.filter((item) => item.deadline === null).length;
-  const nextDeadlines = getNextDeadlines(allRoleFunding, asOf);
-  const topTags = getTopTags(allRoleFunding);
+  const trackCount = fundingStats.byType[roleFundingType];
+  const maxAmount = fundingStats.maxListedAmountByType[roleFundingType];
+  const rollingCount = fundingStats.rollingByType[roleFundingType];
+  const deadlineCount = fundingStats.withDeadlinesByType[roleFundingType];
+  const upcoming30Count = fundingStats.upcoming30ByType[roleFundingType];
+  const nextDeadlines = getNextDeadlines(
+    allRoleFunding,
+    asOf,
+    4,
+    EXPIRING_DEADLINE_WINDOW_DAYS,
+  );
+  const trackTags = fundingStats.topTagsByType[roleFundingType];
   const profileHighlights = getProfileHighlights(roleProfile);
 
   return (
@@ -277,7 +287,7 @@ export default async function DashboardPage() {
                 </span>
                 <span className="inline-flex items-center gap-2">
                   <ListChecks className="h-4 w-4" />
-                  {allRoleFunding.length} opportunities in your track
+                  {trackCount} opportunities in your track
                 </span>
               </div>
             </div>
@@ -310,14 +320,14 @@ export default async function DashboardPage() {
           <StatCard
             icon={BookOpen}
             label={roleCopy.inventoryLabel}
-            value={String(allRoleFunding.length)}
+            value={String(trackCount)}
             detail={`${rollingCount} rolling or ongoing`}
           />
           <StatCard
             icon={Clock3}
             label="30-day deadlines"
-            value={String(data.upcomingDeadlines.length)}
-            detail={`${nextDeadlines.length} nearest deadlines tracked`}
+            value={String(upcoming30Count)}
+            detail="Across all active records"
           />
           <StatCard
             icon={DollarSign}
@@ -386,7 +396,7 @@ export default async function DashboardPage() {
             <Card
               header={<h2 className="display text-3xl leading-none text-[var(--auc-ink)]">Deadline outlook</h2>}
             >
-              {data.upcomingDeadlines.length === 0 ? (
+              {upcoming30Count === 0 ? (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div>
                     <p className="font-black text-[var(--auc-ink)]">{NO_UPCOMING_DEADLINES_TEXT}</p>
@@ -417,19 +427,30 @@ export default async function DashboardPage() {
                   </div>
                 </div>
               ) : (
-                <ul className="grid gap-3 md:grid-cols-2">
-                  {data.upcomingDeadlines.slice(0, 4).map((item) => (
-                    <li key={item.id} className="rounded-lg border border-[var(--auc-coral)] bg-[var(--auc-coral-soft)] p-4">
-                      <Link href={fundingHref(item)} className="font-black text-[var(--auc-ink)] hover:underline">
-                        {item.name}
-                      </Link>
-                      <p className="mt-1 text-sm text-[var(--auc-ink-2)]">{item.provider}</p>
-                      <p className="mt-3 text-sm font-black text-[#912f26]">
-                        Due {formatDate(item.deadline)}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
+                <div>
+                  <p className="mb-3 text-sm text-[var(--auc-ink-2)]">
+                    {upcoming30Count} active opportunit{upcoming30Count === 1 ? "y" : "ies"} close within the next {EXPIRING_DEADLINE_WINDOW_DAYS} days.
+                  </p>
+                  {nextDeadlines.length === 0 ? (
+                    <Link href={fundingHomeRoute} className="font-black text-[var(--auc-ink)] hover:underline">
+                      Open the browser to review current deadlines.
+                    </Link>
+                  ) : (
+                    <ul className="grid gap-3 md:grid-cols-2">
+                      {nextDeadlines.map(({ item, days }) => (
+                        <li key={item.id} className="rounded-lg border border-[var(--auc-coral)] bg-[var(--auc-coral-soft)] p-4">
+                          <Link href={fundingHref(item)} className="font-black text-[var(--auc-ink)] hover:underline">
+                            {item.name}
+                          </Link>
+                          <p className="mt-1 text-sm text-[var(--auc-ink-2)]">{item.provider}</p>
+                          <p className="mt-3 text-sm font-black text-[#912f26]">
+                            Due {formatDate(item.deadline)} · {days === 0 ? "today" : `${days} days`}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               )}
             </Card>
           </section>
@@ -468,7 +489,7 @@ export default async function DashboardPage() {
                 <div className="rounded-lg bg-[var(--auc-bg)] p-3">
                   <p className="text-[var(--auc-ink-2)]">With deadlines</p>
                   <p className="display mt-1 text-3xl leading-none text-[var(--auc-ink)]">
-                    {allRoleFunding.length - rollingCount}
+                    {deadlineCount}
                   </p>
                 </div>
                 <div className="rounded-lg bg-[var(--auc-bg)] p-3">
@@ -477,14 +498,14 @@ export default async function DashboardPage() {
                 </div>
               </div>
               <div className="mt-4">
-                <p className="text-sm font-bold text-[var(--auc-ink)]">Top tags in your track</p>
+                <p className="text-sm font-bold text-[var(--auc-ink)]">Common live tags</p>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {topTags.length === 0 ? (
+                  {trackTags.length === 0 ? (
                     <span className="text-sm text-[var(--auc-ink-2)]">No tags available yet.</span>
                   ) : (
-                    topTags.map(([tag, count]) => (
+                    trackTags.map((tag) => (
                       <Badge key={tag} color="gray">
-                        {tag} · {count}
+                        {tag}
                       </Badge>
                     ))
                   )}

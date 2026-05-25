@@ -17,29 +17,19 @@ import {
   UserRound,
 } from "lucide-react";
 import { ROLE_DEFAULT_ROUTE, type Role } from "@contracts/role";
-import type { FundingItem, FundingSummary } from "@contracts/funding";
+import type { FundingSummary } from "@contracts/funding";
 import type { RoleProfile } from "@contracts/profile";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
-import { getSession } from "@/lib/session/get-session";
-import { GetFundingSummariesForUser, ListFundingForRole } from "@/lib/funding/queries";
-import { getFundingSiteStats } from "@/lib/funding/site-stats";
 import { getFundingTypeForRole } from "@/lib/funding/role-mapping";
-import { getFundingRadarForRole } from "@/lib/funding/enrichment";
-import { listThreads } from "@/lib/forum/queries";
 import {
   EXPIRING_DEADLINE_WINDOW_DAYS,
   NO_UPCOMING_DEADLINES_TEXT,
-  composeDashboard,
 } from "@/lib/dashboard/composer";
-import { getRoleProfile } from "@/lib/profile/queries";
+import { loadDashboard } from "@/lib/dashboard/load-dashboard";
 
 export const dynamic = "force-dynamic";
-
-const TOP_MATCHES_LIMIT = 6;
-const FUNDING_CANDIDATE_LIMIT = 80;
-const FUNDING_INVENTORY_LIMIT = 200;
 
 const ROLE_DASHBOARD: Record<
   Role,
@@ -163,20 +153,6 @@ function getProfileHighlights(roleProfile: RoleProfile | null): Array<[string, s
   ];
 }
 
-function getNextDeadlines(
-  items: FundingItem[],
-  asOf: Date,
-  limit = 4,
-  windowDays?: number,
-) {
-  return items
-    .map((item) => ({ item, days: daysUntil(item.deadline, asOf) }))
-    .filter((entry): entry is { item: FundingItem; days: number } => entry.days !== null && entry.days >= 0)
-    .filter((entry) => windowDays === undefined || entry.days <= windowDays)
-    .sort((a, b) => a.days - b.days)
-    .slice(0, limit);
-}
-
 function StatCard({
   icon: Icon,
   label,
@@ -205,38 +181,23 @@ function StatCard({
 }
 
 export default async function DashboardPage() {
-  const session = await getSession();
-  if (!session) {
+  const loaded = await loadDashboard();
+  if (loaded.status === "signed_out") {
     redirect("/sign-in");
   }
-  if (!session.role) {
+  if (loaded.status === "needs_onboarding") {
     redirect("/onboarding");
   }
 
-  const asOf = new Date();
-  const [
+  const {
+    session,
+    asOf,
     fundingSummaries,
-    allRoleFunding,
-    threads,
     roleProfile,
     fundingRadar,
     fundingStats,
-  ] = await Promise.all([
-    GetFundingSummariesForUser(session.user_id, FUNDING_CANDIDATE_LIMIT),
-    ListFundingForRole({ role: session.role, status: "active", limit: FUNDING_INVENTORY_LIMIT }),
-    listThreads({ limit: 5 }),
-    getRoleProfile(session.user_id),
-    getFundingRadarForRole(session.role, { asOf }),
-    getFundingSiteStats(),
-  ]);
-
-  const data = composeDashboard({
-    topMatches: fundingSummaries.slice(0, TOP_MATCHES_LIMIT),
-    candidateDeadlines: fundingSummaries,
-    threads,
-    asOf,
-  });
-
+    data,
+  } = loaded;
   const fundingHomeRoute = ROLE_DEFAULT_ROUTE[session.role];
   const roleFundingType = getFundingTypeForRole(session.role);
   const roleCopy = ROLE_DASHBOARD[session.role];
@@ -255,12 +216,10 @@ export default async function DashboardPage() {
   const rollingCount = fundingStats.rollingByType[roleFundingType];
   const deadlineCount = fundingStats.withDeadlinesByType[roleFundingType];
   const upcoming30Count = fundingStats.upcoming30ByType[roleFundingType];
-  const nextDeadlines = getNextDeadlines(
-    allRoleFunding,
-    asOf,
-    4,
-    EXPIRING_DEADLINE_WINDOW_DAYS,
-  );
+  const nextDeadlines = data.upcomingDeadlines
+    .map((item) => ({ item, days: daysUntil(item.deadline, asOf) }))
+    .filter((entry): entry is { item: FundingSummary; days: number } => entry.days !== null)
+    .slice(0, 4);
   const trackTags = fundingStats.topTagsByType[roleFundingType];
   const profileHighlights = getProfileHighlights(roleProfile);
 

@@ -4,6 +4,7 @@ import {
   findPolicy,
   resolveRouteDecision,
 } from "@/lib/auth/route-policies";
+import { fundingPolicies } from "@/lib/funding/route-policies";
 import type { RoutePolicyRegistry } from "@contracts/route-policy";
 
 const registry: RoutePolicyRegistry = combineRegistries(
@@ -12,8 +13,8 @@ const registry: RoutePolicyRegistry = combineRegistries(
     { path: "/dashboard", allowed_roles: null, require_auth: true },
     { path: "/onboarding", allowed_roles: null, require_auth: true },
   ],
+  fundingPolicies,
   [
-    { path: "/grants", allowed_roles: null, require_auth: false },
     { path: "/forum/new", allowed_roles: null, require_auth: true },
     { path: "/forum", allowed_roles: null, require_auth: false },
   ],
@@ -55,10 +56,14 @@ describe("route policies", () => {
     });
   });
 
-  it("allows signed-in users to browse other funding categories", () => {
+  it("redirects onboarded users away from wrong funding categories", () => {
     expect(resolveRouteDecision("/grants", "student", true, registry)).toEqual({
-      action: "allow",
+      action: "redirect",
+      location: "/scholarships",
     });
+    expect(
+      resolveRouteDecision("/research-funding", "business", true, registry),
+    ).toEqual({ action: "redirect", location: "/grants" });
   });
 
   it("allows null-role users to browse public funding before onboarding", () => {

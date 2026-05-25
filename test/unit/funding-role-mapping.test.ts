@@ -24,13 +24,13 @@ describe("funding role mapping", () => {
     });
   });
 
-  it("registers public funding browsing policies", () => {
+  it("registers public funding browsing policies with signed-in role scoping", () => {
     expect(fundingPolicies).toEqual([
-      { path: "/grants", allowed_roles: null, require_auth: false },
-      { path: "/scholarships", allowed_roles: null, require_auth: false },
+      { path: "/grants", allowed_roles: ["business"], require_auth: false },
+      { path: "/scholarships", allowed_roles: ["student"], require_auth: false },
       {
         path: "/research-funding",
-        allowed_roles: null,
+        allowed_roles: ["professor"],
         require_auth: false,
       },
     ]);

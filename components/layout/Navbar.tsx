@@ -9,25 +9,12 @@ import MarqueeBelt from "@/components/layout/MarqueeBelt";
 import { cn } from "@/lib/utils";
 import type { Session } from "@contracts/session";
 import { createClient } from "@/lib/supabase/client";
+import { getNavLinksForSession } from "@/lib/session/navigation";
 
 type NavProfile = {
   display_name: string | null;
   avatar_url: string | null;
 };
-
-function navForSession(session: Session | null) {
-  const links = [
-    { name: "Grants", href: "/grants" },
-    { name: "Scholarships", href: "/scholarships" },
-    { name: "Research", href: "/research-funding" },
-    { name: "Forum", href: "/forum" },
-  ];
-
-  if (!session) return links;
-  return session.role
-    ? [{ name: "Dashboard", href: "/dashboard" }, ...links]
-    : [...links, { name: "Onboarding", href: "/onboarding" }];
-}
 
 function getInitials(profile: NavProfile | null, session: Session | null) {
   const source = profile?.display_name || session?.role || "Auctus";
@@ -54,7 +41,7 @@ export default function Navbar({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [profile, setProfile] = useState<NavProfile | null>(null);
-  const links = navForSession(session);
+  const links = getNavLinksForSession(session);
 
   useEffect(() => {
     let mounted = true;

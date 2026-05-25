@@ -48,8 +48,8 @@ describe("funding semantic search helpers", () => {
   it("wires server-side semantic rankings into every funding browser", () => {
     for (const source of fundingPageSources) {
       expect(source).toContain("getSemanticSearchRankingForRole");
-      expect(source).toContain("rankFundingItemsBySemanticIds");
-      expect(source).toContain("semanticRankedIds=");
+      expect(source).toContain("ListFundingPageForRole");
+      expect(source).toContain("semanticRankedIds:");
     }
   });
 });

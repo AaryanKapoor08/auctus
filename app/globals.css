@@ -269,8 +269,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .auc-hero-title {
-  font-size: clamp(5.4rem, 15.4vw, 13.75rem);
-  letter-spacing: -0.045em;
+  font-size: clamp(4.05rem, 11.55vw, 10.3125rem);
+  letter-spacing: 0;
   line-height: 0.86;
 }
 
@@ -374,8 +374,8 @@ html {
   }
 
   .auc-hero-title {
-    font-size: clamp(4.8rem, 24vw, 7.5rem);
-    letter-spacing: -0.05em;
+    font-size: clamp(3.6rem, 18vw, 5.625rem);
+    letter-spacing: 0;
     line-height: 0.84;
   }
 

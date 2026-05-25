@@ -339,7 +339,7 @@ export default async function Home() {
             <SectionLabel>Section 02 · Entry points</SectionLabel>
             <h2 className="display auc-section-title">Pick a lane.</h2>
           </div>
-          <p className="max-w-sm text-sm leading-6 text-[var(--auc-muted)]">
+          <p className="max-w-md text-base font-black leading-7 text-[var(--auc-ink)] md:text-lg">
             Each lane uses real records with role-specific tags, filters and detail pages.
           </p>
         </div>

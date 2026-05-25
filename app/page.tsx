@@ -247,7 +247,7 @@ export default async function Home() {
               <b className="text-[var(--auc-ink)]">
                 {totalOpportunities.toLocaleString("en-CA")} open opportunities
               </b>{" "}
-              from real Canadian funding sources — then lets your profile sharpen the list.
+              from real Canadian funding sources and then lets your profile sharpen the list.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link

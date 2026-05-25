@@ -1,12 +1,12 @@
-import type { FundingItem } from "@contracts/funding";
 import type { ProfessorProfile } from "@contracts/profile";
+import type { MatchableFundingItem } from "./types";
 import {
   clampScore,
   includesValue,
   itemHasText,
 } from "./utils";
 
-function scoreResearchArea(profile: ProfessorProfile, item: FundingItem) {
+function scoreResearchArea(profile: ProfessorProfile, item: MatchableFundingItem) {
   if (!profile.research_area) return 0;
   if (includesValue(item.eligibility.research_area, profile.research_area)) {
     return 30;
@@ -15,12 +15,12 @@ function scoreResearchArea(profile: ProfessorProfile, item: FundingItem) {
   return itemHasText(item, profile.research_area) ? 30 : 0;
 }
 
-function scoreCareerStage(profile: ProfessorProfile, item: FundingItem) {
+function scoreCareerStage(profile: ProfessorProfile, item: MatchableFundingItem) {
   if (!profile.career_stage) return 0;
   return includesValue(item.eligibility.career_stage, profile.career_stage) ? 25 : 0;
 }
 
-function scoreCouncil(profile: ProfessorProfile, item: FundingItem) {
+function scoreCouncil(profile: ProfessorProfile, item: MatchableFundingItem) {
   const council = item.eligibility.council;
   if (!council) return 0;
 
@@ -29,19 +29,22 @@ function scoreCouncil(profile: ProfessorProfile, item: FundingItem) {
     : 0;
 }
 
-function scoreInstitution(profile: ProfessorProfile, item: FundingItem) {
+function scoreInstitution(profile: ProfessorProfile, item: MatchableFundingItem) {
   if (!profile.institution) return 0;
   if (includesValue(item.eligibility.institution, profile.institution)) return 15;
 
   return itemHasText(item, profile.institution) ? 15 : 0;
 }
 
-function scorePastFunding(profile: ProfessorProfile, item: FundingItem) {
+function scorePastFunding(profile: ProfessorProfile, item: MatchableFundingItem) {
   if (!item.eligibility.past_funding_required) return 10;
   return profile.h_index !== null && profile.h_index > 0 ? 10 : 0;
 }
 
-export function scoreResearchGrant(profile: ProfessorProfile, item: FundingItem) {
+export function scoreResearchGrant(
+  profile: ProfessorProfile,
+  item: MatchableFundingItem,
+) {
   if (item.type !== "research_grant") return 0;
 
   return clampScore(

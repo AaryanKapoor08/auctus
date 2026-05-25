@@ -1,14 +1,14 @@
-import type { FundingItem } from "@contracts/funding";
 import type { RoleProfile } from "@contracts/profile";
 import { scoreBusinessGrant } from "./business";
 import { scoreResearchGrant } from "./professor";
 import { scoreScholarship } from "./student";
+import type { MatchableFundingItem } from "./types";
 
 export { scoreBusinessGrant } from "./business";
 export { scoreResearchGrant } from "./professor";
 export { scoreScholarship } from "./student";
 
-function tagBoost(profileTags: string[], item: FundingItem) {
+function tagBoost(profileTags: string[], item: MatchableFundingItem) {
   if (profileTags.length === 0 || item.tags.length === 0) {
     return 0;
   }
@@ -21,7 +21,7 @@ function tagBoost(profileTags: string[], item: FundingItem) {
 
 export function scoreFor(
   roleProfile: RoleProfile,
-  item: FundingItem,
+  item: MatchableFundingItem,
   profileTags: string[] = [],
 ) {
   const boost = tagBoost(profileTags, item);

@@ -1,5 +1,5 @@
-import type { FundingItem } from "@contracts/funding";
 import type { BusinessProfile } from "@contracts/profile";
+import type { MatchableFundingItem } from "./types";
 import {
   clampScore,
   includesValue,
@@ -10,7 +10,7 @@ import {
 
 const atlanticProvinces = new Set(["nb", "ns", "pe", "pei", "nl", "new brunswick"]);
 
-function scoreLocation(profile: BusinessProfile, item: FundingItem) {
+function scoreLocation(profile: BusinessProfile, item: MatchableFundingItem) {
   const location = text(profile.location);
   const eligibility = item.eligibility;
 
@@ -24,7 +24,7 @@ function scoreLocation(profile: BusinessProfile, item: FundingItem) {
   return itemHasText(item, location) ? 25 : 0;
 }
 
-function scoreRevenue(profile: BusinessProfile, item: FundingItem) {
+function scoreRevenue(profile: BusinessProfile, item: MatchableFundingItem) {
   const eligibility = item.eligibility;
   return numberInRange(
     profile.revenue,
@@ -35,7 +35,7 @@ function scoreRevenue(profile: BusinessProfile, item: FundingItem) {
     : 0;
 }
 
-function scoreEmployees(profile: BusinessProfile, item: FundingItem) {
+function scoreEmployees(profile: BusinessProfile, item: MatchableFundingItem) {
   const eligibility = item.eligibility;
   return numberInRange(
     profile.employees,
@@ -46,7 +46,7 @@ function scoreEmployees(profile: BusinessProfile, item: FundingItem) {
     : 0;
 }
 
-function scoreIndustry(profile: BusinessProfile, item: FundingItem) {
+function scoreIndustry(profile: BusinessProfile, item: MatchableFundingItem) {
   const industry = profile.industry;
   if (!industry) return 0;
 
@@ -55,7 +55,10 @@ function scoreIndustry(profile: BusinessProfile, item: FundingItem) {
   return itemHasText(item, industry) ? 30 : 0;
 }
 
-export function scoreBusinessGrant(profile: BusinessProfile, item: FundingItem) {
+export function scoreBusinessGrant(
+  profile: BusinessProfile,
+  item: MatchableFundingItem,
+) {
   if (item.type !== "business_grant") return 0;
 
   return clampScore(

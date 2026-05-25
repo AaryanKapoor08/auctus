@@ -52,6 +52,10 @@ const summaryBundle: FundingEnrichmentBundle = {
   },
 };
 
+const dashboardLoaderSource = readFileSync(
+  join(process.cwd(), "lib/dashboard/load-dashboard.ts"),
+  "utf8",
+);
 const dashboardPageSource = readFileSync(
   join(process.cwd(), "app/dashboard/page.tsx"),
   "utf8",
@@ -91,7 +95,7 @@ describe("dashboard funding radar", () => {
   });
 
   it("wires coverage-gated radar into the dashboard page", () => {
-    expect(dashboardPageSource).toContain("getFundingRadarForRole");
+    expect(dashboardLoaderSource).toContain("getFundingRadarForRole");
     expect(dashboardPageSource).toContain("fundingRadar.insights.length > 0");
     expect(dashboardPageSource).toContain("Funding radar");
   });

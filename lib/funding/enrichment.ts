@@ -7,6 +7,11 @@ import { getFundingTypeForRole } from "./role-mapping";
 import type { FundingItem } from "@contracts/funding";
 import { timeServer } from "@/lib/perf/server-timing";
 
+type FundingRadarItem = Pick<
+  FundingItem,
+  "id" | "status" | "amount_max" | "deadline" | "created_at" | "updated_at"
+>;
+
 export interface FundingTaskEnrichment {
   funding_id: string;
   task_type: AiTaskType;
@@ -165,7 +170,7 @@ function formatCompactCurrency(value: number | null) {
 }
 
 export function buildFundingRadar(input: {
-  items: FundingItem[];
+  items: FundingRadarItem[];
   enrichmentByFundingId: Record<string, FundingEnrichmentBundle>;
   asOf: Date;
 }): FundingRadar {
@@ -246,13 +251,13 @@ export async function getFundingRadarForRole(
       const supabase = await createFundingReadClient();
       const { data, error } = await supabase
         .from("funding")
-        .select("*")
+        .select("id,status,amount_max,deadline,created_at,updated_at")
         .eq("status", "active")
         .eq("type", getFundingTypeForRole(role))
         .limit(500);
 
       if (error) throw error;
-      const items = (data ?? []) as FundingItem[];
+      const items = (data ?? []) as FundingRadarItem[];
       const enrichmentByFundingId = await getEnrichmentForFundingIds(
         items.map((item) => item.id),
       );

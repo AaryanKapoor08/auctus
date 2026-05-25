@@ -1,4 +1,4 @@
-import type { FundingItem } from "@contracts/funding";
+import type { MatchableFundingItem } from "./types";
 
 export function text(value: unknown) {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -26,7 +26,7 @@ export function includesValue(value: unknown, candidate: unknown) {
   return textIncludes(value, candidateText);
 }
 
-export function itemHasText(item: FundingItem, candidate: unknown) {
+export function itemHasText(item: MatchableFundingItem, candidate: unknown) {
   const candidateText = text(candidate);
   if (!candidateText) return false;
 

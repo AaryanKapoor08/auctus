@@ -11,6 +11,7 @@ import type {
 import { createFundingReadClient } from "./supabase";
 import { getFundingTypeForRole } from "./role-mapping";
 import { scoreFor } from "@/lib/matching";
+import type { MatchableFundingItem } from "@/lib/matching/types";
 import { getProfileMatchTags, getRoleProfile } from "@/lib/profile/queries";
 import { buildIlikeOrFilter } from "@/lib/supabase/postgrest-filters";
 import { timeServer } from "@/lib/perf/server-timing";
@@ -19,6 +20,9 @@ const MAX_CATEGORY_FILTERS = 12;
 const SUMMARY_MATCH_CANDIDATE_LIMIT = 100;
 const FUNDING_LIST_COLUMNS =
   "id,type,name,description,provider,amount_min,amount_max,deadline,category,tags";
+const FUNDING_SCORING_COLUMNS =
+  "id,type,name,provider,amount_max,deadline,eligibility,requirements,category,tags";
+const FUNDING_SUMMARY_COLUMNS = "id,type,name,provider,amount_max,deadline";
 const FUNDING_PAGE_SIZE_DEFAULT = 36;
 const FUNDING_PAGE_SIZE_MAX = 48;
 
@@ -57,7 +61,10 @@ export type FundingPageResult = {
 };
 
 function toFundingSummary(
-  item: FundingItem,
+  item: Pick<
+    FundingItem,
+    "id" | "type" | "name" | "provider" | "amount_max" | "deadline"
+  >,
   match_score: FundingSummary["match_score"] = null,
 ): FundingSummary {
   return {
@@ -103,6 +110,25 @@ function normalizePageSize(value: number | undefined) {
   }
 
   return Math.min(Math.floor(value), FUNDING_PAGE_SIZE_MAX);
+}
+
+async function listFundingScoringCandidates(query: {
+  role: FundingQuery["role"];
+  status?: FundingQuery["status"];
+  limit: number;
+}): Promise<MatchableFundingItem[]> {
+  const supabase = await createFundingReadClient();
+  const { data, error } = await supabase
+    .from("funding")
+    .select(FUNDING_SCORING_COLUMNS)
+    .eq("type", getFundingTypeForRole(query.role))
+    .eq("status", query.status ?? "active")
+    .order("created_at", { ascending: false })
+    .limit(query.limit);
+
+  if (error) throw error;
+
+  return (data ?? []) as MatchableFundingItem[];
 }
 
 export const ListFundingForRole: ListFundingForRoleContract = async (
@@ -287,7 +313,7 @@ export const GetFundingSummariesForUser: GetFundingSummariesForUserContract = as
         const supabase = await createFundingReadClient();
         const { data, error } = await supabase
           .from("funding")
-          .select("*")
+          .select(FUNDING_SUMMARY_COLUMNS)
           .eq("status", "active")
           .order("created_at", { ascending: false })
           .limit(limit);
@@ -299,7 +325,7 @@ export const GetFundingSummariesForUser: GetFundingSummariesForUserContract = as
         );
       }
 
-      const items = await ListFundingForRole({
+      const items = await listFundingScoringCandidates({
         role: roleProfile.role,
         status: "active",
         limit: Math.max(limit, SUMMARY_MATCH_CANDIDATE_LIMIT),

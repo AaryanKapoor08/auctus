@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
 import type { Session } from "@contracts/session";
 import { createClient } from "@/lib/supabase/client";
 
 export function useSession(initialSession: Session | null = null) {
-  const pathname = usePathname();
   const [session, setSession] = useState<Session | null>(initialSession);
-  const [loading, setLoading] = useState(initialSession === null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -40,19 +38,29 @@ export function useSession(initialSession: Session | null = null) {
       setLoading(false);
     }
 
-    void loadSession();
-
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      void loadSession();
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT") {
+        setSession(null);
+        setLoading(false);
+        return;
+      }
+
+      if (
+        event === "SIGNED_IN" ||
+        event === "TOKEN_REFRESHED" ||
+        event === "USER_UPDATED"
+      ) {
+        void loadSession();
+      }
     });
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [pathname]);
+  }, []);
 
   return { session, loading };
 };

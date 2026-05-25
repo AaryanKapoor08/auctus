@@ -1,3 +1,6 @@
+import "server-only";
+
+import { cache } from "react";
 import type {
   BusinessProfile,
   OnboardedProfile,
@@ -99,9 +102,9 @@ async function loadRoleProfile(user_id: string): Promise<RoleProfile | null> {
   };
 }
 
-export async function getRoleProfile(user_id: string): Promise<RoleProfile | null> {
-  return timeServer("getRoleProfile", () => loadRoleProfile(user_id));
-}
+const getCachedRoleProfile = cache((user_id: string) =>
+  timeServer("getRoleProfile", () => loadRoleProfile(user_id)),
+);
 
 async function loadProfileMatchTags(user_id: string): Promise<string[]> {
   const supabase = await createClient();
@@ -116,6 +119,14 @@ async function loadProfileMatchTags(user_id: string): Promise<string[]> {
   return data?.tags ?? [];
 }
 
+const getCachedProfileMatchTags = cache((user_id: string) =>
+  timeServer("getProfileMatchTags", () => loadProfileMatchTags(user_id)),
+);
+
+export async function getRoleProfile(user_id: string): Promise<RoleProfile | null> {
+  return getCachedRoleProfile(user_id);
+}
+
 export async function getProfileMatchTags(user_id: string): Promise<string[]> {
-  return timeServer("getProfileMatchTags", () => loadProfileMatchTags(user_id));
+  return getCachedProfileMatchTags(user_id);
 }

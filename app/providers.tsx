@@ -9,7 +9,7 @@ type AuthContextValue = ReturnType<typeof useSession>;
 
 const AuthContext = createContext<AuthContextValue>({
   session: null,
-  loading: true,
+  loading: false,
 });
 
 export function useAuth() {

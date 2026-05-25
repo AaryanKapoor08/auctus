@@ -5,6 +5,11 @@ export type NavLink = {
   href: string;
 };
 
+export type NavProfile = {
+  display_name: string | null;
+  avatar_url: string | null;
+};
+
 const PUBLIC_FUNDING_LINKS: NavLink[] = [
   { name: "Grants", href: "/grants" },
   { name: "Scholarships", href: "/scholarships" },

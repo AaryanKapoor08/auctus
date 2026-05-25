@@ -12,7 +12,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Providers } from "./providers";
-import { getSession } from "@/lib/session/get-session";
+import { getShellContext } from "@/lib/session/shell-context";
 import { getFundingSiteStats } from "@/lib/funding/site-stats";
 import { buildFundingNewsTickerItems } from "@/lib/funding/site-stats-shared";
 
@@ -55,8 +55,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [session, fundingStats] = await Promise.all([
-    getSession(),
+  const [shellContext, fundingStats] = await Promise.all([
+    getShellContext(),
     getFundingSiteStats(),
   ]);
   const tickerItems = buildFundingNewsTickerItems(fundingStats);
@@ -68,8 +68,12 @@ export default async function RootLayout({
         suppressHydrationWarning
       >
         <ErrorBoundary>
-          <Providers initialSession={session}>
-            <Navbar initialSession={session} tickerItems={tickerItems} />
+          <Providers initialSession={shellContext.session}>
+            <Navbar
+              initialSession={shellContext.session}
+              initialProfile={shellContext.navProfile}
+              tickerItems={tickerItems}
+            />
             <main className="min-h-screen">{children}</main>
             <Footer />
             <Analytics />

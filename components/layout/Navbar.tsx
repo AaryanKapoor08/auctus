@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Menu, UserCircle, X } from "lucide-react";
@@ -8,13 +8,7 @@ import { useAuth } from "@/app/providers";
 import MarqueeBelt from "@/components/layout/MarqueeBelt";
 import { cn } from "@/lib/utils";
 import type { Session } from "@contracts/session";
-import { createClient } from "@/lib/supabase/client";
-import { getNavLinksForSession } from "@/lib/session/navigation";
-
-type NavProfile = {
-  display_name: string | null;
-  avatar_url: string | null;
-};
+import { getNavLinksForSession, type NavProfile } from "@/lib/session/navigation";
 
 function getInitials(profile: NavProfile | null, session: Session | null) {
   const source = profile?.display_name || session?.role || "Auctus";
@@ -30,9 +24,11 @@ function getInitials(profile: NavProfile | null, session: Session | null) {
 
 export default function Navbar({
   initialSession,
+  initialProfile = null,
   tickerItems,
 }: {
   initialSession?: Session | null;
+  initialProfile?: NavProfile | null;
   tickerItems: string[];
 }) {
   const pathname = usePathname();
@@ -40,36 +36,11 @@ export default function Navbar({
   const session = loading ? initialSession ?? null : clientSession;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [profile, setProfile] = useState<NavProfile | null>(null);
+  const profile =
+    session?.user_id && session.user_id === initialSession?.user_id
+      ? initialProfile
+      : null;
   const links = getNavLinksForSession(session);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function loadProfile() {
-      if (!session?.user_id) {
-        setProfile(null);
-        return;
-      }
-
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("profiles")
-        .select("display_name, avatar_url")
-        .eq("id", session.user_id)
-        .maybeSingle();
-
-      if (mounted) {
-        setProfile(data ?? null);
-      }
-    }
-
-    void loadProfile();
-
-    return () => {
-      mounted = false;
-    };
-  }, [session?.user_id]);
 
   const isActivePath = (href: string) =>
     href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);

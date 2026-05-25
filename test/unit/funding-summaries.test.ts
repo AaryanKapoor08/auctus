@@ -3,6 +3,7 @@ import type { FundingItem } from "@contracts/funding";
 import type { RoleProfile } from "@contracts/profile";
 import {
   GetFundingSummariesForUser,
+  ListFundingPageForRole,
   ListFundingForRole,
 } from "@/lib/funding/queries";
 
@@ -73,10 +74,18 @@ function createQuery(data: FundingItem[]) {
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
     contains: vi.fn().mockReturnThis(),
+    not: vi.fn().mockReturnThis(),
+    gte: vi.fn().mockReturnThis(),
+    lte: vi.fn().mockReturnThis(),
+    is: vi.fn().mockReturnThis(),
+    in: vi.fn().mockReturnThis(),
     or: vi.fn().mockReturnThis(),
     order: vi.fn().mockReturnThis(),
-    range: vi.fn().mockResolvedValue({ data, error: null }),
+    range: vi.fn().mockResolvedValue({ data, error: null, count: data.length }),
     limit: vi.fn().mockResolvedValue({ data, error: null }),
+    then: vi.fn((resolve) =>
+      Promise.resolve({ data, error: null, count: data.length }).then(resolve),
+    ),
   };
 }
 
@@ -254,5 +263,83 @@ describe("GetFundingSummariesForUser", () => {
     expect(query.or).toHaveBeenCalledWith(
       "name.ilike.%status eq expired%,provider.ilike.%status eq expired%,description.ilike.%status eq expired%",
     );
+  });
+
+  it("paginates funding browser queries with narrow card fields", async () => {
+    const query = createQuery([baseItem]);
+    mocks.createFundingReadClient.mockResolvedValue({
+      from: vi.fn(() => query),
+    });
+
+    const result = await ListFundingPageForRole({
+      role: "student",
+      page: 2,
+      pageSize: 36,
+    });
+
+    expect(query.select).toHaveBeenCalledWith(
+      "id,type,name,description,provider,amount_min,amount_max,deadline,category,tags",
+      { count: "exact" },
+    );
+    expect(query.eq).toHaveBeenCalledWith("type", "scholarship");
+    expect(query.range).toHaveBeenCalledWith(36, 71);
+    expect(result).toMatchObject({
+      items: [baseItem],
+      totalCount: 1,
+      page: 2,
+      pageSize: 36,
+      pageCount: 1,
+    });
+  });
+
+  it("applies server-side search, categories, deadline, and sort filters", async () => {
+    const query = createQuery([baseItem]);
+    mocks.createFundingReadClient.mockResolvedValue({
+      from: vi.fn(() => query),
+    });
+
+    await ListFundingPageForRole({
+      role: "business",
+      categories: ["Digital", "Federal"],
+      deadline: "30",
+      sort: "deadline",
+      search: "%,status.eq.expired",
+      pageSize: 100,
+    });
+
+    expect(query.contains).toHaveBeenCalledWith("tags", ["Digital"]);
+    expect(query.contains).toHaveBeenCalledWith("tags", ["Federal"]);
+    expect(query.not).toHaveBeenCalledWith("deadline", "is", null);
+    expect(query.gte).toHaveBeenCalledWith("deadline", expect.any(String));
+    expect(query.lte).toHaveBeenCalledWith("deadline", expect.any(String));
+    expect(query.or).toHaveBeenCalledWith(
+      "name.ilike.%status eq expired%,provider.ilike.%status eq expired%,description.ilike.%status eq expired%",
+    );
+    expect(query.order).toHaveBeenCalledWith("deadline", {
+      ascending: true,
+      nullsFirst: false,
+    });
+    expect(query.range).toHaveBeenCalledWith(0, 47);
+  });
+
+  it("sorts semantic ranked funding pages without dumping the full role corpus", async () => {
+    const first = { ...baseItem, id: "first" };
+    const second = { ...baseItem, id: "second" };
+    const query = createQuery([second, first]);
+    mocks.createFundingReadClient.mockResolvedValue({
+      from: vi.fn(() => query),
+    });
+
+    const result = await ListFundingPageForRole({
+      role: "business",
+      semanticRankedIds: ["first", "second"],
+      pageSize: 1,
+    });
+
+    expect(query.in).toHaveBeenCalledWith("id", ["first", "second"]);
+    expect(query.range).not.toHaveBeenCalled();
+    expect(result.items.map((item) => item.id)).toEqual(["first"]);
+    expect(result.totalCount).toBe(2);
+    expect(result.pageCount).toBe(2);
   });
 });

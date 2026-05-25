@@ -2,12 +2,9 @@ import FundingBrowser, {
   type FundingBrowserDeadlineFilter,
   type FundingBrowserSortOption,
 } from "@/components/funding/FundingBrowser";
-import { ListFundingForRole } from "@/lib/funding/queries";
+import { ListFundingPageForRole } from "@/lib/funding/queries";
 import { getRecommendedFundingTags } from "@/lib/funding/recommended-tags";
-import {
-  getSemanticSearchRankingForRole,
-  rankFundingItemsBySemanticIds,
-} from "@/lib/funding/semantic-search";
+import { getSemanticSearchRankingForRole } from "@/lib/funding/semantic-search";
 import { getSession } from "@/lib/session/get-session";
 
 type SearchParams = Promise<{
@@ -15,7 +12,10 @@ type SearchParams = Promise<{
   category?: string | string[];
   deadline?: string;
   sort?: string;
+  page?: string;
 }>;
+
+const PAGE_SIZE = 36;
 
 function toArray(value: string | string[] | undefined) {
   if (!value) return [];
@@ -34,25 +34,41 @@ function parseSort(value: string | undefined): FundingBrowserSortOption {
     : "relevance";
 }
 
+function parsePage(value: string | undefined) {
+  const page = Number(value);
+  return Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+}
+
 export default async function ResearchFundingPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
-  const [items, recommendedTags, session, semanticRanking] = await Promise.all([
-    ListFundingForRole({ role: "professor" }),
+  const categories = toArray(params.category);
+  const deadline = parseDeadline(params.deadline);
+  const sort = parseSort(params.sort);
+  const page = parsePage(params.page);
+  const [recommendedTags, session, semanticRanking] = await Promise.all([
     getRecommendedFundingTags("professor"),
     getSession(),
     getSemanticSearchRankingForRole({
       role: "professor",
       query: params.search,
-      limit: 100,
+      limit: 200,
     }),
   ]);
-  const rankedItems = semanticRanking.enabled
-    ? rankFundingItemsBySemanticIds(items, semanticRanking.rankedIds)
-    : items;
+  const activeCategories = categories.length > 0 ? categories : recommendedTags;
+  const fundingPage = await ListFundingPageForRole({
+    role: "professor",
+    search: params.search,
+    categories: activeCategories,
+    deadline,
+    sort,
+    page,
+    pageSize: PAGE_SIZE,
+    semanticRankedIds: semanticRanking.enabled ? semanticRanking.rankedIds : [],
+  });
 
   return (
     <div className="auc-page min-h-screen pb-20">
@@ -66,21 +82,24 @@ export default async function ResearchFundingPage({
             </p>
           </div>
           <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-600 shadow-sm">
-            <span className="font-semibold text-gray-900">{rankedItems.length}</span> available
+            <span className="font-semibold text-gray-900">{fundingPage.totalCount}</span> available
           </div>
         </div>
       </section>
       <div className="auc-reference-section">
         <FundingBrowser
+          key={`${params.search ?? ""}:${activeCategories.join(",")}:${deadline}:${sort}:${fundingPage.page}`}
           role="professor"
-          items={rankedItems}
+          items={fundingPage.items}
+          totalCount={fundingPage.totalCount}
+          page={fundingPage.page}
+          pageCount={fundingPage.pageCount}
           basePath="/research-funding"
           initialSearch={params.search}
-          initialCategories={toArray(params.category)}
-          initialDeadline={parseDeadline(params.deadline)}
-          initialSort={parseSort(params.sort)}
+          initialCategories={activeCategories}
+          initialDeadline={deadline}
+          initialSort={sort}
           recommendedCategories={recommendedTags}
-          semanticRankedIds={semanticRanking.enabled ? semanticRanking.rankedIds : []}
           showPersonalizationPrompt={!session}
         />
       </div>

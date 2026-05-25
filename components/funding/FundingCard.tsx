@@ -2,7 +2,21 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { FundingItem } from "@contracts/funding";
 
-export function formatFundingAmount(item: FundingItem) {
+export type FundingCardItem = Pick<
+  FundingItem,
+  | "id"
+  | "type"
+  | "name"
+  | "description"
+  | "provider"
+  | "amount_min"
+  | "amount_max"
+  | "deadline"
+  | "category"
+  | "tags"
+>;
+
+export function formatFundingAmount(item: FundingCardItem) {
   if (item.amount_min && item.amount_max) {
     return `$${item.amount_min.toLocaleString("en-CA")} - $${item.amount_max.toLocaleString("en-CA")}`;
   }
@@ -26,13 +40,13 @@ export function formatFundingDeadline(deadline: string | null) {
   }).format(date);
 }
 
-function kindLabel(item: FundingItem) {
+function kindLabel(item: FundingCardItem) {
   if (item.type === "business_grant") return "Grant";
   if (item.type === "scholarship") return "Scholarship";
   return "Research";
 }
 
-function kindClasses(item: FundingItem) {
+function kindClasses(item: FundingCardItem) {
   if (item.type === "business_grant") {
     return "bg-[var(--auc-purple-soft)] text-[var(--auc-purple-deep)]";
   }
@@ -48,7 +62,7 @@ export default function FundingCard({
   item,
   href,
 }: {
-  item: FundingItem;
+  item: FundingCardItem;
   href: string;
 }) {
   return (

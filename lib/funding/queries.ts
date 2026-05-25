@@ -17,6 +17,44 @@ import { timeServer } from "@/lib/perf/server-timing";
 
 const MAX_CATEGORY_FILTERS = 12;
 const SUMMARY_MATCH_CANDIDATE_LIMIT = 100;
+const FUNDING_LIST_COLUMNS =
+  "id,type,name,description,provider,amount_min,amount_max,deadline,category,tags";
+const FUNDING_PAGE_SIZE_DEFAULT = 36;
+const FUNDING_PAGE_SIZE_MAX = 48;
+
+export type FundingListDeadlineFilter = "all" | "30" | "60" | "90" | "rolling";
+export type FundingListSortOption = "relevance" | "deadline" | "amount" | "newest";
+
+export type FundingListItem = Pick<
+  FundingItem,
+  | "id"
+  | "type"
+  | "name"
+  | "description"
+  | "provider"
+  | "amount_min"
+  | "amount_max"
+  | "deadline"
+  | "category"
+  | "tags"
+>;
+
+export type FundingPageQuery = Omit<FundingQuery, "category" | "limit" | "offset"> & {
+  categories?: string[];
+  deadline?: FundingListDeadlineFilter;
+  sort?: FundingListSortOption;
+  page?: number;
+  pageSize?: number;
+  semanticRankedIds?: string[];
+};
+
+export type FundingPageResult = {
+  items: FundingListItem[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  pageCount: number;
+};
 
 function toFundingSummary(
   item: FundingItem,
@@ -39,6 +77,32 @@ function parseCategoryFilters(category: string | undefined) {
     .map((value) => value.trim())
     .filter(Boolean)
     .slice(0, MAX_CATEGORY_FILTERS);
+}
+
+function parseCategoryList(categories: string[] | undefined) {
+  return (categories ?? [])
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .slice(0, MAX_CATEGORY_FILTERS);
+}
+
+function dateOnlyDaysFromNow(days: number) {
+  const date = new Date();
+  date.setUTCHours(0, 0, 0, 0);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function normalizePage(value: number | undefined) {
+  return Number.isFinite(value) && value && value > 0 ? Math.floor(value) : 1;
+}
+
+function normalizePageSize(value: number | undefined) {
+  if (!Number.isFinite(value) || !value || value < 1) {
+    return FUNDING_PAGE_SIZE_DEFAULT;
+  }
+
+  return Math.min(Math.floor(value), FUNDING_PAGE_SIZE_MAX);
 }
 
 export const ListFundingForRole: ListFundingForRoleContract = async (
@@ -89,6 +153,111 @@ export const ListFundingForRole: ListFundingForRoleContract = async (
     },
   );
 };
+
+export async function ListFundingPageForRole(
+  query: FundingPageQuery,
+): Promise<FundingPageResult> {
+  return timeServer(
+    "ListFundingPageForRole",
+    async () => {
+      const page = normalizePage(query.page);
+      const pageSize = normalizePageSize(query.pageSize);
+      const from = (page - 1) * pageSize;
+      const to = from + pageSize - 1;
+      const categories = parseCategoryList(query.categories);
+      const semanticRankedIds = [...new Set(query.semanticRankedIds ?? [])].slice(0, 500);
+      const supabase = await createFundingReadClient();
+      let request = supabase
+        .from("funding")
+        .select(FUNDING_LIST_COLUMNS, { count: "exact" })
+        .eq("type", getFundingTypeForRole(query.role))
+        .eq("status", query.status ?? "active");
+
+      for (const category of categories) {
+        request = request.contains("tags", [category]);
+      }
+
+      if (query.deadline === "rolling") {
+        request = request.is("deadline", null);
+      } else if (query.deadline && query.deadline !== "all") {
+        request = request
+          .not("deadline", "is", null)
+          .gte("deadline", dateOnlyDaysFromNow(0))
+          .lte("deadline", dateOnlyDaysFromNow(Number(query.deadline)));
+      }
+
+      if (semanticRankedIds.length > 0) {
+        request = request.in("id", semanticRankedIds);
+      } else if (query.search) {
+        const searchFilter = buildIlikeOrFilter(
+          ["name", "provider", "description"],
+          query.search,
+        );
+
+        if (searchFilter) {
+          request = request.or(searchFilter);
+        }
+      }
+
+      if (semanticRankedIds.length === 0) {
+        if (query.sort === "deadline") {
+          request = request.order("deadline", {
+            ascending: true,
+            nullsFirst: false,
+          });
+        } else if (query.sort === "amount") {
+          request = request.order("amount_max", {
+            ascending: false,
+            nullsFirst: false,
+          });
+        } else {
+          request = request.order("created_at", { ascending: false });
+        }
+
+        request = request.range(from, to);
+      }
+
+      const { data, error, count } = await request;
+
+      if (error) throw error;
+
+      if (semanticRankedIds.length > 0) {
+        const order = new Map(semanticRankedIds.map((id, index) => [id, index]));
+        const rankedRows = ((data ?? []) as FundingListItem[]).sort(
+          (a, b) =>
+            (order.get(a.id) ?? Number.POSITIVE_INFINITY) -
+            (order.get(b.id) ?? Number.POSITIVE_INFINITY),
+        );
+        const totalCount = rankedRows.length;
+
+        return {
+          items: rankedRows.slice(from, to + 1),
+          totalCount,
+          page,
+          pageSize,
+          pageCount: Math.max(1, Math.ceil(totalCount / pageSize)),
+        };
+      }
+
+      const totalCount = count ?? 0;
+
+      return {
+        items: (data ?? []) as FundingListItem[],
+        totalCount,
+        page,
+        pageSize,
+        pageCount: Math.max(1, Math.ceil(totalCount / pageSize)),
+      };
+    },
+    {
+      role: query.role,
+      page: query.page ?? 1,
+      pageSize: query.pageSize ?? FUNDING_PAGE_SIZE_DEFAULT,
+      hasSearch: Boolean(query.search),
+      categoryCount: query.categories?.length ?? 0,
+    },
+  );
+}
 
 export const GetFundingById: GetFundingByIdContract = async (id) => {
   return timeServer("GetFundingById", async () => {

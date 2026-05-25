@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Calendar, Search, SlidersHorizontal, X } from "lucide-react";
 import Link from "next/link";
-import type { FundingItem } from "@contracts/funding";
 import type { Role } from "@contracts/role";
 import { FUNDING_FILTERS } from "@/lib/funding/filter-definitions";
 import Button from "@/components/ui/Button";
-import FundingCard from "./FundingCard";
+import FundingCard, { type FundingCardItem } from "./FundingCard";
 import { cn } from "@/lib/utils";
 
 type DeadlineFilter = "all" | "30" | "60" | "90" | "rolling";
@@ -20,99 +20,51 @@ function normalize(value: string) {
   return value.trim().toLowerCase();
 }
 
-function itemTags(item: FundingItem) {
-  return new Set(
-    [...item.tags, item.category ?? ""]
-      .map(normalize)
-      .filter(Boolean),
-  );
-}
-
-function matchesSearch(
-  item: FundingItem,
-  search: string,
-  semanticRankedIdSet: Set<string>,
-) {
-  if (!search) return true;
-  if (semanticRankedIdSet.has(item.id)) return true;
-
-  const query = normalize(search);
-  const haystack = [
-    item.name,
-    item.provider,
-    item.description ?? "",
-    item.category ?? "",
-    item.tags.join(" "),
-  ]
-    .join(" ")
-    .toLowerCase();
-
-  return haystack.includes(query);
-}
-
-function daysUntil(deadline: string | null) {
-  if (!deadline) return Number.POSITIVE_INFINITY;
-  const due = new Date(deadline);
-  if (Number.isNaN(due.getTime())) return Number.POSITIVE_INFINITY;
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  due.setHours(0, 0, 0, 0);
-  return Math.ceil((due.getTime() - today.getTime()) / 86_400_000);
-}
-
-function matchesDeadline(item: FundingItem, deadline: DeadlineFilter) {
-  if (deadline === "all") return true;
-  if (deadline === "rolling") return item.deadline === null;
-
-  const days = daysUntil(item.deadline);
-  return Number.isFinite(days) && days >= 0 && days <= Number(deadline);
-}
-
-function relevanceScore(item: FundingItem, tags: string[]) {
-  const values = itemTags(item);
-  return tags.reduce(
-    (score, tag) => score + (values.has(normalize(tag)) ? 1 : 0),
-    0,
-  );
-}
-
 function toQueryString(input: {
   search: string;
   selectedTags: string[];
   deadline: DeadlineFilter;
   sort: SortOption;
+  page: number;
 }) {
   const params = new URLSearchParams();
   if (input.search) params.set("search", input.search);
   input.selectedTags.forEach((tag) => params.append("category", tag));
   if (input.deadline !== "all") params.set("deadline", input.deadline);
   if (input.sort !== "relevance") params.set("sort", input.sort);
+  if (input.page > 1) params.set("page", String(input.page));
   return params.toString();
 }
 
 export default function FundingBrowser({
   role,
   items,
+  totalCount,
+  page,
+  pageCount,
   basePath,
   initialSearch = "",
   initialCategories = [],
   initialDeadline = "all",
   initialSort = "relevance",
   recommendedCategories = [],
-  semanticRankedIds = [],
   showPersonalizationPrompt = false,
 }: {
   role: Role;
-  items: FundingItem[];
+  items: FundingCardItem[];
+  totalCount: number;
+  page: number;
+  pageCount: number;
   basePath: string;
   initialSearch?: string;
   initialCategories?: string[];
   initialDeadline?: DeadlineFilter;
   initialSort?: SortOption;
   recommendedCategories?: string[];
-  semanticRankedIds?: string[];
   showPersonalizationPrompt?: boolean;
 }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const filters = FUNDING_FILTERS[role];
   const categoryFilter = filters.find((filter) => filter.key === "category");
   const options = useMemo(() => categoryFilter?.options ?? [], [categoryFilter]);
@@ -124,19 +76,13 @@ export default function FundingBrowser({
     }
     return Array.from(groups.entries());
   }, [options]);
-  const optionGroupByValue = useMemo(
-    () =>
-      new Map(
-        options.map((option) => [
-          normalize(option.value),
-          option.group ?? "Other",
-        ]),
-      ),
+  const optionValues = useMemo(
+    () => new Set(options.map((option) => option.value)),
     [options],
   );
-  const optionValues = new Set(options.map((option) => option.value));
-  const profileCategories = recommendedCategories.filter((tag) =>
-    optionValues.has(tag),
+  const profileCategories = useMemo(
+    () => recommendedCategories.filter((tag) => optionValues.has(tag)),
+    [optionValues, recommendedCategories],
   );
   const startingCategories =
     initialCategories.length > 0 ? initialCategories : profileCategories;
@@ -151,93 +97,31 @@ export default function FundingBrowser({
     () => new Set(profileCategories.map(normalize)),
     [profileCategories],
   );
-  const semanticOrder = useMemo(
-    () => new Map(semanticRankedIds.map((id, index) => [id, index])),
-    [semanticRankedIds],
-  );
-  const semanticRankedIdSet = useMemo(
-    () => new Set(semanticRankedIds),
-    [semanticRankedIds],
-  );
-  const tagCounts = useMemo(() => {
-    return Object.fromEntries(
-      options.map((option) => [
-        option.value,
-        items.filter((item) => itemTags(item).has(normalize(option.value))).length,
-      ]),
-    );
-  }, [items, options]);
 
-  const visibleItems = useMemo(() => {
-    const activeTagsByGroup = new Map<string, string[]>();
-    for (const tag of selectedTags) {
-      const normalized = normalize(tag);
-      const group = optionGroupByValue.get(normalized) ?? normalized;
-      activeTagsByGroup.set(group, [
-        ...(activeTagsByGroup.get(group) ?? []),
-        normalized,
-      ]);
-    }
-
-    const filtered = items.filter((item) => {
-      const tags = itemTags(item);
-      return (
-        matchesSearch(item, search, semanticRankedIdSet) &&
-        Array.from(activeTagsByGroup.values()).every((groupTags) =>
-          groupTags.some((tag) => tags.has(tag)),
-        ) &&
-        matchesDeadline(item, deadline)
-      );
+  function navigate(input: {
+    search?: string;
+    selectedTags?: string[];
+    deadline?: DeadlineFilter;
+    sort?: SortOption;
+    page?: number;
+  }) {
+    const query = toQueryString({
+      search: input.search ?? search,
+      selectedTags: input.selectedTags ?? selectedTags,
+      deadline: input.deadline ?? deadline,
+      sort: input.sort ?? sort,
+      page: input.page ?? page,
     });
-
-    return filtered.sort((a, b) => {
-      if (sort === "deadline") {
-        return daysUntil(a.deadline) - daysUntil(b.deadline);
-      }
-
-      if (sort === "amount") {
-        return (b.amount_max ?? b.amount_min ?? 0) - (a.amount_max ?? a.amount_min ?? 0);
-      }
-
-      if (sort === "newest") {
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      }
-
-      if (semanticOrder.size > 0 && search.trim().length > 0) {
-        const ai = semanticOrder.get(a.id) ?? Number.POSITIVE_INFINITY;
-        const bi = semanticOrder.get(b.id) ?? Number.POSITIVE_INFINITY;
-        if (ai !== bi) return ai - bi;
-      }
-
-      const bScore = relevanceScore(b, [...profileCategories, ...selectedTags]);
-      const aScore = relevanceScore(a, [...profileCategories, ...selectedTags]);
-      if (bScore !== aScore) return bScore - aScore;
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-  }, [
-    deadline,
-    items,
-    optionGroupByValue,
-    profileCategories,
-    search,
-    selectedTags,
-    semanticOrder,
-    semanticRankedIdSet,
-    sort,
-  ]);
-
-  useEffect(() => {
-    const query = toQueryString({ search, selectedTags, deadline, sort });
-    const nextUrl = query ? `${window.location.pathname}?${query}` : window.location.pathname;
-    window.history.replaceState(null, "", nextUrl);
-  }, [deadline, search, selectedTags, sort]);
+    const href = query ? `${basePath}?${query}` : basePath;
+    startTransition(() => router.push(href));
+  }
 
   function toggleTag(tag: string) {
-    setSelectedTags((current) =>
-      current.includes(tag)
-        ? current.filter((value) => value !== tag)
-        : [...current, tag],
-    );
+    const nextTags = selectedTags.includes(tag)
+      ? selectedTags.filter((value) => value !== tag)
+      : [...selectedTags, tag];
+    setSelectedTags(nextTags);
+    navigate({ selectedTags: nextTags, page: 1 });
   }
 
   function clearFilters() {
@@ -246,11 +130,19 @@ export default function FundingBrowser({
     setSelectedTags([]);
     setDeadline("all");
     setSort("relevance");
+    navigate({
+      search: "",
+      selectedTags: [],
+      deadline: "all",
+      sort: "relevance",
+      page: 1,
+    });
   }
 
   function useProfileFilters() {
     setSelectedTags(profileCategories);
     setSort("relevance");
+    navigate({ selectedTags: profileCategories, sort: "relevance", page: 1 });
   }
 
   const hasFilters =
@@ -294,7 +186,9 @@ export default function FundingBrowser({
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            setSearch(searchDraft.trim());
+            const nextSearch = searchDraft.trim();
+            setSearch(nextSearch);
+            navigate({ search: nextSearch, page: 1 });
           }}
           className="mb-5"
         >
@@ -303,10 +197,7 @@ export default function FundingBrowser({
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--auc-muted)]" />
             <input
               value={searchDraft}
-              onChange={(event) => {
-                setSearchDraft(event.target.value);
-                setSearch(event.target.value.trim());
-              }}
+              onChange={(event) => setSearchDraft(event.target.value)}
               placeholder="Name, provider, keyword..."
               className="auc-field w-full py-2 pl-9 pr-3 text-sm"
             />
@@ -345,7 +236,11 @@ export default function FundingBrowser({
           <label className="auc-label mb-2 block">Sort</label>
           <select
             value={sort}
-            onChange={(event) => setSort(event.target.value as SortOption)}
+            onChange={(event) => {
+              const nextSort = event.target.value as SortOption;
+              setSort(nextSort);
+              navigate({ sort: nextSort, page: 1 });
+            }}
             className="auc-field w-full px-3 py-2 text-sm"
           >
             <option value="relevance">Best match</option>
@@ -370,7 +265,11 @@ export default function FundingBrowser({
                   type="radio"
                   name="deadline"
                   checked={deadline === value}
-                  onChange={() => setDeadline(value as DeadlineFilter)}
+                  onChange={() => {
+                    const nextDeadline = value as DeadlineFilter;
+                    setDeadline(nextDeadline);
+                    navigate({ deadline: nextDeadline, page: 1 });
+                  }}
                   className="accent-[var(--auc-purple)]"
                 />
                 {label}
@@ -381,9 +280,7 @@ export default function FundingBrowser({
 
         <div>
           <div className="mb-2 flex items-center justify-between gap-3">
-            <label className="auc-label block">
-              Categories
-            </label>
+            <label className="auc-label block">Categories</label>
             <div className="flex items-center gap-2 text-xs">
               {profileCategories.length > 0 && (
                 <>
@@ -399,7 +296,10 @@ export default function FundingBrowser({
               )}
               <button
                 type="button"
-                onClick={() => setSelectedTags([])}
+                onClick={() => {
+                  setSelectedTags([]);
+                  navigate({ selectedTags: [], page: 1 });
+                }}
                 className="font-bold text-[var(--auc-muted)] hover:text-[var(--auc-ink)]"
               >
                 Clear
@@ -421,32 +321,29 @@ export default function FundingBrowser({
                       <label
                         key={option.value}
                         className={cn(
-                          "flex cursor-pointer items-center justify-between gap-3 px-1 py-1.5 text-sm transition",
+                          "flex cursor-pointer items-center gap-3 px-1 py-1.5 text-sm transition",
                           checked
                             ? "text-[var(--auc-ink)]"
                             : "text-[var(--auc-ink-2)]",
                         )}
                       >
-                        <span className="flex min-w-0 items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={() => toggleTag(option.value)}
-                            className="accent-[var(--auc-purple)]"
-                          />
-                          <span className="truncate">{option.label}</span>
-                          {recommended && (
-                            <span className={cn(
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleTag(option.value)}
+                          className="accent-[var(--auc-purple)]"
+                        />
+                        <span className="min-w-0 flex-1 truncate">{option.label}</span>
+                        {recommended && (
+                          <span
+                            className={cn(
                               "mono rounded px-1.5 py-0.5 text-[9px] font-black uppercase tracking-[0.04em]",
                               "bg-[var(--auc-purple)] text-white",
-                            )}>
-                              profile
-                            </span>
-                          )}
-                        </span>
-                        <span className="mono text-xs text-[var(--auc-muted)]">
-                          {tagCounts[option.value] ?? 0}
-                        </span>
+                            )}
+                          >
+                            profile
+                          </span>
+                        )}
                       </label>
                     );
                   })}
@@ -496,6 +393,7 @@ export default function FundingBrowser({
                 onClick={() => {
                   setSearch("");
                   setSearchDraft("");
+                  navigate({ search: "", page: 1 });
                 }}
                 className="inline-flex items-center gap-2 rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-paper)] px-3 py-1.5 text-sm font-bold"
               >
@@ -506,7 +404,10 @@ export default function FundingBrowser({
             {deadline !== "all" && (
               <button
                 type="button"
-                onClick={() => setDeadline("all")}
+                onClick={() => {
+                  setDeadline("all");
+                  navigate({ deadline: "all", page: 1 });
+                }}
                 className="inline-flex items-center gap-2 rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-paper)] px-3 py-1.5 text-sm font-bold"
               >
                 {deadlineLabels[deadline]}
@@ -516,7 +417,10 @@ export default function FundingBrowser({
             {sort !== "relevance" && (
               <button
                 type="button"
-                onClick={() => setSort("relevance")}
+                onClick={() => {
+                  setSort("relevance");
+                  navigate({ sort: "relevance", page: 1 });
+                }}
                 className="inline-flex items-center gap-2 rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-paper)] px-3 py-1.5 text-sm font-bold"
               >
                 sort: {sortLabels[sort]}
@@ -546,24 +450,46 @@ export default function FundingBrowser({
 
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="mono text-sm text-[var(--auc-ink-2)]">
-            Showing <span className="font-black text-[var(--auc-ink)]">{visibleItems.length}</span>{" "}
-            of <span className="font-black text-[var(--auc-ink)]">{items.length}</span> results
+            Showing <span className="font-black text-[var(--auc-ink)]">{items.length}</span>{" "}
+            of <span className="font-black text-[var(--auc-ink)]">{totalCount}</span> results
           </p>
           <p className="mono text-[0.68rem] font-bold uppercase tracking-[0.06em] text-[var(--auc-muted)]">
-            Current active records
+            {isPending ? "Updating results" : `Page ${page} of ${pageCount}`}
           </p>
         </div>
 
-        {visibleItems.length > 0 ? (
+        {items.length > 0 ? (
+          <>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {visibleItems.map((item) => (
-              <FundingCard
-                key={item.id}
-                item={item}
-                href={`${basePath}/${item.id}`}
-              />
-            ))}
-          </div>
+              {items.map((item) => (
+                <FundingCard
+                  key={item.id}
+                  item={item}
+                  href={`${basePath}/${item.id}`}
+                />
+              ))}
+            </div>
+            {pageCount > 1 && (
+              <div className="mt-8 flex items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={page <= 1 || isPending}
+                  onClick={() => navigate({ page: page - 1 })}
+                >
+                  Previous
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={page >= pageCount || isPending}
+                  onClick={() => navigate({ page: page + 1 })}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </>
         ) : (
           <div className="auc-card-flat border-dashed bg-[var(--auc-paper)] px-6 py-14 text-center">
             <Calendar className="mx-auto mb-4 h-12 w-12 text-[var(--auc-muted)]" />

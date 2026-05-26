@@ -292,11 +292,37 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .auc-summary-loop {
-  animation: auc-pop 6.5s ease-in-out infinite;
+  opacity: 0;
 }
 
 .auc-btn-loop {
-  animation: auc-btn 6.5s ease-in-out infinite;
+  animation: auc-btn-first 16s ease-in-out infinite;
+}
+
+.auc-demo-btn-second {
+  animation-name: auc-btn-second;
+}
+
+.auc-demo-pending-first {
+  animation: auc-pending-first 16s ease-in-out infinite;
+}
+
+.auc-demo-summary-first {
+  animation: auc-summary-first 16s ease-in-out infinite;
+}
+
+.auc-demo-second {
+  animation: auc-demo-second 16s ease-in-out infinite;
+  overflow: hidden;
+  transform-origin: top;
+}
+
+.auc-demo-pending-second {
+  animation: auc-pending-second 16s ease-in-out infinite;
+}
+
+.auc-demo-summary-second {
+  animation: auc-summary-second 16s ease-in-out infinite;
 }
 
 section {
@@ -307,29 +333,128 @@ html {
   scroll-behavior: smooth;
 }
 
-@keyframes auc-pop {
+button,
+a[href].rounded-full,
+a[href].auc-pill,
+[role="button"] {
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+@media (hover: hover) {
+  button:not(:disabled):hover,
+  a[href].rounded-full:hover,
+  a[href].auc-pill:hover,
+  [role="button"]:not([aria-disabled="true"]):hover {
+    transform: translateY(-1px);
+  }
+}
+
+button:not(:disabled):active,
+a[href].rounded-full:active,
+a[href].auc-pill:active,
+[role="button"]:not([aria-disabled="true"]):active {
+  transform: translateY(0);
+}
+
+@keyframes auc-pending-first {
   0%,
+  16% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  22%,
   100% {
     opacity: 0;
-    transform: translateY(8px) scale(0.98);
+    transform: translateY(-6px);
   }
-  8%,
-  92% {
+}
+
+@keyframes auc-summary-first {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  28%,
+  100% {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
-@keyframes auc-btn {
+@keyframes auc-demo-second {
   0%,
-  30%,
+  38% {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  48%,
+  100% {
+    max-height: 430px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes auc-pending-second {
+  0%,
+  58% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  64%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes auc-summary-second {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  70%,
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes auc-btn-first {
+  0%,
+  8%,
+  18%,
   100% {
     transform: scale(1);
   }
-  8% {
+  11% {
     transform: scale(0.94);
   }
-  12% {
+  14% {
+    transform: scale(1);
+  }
+}
+
+@keyframes auc-btn-second {
+  0%,
+  50%,
+  60%,
+  100% {
+    transform: scale(1);
+  }
+  53% {
+    transform: scale(0.94);
+  }
+  56% {
     transform: scale(1);
   }
 }

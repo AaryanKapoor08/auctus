@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
 import type { FundingItem } from "@contracts/funding";
 import MarqueeBelt from "@/components/layout/MarqueeBelt";
 import { getSession } from "@/lib/session/get-session";
@@ -73,16 +74,10 @@ function StepBlock({
   );
 }
 
-function AutomateSection({ featuredItem }: { featuredItem: FundingItem | null }) {
-  const featuredHref = featuredItem ? fundingHref(featuredItem) : "/grants";
-  const featuredType = featuredItem ? fundingLabel(featuredItem).toUpperCase() : "FUNDING";
-  const featuredCategory =
-    featuredItem?.category?.toUpperCase() ?? featuredItem?.provider.toUpperCase() ?? "LIVE DATA";
-
+function AutomateSection() {
   return (
-    <section className="auc-reference-section grid gap-10 pt-28 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+    <section className="auc-reference-section grid gap-10 pt-28 lg:grid-cols-[1fr_1.05fr] lg:items-start lg:gap-14">
       <div>
-        <SectionLabel>06 · Automate</SectionLabel>
         <h2 className="display auc-section-title max-w-xl">
           Automate
           <br />
@@ -93,8 +88,8 @@ function AutomateSection({ featuredItem }: { featuredItem: FundingItem | null })
           that matter.
         </h2>
         <p className="mt-6 max-w-xl text-lg leading-8 text-[var(--auc-ink-2)]">
-          Auctus keeps funding detail pages anchored to provider records, then adds
-          plain-language summaries and application checklists when current enrichment exists.
+          Auctus turns long funding pages into clear summaries, eligibility notes, and
+          application checklists so you can decide what is worth your time.
         </p>
         <div className="mt-7 flex flex-wrap gap-2">
           {[
@@ -115,61 +110,104 @@ function AutomateSection({ featuredItem }: { featuredItem: FundingItem | null })
         </div>
       </div>
 
-      <div className="auc-card relative overflow-hidden p-6">
-        <div className="mb-4 flex items-center justify-between gap-4">
-          <div className="auc-label">Live record · provider first</div>
-          <div className="mono inline-flex items-center gap-2 text-[0.68rem] font-bold text-[var(--auc-muted)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#10c966]" />
-            CURRENT
-          </div>
-        </div>
+      <div className="auc-card relative h-fit overflow-hidden p-6">
         <div className="grid gap-4 rounded-[14px] border-2 border-[var(--auc-ink)] bg-[var(--auc-bg)] p-4 sm:grid-cols-[1fr_auto] sm:items-center">
           <div>
             <div className="mb-2 flex gap-2">
               <span className="mono rounded bg-[var(--auc-purple-soft)] px-2 py-1 text-[0.62rem] font-black text-[var(--auc-purple-deep)]">
-                {featuredType}
+                GRANT
               </span>
               <span className="mono rounded bg-[var(--auc-coral-soft)] px-2 py-1 text-[0.62rem] font-black text-[#912f26]">
-                {featuredCategory}
+                GROWTH
               </span>
             </div>
             <div className="text-lg font-black leading-snug">
-              {featuredItem?.name ?? "Detail pages stay provider-first."}
+              Entrepreneurship Knowledge Hub
             </div>
             <div className="mt-2 flex flex-wrap gap-4 text-sm text-[var(--auc-ink-2)]">
-              <span className="display text-sm">
-                {featuredItem ? formatAmount(featuredItem) : "Amount varies"}
-              </span>
-              <span className="font-bold text-[var(--auc-coral)]">
-                * {featuredItem ? formatDeadline(featuredItem.deadline) : "Rolling"}
-              </span>
+              <span className="display text-sm">Amount varies</span>
               <span className="mono text-[0.68rem] text-[var(--auc-muted)]">
-                {featuredItem?.provider ?? "Provider record"}
+                Innovation, Science and Economic Development Canada
               </span>
             </div>
           </div>
-          <Link
-            href={featuredHref}
+          <div
             className="auc-btn-loop inline-flex items-center justify-center gap-2 rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] px-4 py-3 text-sm font-black shadow-[0_3px_0_var(--auc-ink)]"
           >
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--auc-ink)] text-[0.7rem] text-[var(--auc-lime)]">
               ✦
             </span>
-            Open detail
-          </Link>
+            Summarise
+          </div>
         </div>
-        <div className="auc-summary-loop relative mt-3 rounded-[14px] border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] p-5 shadow-[4px_4px_0_var(--auc-ink)]">
-          <div className="auc-label text-[var(--auc-ink)] opacity-70">Display policy</div>
-          <p className="mt-2 text-sm leading-6">
-            Current enrichment appears only when reviewed and useful. The original
-            amount, deadline, requirements, and provider application link remain visible.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {["✓ Eligibility", "✓ Requirements", "✓ Checklist", "! Review caveats"].map((item) => (
-              <span key={item} className="mono rounded-full border border-[var(--auc-rule-strong)] bg-white px-3 py-1.5 text-[0.68rem] font-black">
-                {item}
+        <div className="mt-3 grid min-h-[172px]">
+          <div className="auc-demo-pending-first col-start-1 row-start-1 rounded-[14px] border-2 border-dashed border-[var(--auc-rule-strong)] bg-white/60 p-5 text-sm font-bold text-[var(--auc-muted)]">
+            No summary yet.
+          </div>
+          <div className="auc-summary-loop auc-demo-summary-first col-start-1 row-start-1 rounded-[14px] border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] p-5 shadow-[4px_4px_0_var(--auc-ink)]">
+            <div className="auc-label text-[var(--auc-ink)] opacity-70">Summary</div>
+            <p className="mt-2 text-sm leading-6">
+              A support hub for entrepreneurs looking for business guidance,
+              mentorship, networking, and growth resources.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {["✓ Eligibility", "✓ Requirements", "✓ Checklist", "! Review caveats"].map((item) => (
+                <span key={item} className="mono rounded-full border border-[var(--auc-rule-strong)] bg-white px-3 py-1.5 text-[0.68rem] font-black">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="auc-demo-second hidden md:block">
+          <div className="mt-5 grid gap-4 rounded-[14px] border-2 border-[var(--auc-ink)] bg-[var(--auc-bg)] p-4 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div>
+              <div className="mb-2 flex gap-2">
+                <span className="mono rounded bg-[var(--auc-purple-soft)] px-2 py-1 text-[0.62rem] font-black text-[var(--auc-purple-deep)]">
+                  GRANT
+                </span>
+                <span className="mono rounded bg-[var(--auc-coral-soft)] px-2 py-1 text-[0.62rem] font-black text-[#912f26]">
+                  DIGITAL
+                </span>
+              </div>
+              <div className="text-lg font-black leading-snug">
+                Digital Adoption Planning Grant
+              </div>
+              <div className="mt-2 flex flex-wrap gap-4 text-sm text-[var(--auc-ink-2)]">
+                <span className="display text-sm">Up to $15,000</span>
+                <span className="mono text-[0.68rem] text-[var(--auc-muted)]">
+                  Canadian small business program
+                </span>
+              </div>
+            </div>
+            <div
+              className="auc-btn-loop auc-demo-btn-second inline-flex items-center justify-center gap-2 rounded-full border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] px-4 py-3 text-sm font-black shadow-[0_3px_0_var(--auc-ink)]"
+            >
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--auc-ink)] text-[0.7rem] text-[var(--auc-lime)]">
+                ✦
               </span>
-            ))}
+              Summarise
+            </div>
+          </div>
+          <div className="mt-3 grid min-h-[172px]">
+            <div className="auc-demo-pending-second col-start-1 row-start-1 rounded-[14px] border-2 border-dashed border-[var(--auc-rule-strong)] bg-white/60 p-5 text-sm font-bold text-[var(--auc-muted)]">
+              No summary yet.
+            </div>
+            <div className="auc-summary-loop auc-demo-summary-second col-start-1 row-start-1 rounded-[14px] border-2 border-[var(--auc-ink)] bg-[var(--auc-lime)] p-5 shadow-[4px_4px_0_var(--auc-ink)]">
+              <div className="auc-label text-[var(--auc-ink)] opacity-70">Summary</div>
+              <p className="mt-2 text-sm leading-6">
+                Funding for small businesses that need expert help choosing digital
+                tools, improving online sales, or planning new systems.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {["✓ Eligibility", "✓ Budget notes", "✓ Next steps", "! Deadline check"].map((item) => (
+                  <span key={item} className="mono rounded-full border border-[var(--auc-rule-strong)] bg-white px-3 py-1.5 text-[0.68rem] font-black">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -256,14 +294,8 @@ export default async function Home() {
               >
                 {session ? "Open dashboard" : "Let's begin?"}
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--auc-lime)] text-[var(--auc-ink)]">
-                  →
+                  <ArrowRight className="h-4 w-4" strokeWidth={3} />
                 </span>
-              </Link>
-              <Link
-                href="/grants"
-                className="inline-flex items-center rounded-full border-2 border-[var(--auc-ink)] px-7 py-5 text-[1.05rem] font-bold text-[var(--auc-ink)]"
-              >
-                Browse the database
               </Link>
             </div>
 
@@ -336,12 +368,9 @@ export default async function Home() {
       <section id="opportunities" className="auc-reference-section pt-24">
         <div className="mb-8 flex flex-col gap-5 border-b-2 border-[var(--auc-ink)] pb-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <SectionLabel>Section 02 · Entry points</SectionLabel>
+            <SectionLabel>Section 01 · How to begin?</SectionLabel>
             <h2 className="display auc-section-title">Pick a lane.</h2>
           </div>
-          <p className="max-w-md text-base font-black leading-7 text-[var(--auc-ink)] md:text-lg">
-            Each lane uses real records with role-specific tags, filters and detail pages.
-          </p>
         </div>
 
         <div className="grid border-t border-[var(--auc-rule)] lg:grid-cols-3">
@@ -352,9 +381,6 @@ export default async function Home() {
             >
               <div className="flex items-baseline justify-between">
                 <div className="mono text-sm text-[var(--auc-muted)]">NO. {lane.number}</div>
-                <div className="mono text-[0.68rem] font-bold uppercase tracking-[0.05em] text-[var(--auc-muted)]">
-                  Open now
-                </div>
               </div>
               <div className="display mt-2 text-[2.5rem] leading-none">{lane.label}</div>
               <div className={`display-cond mt-5 text-[9rem] leading-[0.85] ${lane.accent}`}>
@@ -375,7 +401,10 @@ export default async function Home() {
                 href={lane.href}
                 className="mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-[var(--auc-ink)] px-5 py-3 text-sm font-black text-white"
               >
-                Open {lane.label.toLowerCase()} <span className={index === 2 ? "text-[var(--auc-lime)]" : "text-[var(--auc-coral)]"}>→</span>
+                Open {lane.label.toLowerCase()}
+                <span className={index === 0 ? "inline-flex items-center justify-center text-[var(--auc-purple)]" : index === 2 ? "inline-flex items-center justify-center text-[var(--auc-lime)]" : "inline-flex items-center justify-center text-[var(--auc-coral)]"}>
+                  <ArrowRight className="h-4 w-4" strokeWidth={3} />
+                </span>
               </Link>
             </div>
           ))}
@@ -383,7 +412,7 @@ export default async function Home() {
       </section>
 
       <section className="auc-reference-section pt-28">
-        <SectionLabel>Section 04 · How it works</SectionLabel>
+        <SectionLabel>Section 02 · How it works</SectionLabel>
         <h2 className="display auc-section-title max-w-6xl">
           From a live funding database to a cleaner shortlist.
         </h2>
@@ -428,11 +457,10 @@ export default async function Home() {
         />
       </div>
 
-      <AutomateSection featuredItem={previewItems[0] ?? null} />
+      <AutomateSection />
 
-      <section id="community" className="auc-reference-section grid gap-12 pt-28 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+      <section id="community" className="auc-reference-section grid gap-12 pb-28 pt-28 lg:grid-cols-[1fr_1.1fr] lg:items-center">
         <div>
-          <SectionLabel>05 · Community</SectionLabel>
           <h2 className="display max-w-2xl text-[clamp(3.5rem,6vw,4.5rem)] leading-[0.95] tracking-[-0.03em]">
             Real notes from
             <br />
@@ -445,9 +473,6 @@ export default async function Home() {
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/forum" className="rounded-full bg-[var(--auc-ink)] px-6 py-3.5 text-sm font-black text-white">
               Browse threads
-            </Link>
-            <Link href="/forum/new" className="rounded-full border-2 border-[var(--auc-ink)] px-6 py-3.5 text-sm font-black text-[var(--auc-ink)]">
-              Start a thread
             </Link>
           </div>
         </div>

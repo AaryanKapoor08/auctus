@@ -75,9 +75,9 @@ export default async function ResearchFundingPage({
       <section className="auc-reference-section pb-6 pt-14">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="auc-label">03 · Research funding</div>
-            <h1 className="display mt-3 text-6xl leading-[0.92] tracking-[-0.035em] md:text-8xl">Research funding</h1>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--auc-ink-2)]">
+            <div className="auc-label">03 · Research</div>
+            <h1 className="display mt-3 text-6xl leading-[0.92] tracking-[-0.035em] md:text-8xl">Research</h1>
+            <p className="mt-4 max-w-3xl text-lg font-medium leading-8 text-[var(--auc-ink-2)]">
               Research grants, equipment funds, training programs, and partnership opportunities.
             </p>
           </div>

@@ -76,8 +76,8 @@ export default async function GrantsPage({
         <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="auc-label">01 · Business funding</div>
-            <h1 className="display mt-3 text-6xl leading-[0.92] tracking-[-0.035em] md:text-8xl">Business grants</h1>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--auc-ink-2)]">
+            <h1 className="display mt-3 text-6xl leading-[0.92] tracking-[-0.035em] md:text-8xl">Business</h1>
+            <p className="mt-4 max-w-none text-lg font-medium leading-8 text-[var(--auc-ink-2)] xl:whitespace-nowrap">
               Funding opportunities for growth, hiring, exports, digital adoption, innovation, and operations.
             </p>
           </div>

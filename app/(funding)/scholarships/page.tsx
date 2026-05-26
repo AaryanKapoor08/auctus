@@ -77,7 +77,7 @@ export default async function ScholarshipsPage({
           <div>
             <div className="auc-label">02 · Student funding</div>
             <h1 className="display mt-3 text-6xl leading-[0.92] tracking-[-0.035em] md:text-8xl">Scholarships</h1>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-[var(--auc-ink-2)]">
+            <p className="mt-4 max-w-3xl text-lg font-medium leading-8 text-[var(--auc-ink-2)]">
               Scholarships, bursaries, graduate awards, field-specific funding, and student prizes.
             </p>
           </div>

@@ -15,8 +15,12 @@ import type { MatchableFundingItem } from "@/lib/matching/types";
 import { getProfileMatchTags, getRoleProfile } from "@/lib/profile/queries";
 import { buildIlikeOrFilter } from "@/lib/supabase/postgrest-filters";
 import { timeServer } from "@/lib/perf/server-timing";
+import {
+  FUNDING_CATEGORY_MAX_CHARS,
+  FUNDING_MAX_CATEGORY_FILTERS,
+  FUNDING_MAX_PAGE,
+} from "./search-input";
 
-const MAX_CATEGORY_FILTERS = 12;
 const SUMMARY_MATCH_CANDIDATE_LIMIT = 100;
 const FUNDING_LIST_COLUMNS =
   "id,type,name,description,provider,amount_min,amount_max,deadline,category,tags";
@@ -83,14 +87,16 @@ function parseCategoryFilters(category: string | undefined) {
     .split(",")
     .map((value) => value.trim())
     .filter(Boolean)
-    .slice(0, MAX_CATEGORY_FILTERS);
+    .map((value) => Array.from(value).slice(0, FUNDING_CATEGORY_MAX_CHARS).join(""))
+    .slice(0, FUNDING_MAX_CATEGORY_FILTERS);
 }
 
 function parseCategoryList(categories: string[] | undefined) {
   return (categories ?? [])
     .map((value) => value.trim())
     .filter(Boolean)
-    .slice(0, MAX_CATEGORY_FILTERS);
+    .map((value) => Array.from(value).slice(0, FUNDING_CATEGORY_MAX_CHARS).join(""))
+    .slice(0, FUNDING_MAX_CATEGORY_FILTERS);
 }
 
 function dateOnlyDaysFromNow(days: number) {
@@ -101,7 +107,9 @@ function dateOnlyDaysFromNow(days: number) {
 }
 
 function normalizePage(value: number | undefined) {
-  return Number.isFinite(value) && value && value > 0 ? Math.floor(value) : 1;
+  return Number.isFinite(value) && value && value > 0
+    ? Math.min(Math.floor(value), FUNDING_MAX_PAGE)
+    : 1;
 }
 
 function normalizePageSize(value: number | undefined) {

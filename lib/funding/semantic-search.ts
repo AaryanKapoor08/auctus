@@ -12,6 +12,7 @@ import {
 import { AI_INPUT_TEXT_LIMIT_CHARS } from "@/lib/ai/enrichment-schema";
 import { createFundingServiceClient } from "./supabase";
 import { getFundingTypeForRole } from "./role-mapping";
+import { normalizeFundingSearchInput } from "./search-input";
 
 export const SEMANTIC_SEARCH_COVERAGE_THRESHOLD = 0.8;
 export const SEMANTIC_SEARCH_MIN_QUERY_LENGTH = 3;
@@ -129,7 +130,7 @@ export async function getSemanticSearchRankingForRole(input: {
   limit?: number;
   provider?: EmbeddingProvider;
 }): Promise<SemanticSearchRanking> {
-  const query = input.query?.trim() ?? "";
+  const query = normalizeFundingSearchInput(input.query);
   if (query.length < SEMANTIC_SEARCH_MIN_QUERY_LENGTH) {
     return { enabled: false, coverage: 0, rankedIds: [], reason: "short_query" };
   }

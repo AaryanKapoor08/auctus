@@ -1,67 +1,36 @@
-import FundingBrowser, {
-  type FundingBrowserDeadlineFilter,
-  type FundingBrowserSortOption,
-} from "@/components/funding/FundingBrowser";
+import FundingBrowser from "@/components/funding/FundingBrowser";
 import { ListFundingPageForRole } from "@/lib/funding/queries";
 import { getRecommendedFundingTags } from "@/lib/funding/recommended-tags";
+import {
+  parseFundingPageSearchParams,
+  type FundingPageSearchParams,
+} from "@/lib/funding/search-input";
 import { getSemanticSearchRankingForRole } from "@/lib/funding/semantic-search";
 import { getSession } from "@/lib/session/get-session";
 
-type SearchParams = Promise<{
-  search?: string;
-  category?: string | string[];
-  deadline?: string;
-  sort?: string;
-  page?: string;
-}>;
-
 const PAGE_SIZE = 36;
-
-function toArray(value: string | string[] | undefined) {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function parseDeadline(value: string | undefined): FundingBrowserDeadlineFilter {
-  return value === "30" || value === "60" || value === "90" || value === "rolling"
-    ? value
-    : "all";
-}
-
-function parseSort(value: string | undefined): FundingBrowserSortOption {
-  return value === "deadline" || value === "amount" || value === "newest"
-    ? value
-    : "relevance";
-}
-
-function parsePage(value: string | undefined) {
-  const page = Number(value);
-  return Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
-}
 
 export default async function ScholarshipsPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<FundingPageSearchParams>;
 }) {
   const params = await searchParams;
-  const categories = toArray(params.category);
-  const deadline = parseDeadline(params.deadline);
-  const sort = parseSort(params.sort);
-  const page = parsePage(params.page);
+  const { search, categories, deadline, sort, page } =
+    parseFundingPageSearchParams(params, "student");
   const [recommendedTags, session, semanticRanking] = await Promise.all([
     getRecommendedFundingTags("student"),
     getSession(),
     getSemanticSearchRankingForRole({
       role: "student",
-      query: params.search,
+      query: search,
       limit: 200,
     }),
   ]);
   const activeCategories = categories.length > 0 ? categories : recommendedTags;
   const fundingPage = await ListFundingPageForRole({
     role: "student",
-    search: params.search,
+    search,
     categories: activeCategories,
     deadline,
     sort,
@@ -88,14 +57,14 @@ export default async function ScholarshipsPage({
       </section>
       <div className="auc-reference-section">
         <FundingBrowser
-          key={`${params.search ?? ""}:${activeCategories.join(",")}:${deadline}:${sort}:${fundingPage.page}`}
+          key={`${search}:${activeCategories.join(",")}:${deadline}:${sort}:${fundingPage.page}`}
           role="student"
           items={fundingPage.items}
           totalCount={fundingPage.totalCount}
           page={fundingPage.page}
           pageCount={fundingPage.pageCount}
           basePath="/scholarships"
-          initialSearch={params.search}
+          initialSearch={search}
           initialCategories={activeCategories}
           initialDeadline={deadline}
           initialSort={sort}

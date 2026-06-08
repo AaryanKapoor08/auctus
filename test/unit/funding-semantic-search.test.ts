@@ -3,9 +3,11 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   buildFundingEmbeddingText,
+  SEMANTIC_SEARCH_MIN_QUERY_LENGTH,
   rankFundingItemsBySemanticIds,
   toVectorLiteral,
 } from "@/lib/funding/semantic-search";
+import { normalizeFundingSearchInput } from "@/lib/funding/search-input";
 
 const fundingPageSources = [
   "app/(funding)/grants/page.tsx",
@@ -43,6 +45,18 @@ describe("funding semantic search helpers", () => {
 
   it("rejects vectors that do not fit the locked pgvector dimension", () => {
     expect(() => toVectorLiteral([0.1, 0.2])).toThrow(/768/);
+  });
+
+  it("uses the shared bounded search normalizer for semantic provider input", () => {
+    const query = normalizeFundingSearchInput([
+      `  ${"a".repeat(300)}\u0000`,
+      "second",
+    ]);
+
+    expect(query.length).toBe(256);
+    expect(query.length).toBeGreaterThanOrEqual(SEMANTIC_SEARCH_MIN_QUERY_LENGTH);
+    expect(query).not.toContain("\u0000");
+    expect(query).not.toContain("second");
   });
 
   it("wires server-side semantic rankings into every funding browser", () => {

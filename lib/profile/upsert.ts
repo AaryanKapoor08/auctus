@@ -53,18 +53,48 @@ const educationLevels = new Set([
 
 const careerStages = new Set(["early", "mid", "senior", "emeritus"]);
 
-function requireText(value: string, label: string) {
+export const PROFILE_DISPLAY_NAME_MAX_CHARS = 80;
+export const PROFILE_REQUIRED_TEXT_MAX_CHARS = 160;
+export const PROFILE_OPTIONAL_TEXT_MAX_CHARS = 160;
+export const PROFILE_KEYWORD_MAX_CHARS = 48;
+export const PROFILE_KEYWORD_MAX_COUNT = 12;
+
+function textLength(value: string) {
+  return Array.from(value).length;
+}
+
+function assertMaxText(value: string, label: string, maxChars: number) {
+  if (textLength(value) > maxChars) {
+    throw new Error(`${label} must be ${maxChars} characters or less`);
+  }
+}
+
+function requireText(
+  value: string,
+  label: string,
+  maxChars = PROFILE_REQUIRED_TEXT_MAX_CHARS,
+) {
   const text = value.trim();
 
   if (!text) {
     throw new Error(`${label} is required`);
   }
 
+  assertMaxText(text, label, maxChars);
+
   return text;
 }
 
-function optionalText(value: FormDataEntryValue | null) {
+function optionalText(
+  value: FormDataEntryValue | null,
+  label = "Text",
+  maxChars = PROFILE_OPTIONAL_TEXT_MAX_CHARS,
+) {
   const text = typeof value === "string" ? value.trim() : "";
+  if (text.length > 0) {
+    assertMaxText(text, label, maxChars);
+  }
+
   return text.length > 0 ? text : null;
 }
 
@@ -81,7 +111,7 @@ function optionalNumber(value: FormDataEntryValue | null) {
 }
 
 function requireOptionalText(value: FormDataEntryValue | null, label: string) {
-  return requireText(optionalText(value) ?? "", label);
+  return requireText(optionalText(value, label) ?? "", label);
 }
 
 function requireEnum<T extends string>(
@@ -148,31 +178,56 @@ function scopeTags(value: string | null) {
   return ["Provincial"];
 }
 
+function parseResearchKeywords(value: FormDataEntryValue | null) {
+  const keywords = (optionalText(value, "Research keywords", 1000) ?? "")
+    .split(",")
+    .map((keyword) => keyword.trim())
+    .filter(Boolean);
+
+  if (keywords.length > PROFILE_KEYWORD_MAX_COUNT) {
+    throw new Error(
+      `Research keywords must include ${PROFILE_KEYWORD_MAX_COUNT} items or fewer`,
+    );
+  }
+
+  for (const keyword of keywords) {
+    assertMaxText(keyword, "Research keyword", PROFILE_KEYWORD_MAX_CHARS);
+  }
+
+  return keywords;
+}
+
 export function parseOnboardingForm(role: string, formData: FormData): OnboardingInput {
   if (!isRole(role)) {
     throw new Error("Invalid role");
   }
 
-  const display_name = optionalText(formData.get("display_name")) ?? "";
-  requireText(display_name, "Display name");
+  const display_name =
+    optionalText(
+      formData.get("display_name"),
+      "Display name",
+      PROFILE_DISPLAY_NAME_MAX_CHARS,
+    ) ?? "";
+  requireText(display_name, "Display name", PROFILE_DISPLAY_NAME_MAX_CHARS);
 
   if (role === "business") {
-    const business_name = optionalText(formData.get("business_name")) ?? "";
+    const business_name =
+      optionalText(formData.get("business_name"), "Business name") ?? "";
     requireText(business_name, "Business name");
 
     return {
       role,
       display_name,
       business_name,
-      industry: optionalText(formData.get("industry")),
-      location: optionalText(formData.get("location")),
+      industry: optionalText(formData.get("industry"), "Industry"),
+      location: optionalText(formData.get("location"), "Location"),
       revenue: optionalNumber(formData.get("revenue")),
       employees: optionalNumber(formData.get("employees")),
       match_tags: uniqueTags([
         "Business",
-        ...tagsFromText(optionalText(formData.get("industry"))),
-        ...tagsFromText(optionalText(formData.get("business_stage"))),
-        ...scopeTags(optionalText(formData.get("funding_scope")) ?? optionalText(formData.get("location"))),
+        ...tagsFromText(optionalText(formData.get("industry"), "Industry")),
+        ...tagsFromText(optionalText(formData.get("business_stage"), "Business stage")),
+        ...scopeTags(optionalText(formData.get("funding_scope"), "Funding scope") ?? optionalText(formData.get("location"), "Location")),
       ]),
     };
   }
@@ -194,7 +249,7 @@ export function parseOnboardingForm(role: string, formData: FormData): Onboardin
       display_name,
       education_level,
       field_of_study,
-      institution: optionalText(formData.get("institution")),
+      institution: optionalText(formData.get("institution"), "Institution"),
       province,
       gpa: optionalNumber(formData.get("gpa")),
       match_tags: uniqueTags([
@@ -222,14 +277,11 @@ export function parseOnboardingForm(role: string, formData: FormData): Onboardin
   return {
     role,
     display_name,
-    institution: optionalText(formData.get("institution")),
-    department: optionalText(formData.get("department")),
+    institution: optionalText(formData.get("institution"), "Institution"),
+    department: optionalText(formData.get("department"), "Department"),
     research_area,
     career_stage,
-    research_keywords: (optionalText(formData.get("research_keywords")) ?? "")
-      .split(",")
-      .map((keyword) => keyword.trim())
-      .filter(Boolean),
+    research_keywords: parseResearchKeywords(formData.get("research_keywords")),
     match_tags: uniqueTags([
       "Professor",
       "Research",

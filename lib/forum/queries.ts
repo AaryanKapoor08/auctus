@@ -16,6 +16,11 @@ export const FORUM_CATEGORIES = [
   "Announcements",
 ] as const;
 
+export const FORUM_TITLE_MAX_CHARS = 160;
+export const FORUM_THREAD_CONTENT_MAX_CHARS = 5000;
+export const FORUM_REPLY_CONTENT_MAX_CHARS = 2500;
+export const FORUM_TAG_MAX_CHARS = 32;
+
 export type ForumAuthor = {
   id: string;
   display_name: string;
@@ -68,6 +73,24 @@ function fallbackAuthor(): ForumAuthor {
   };
 }
 
+function textLength(value: string) {
+  return Array.from(value).length;
+}
+
+function requireBoundedText(value: FormDataEntryValue | null, label: string, maxChars: number) {
+  const text = typeof value === "string" ? value.trim() : "";
+
+  if (!text) {
+    throw new Error(`${label} is required`);
+  }
+
+  if (textLength(text) > maxChars) {
+    throw new Error(`${label} must be ${maxChars} characters or less`);
+  }
+
+  return text;
+}
+
 function mapThread(row: ThreadRow): ForumThread {
   const count = first(row.replies);
 
@@ -101,7 +124,11 @@ function parseTags(value: FormDataEntryValue | null) {
 
   return value
     .split(",")
-    .map((tag) => tag.trim().replace(/^#/, "").toLowerCase())
+    .map((tag) =>
+      Array.from(tag.trim().replace(/^#/, "").toLowerCase())
+        .slice(0, FORUM_TAG_MAX_CHARS)
+        .join(""),
+    )
     .filter(Boolean)
     .slice(0, 5);
 }
@@ -214,13 +241,17 @@ export async function getThread(threadId: string): Promise<{
 
 export async function createThread(formData: FormData) {
   const session = await requireSession();
-  const title = String(formData.get("title") ?? "").trim();
-  const content = String(formData.get("content") ?? "").trim();
+  const title = requireBoundedText(
+    formData.get("title"),
+    "Title",
+    FORUM_TITLE_MAX_CHARS,
+  );
+  const content = requireBoundedText(
+    formData.get("content"),
+    "Content",
+    FORUM_THREAD_CONTENT_MAX_CHARS,
+  );
   const category = parseCategory(formData.get("category"));
-
-  if (!title || !content) {
-    throw new Error("Title, category, and content are required");
-  }
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -244,11 +275,11 @@ export async function createThread(formData: FormData) {
 
 export async function createReply(threadId: string, formData: FormData) {
   const session = await requireSession();
-  const content = String(formData.get("content") ?? "").trim();
-
-  if (!content) {
-    throw new Error("Reply content is required");
-  }
+  const content = requireBoundedText(
+    formData.get("content"),
+    "Reply content",
+    FORUM_REPLY_CONTENT_MAX_CHARS,
+  );
 
   const supabase = await createClient();
   const { error } = await supabase.from("replies").insert({

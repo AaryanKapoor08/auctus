@@ -17,6 +17,10 @@ describe("forum and identity RLS migrations", () => {
     join(root, "supabase/migrations/0027_public_forum_reads.sql"),
     "utf8",
   );
+  const contentLimitsSql = readFileSync(
+    join(root, "supabase/migrations/0013_identity_content_limits.sql"),
+    "utf8",
+  );
 
   it("defines helpful votes through a duplicate-safe security definer function", () => {
     const sql = readFileSync(
@@ -55,6 +59,20 @@ describe("forum and identity RLS migrations", () => {
     expect(profileEmailSql).toMatch(
       /grant select \(\s+id,\s+role,\s+display_name,\s+avatar_url,\s+created_at,\s+updated_at\s+\) on public\.profiles to authenticated;/,
     );
+  });
+
+  it("enforces bounded profile and forum content for new writes", () => {
+    expect(contentLimitsSql).toContain("profiles_display_name_length");
+    expect(contentLimitsSql).toContain("business_profiles_text_length");
+    expect(contentLimitsSql).toContain("student_profiles_text_length");
+    expect(contentLimitsSql).toContain("professor_profiles_text_length");
+    expect(contentLimitsSql).toContain("threads_content_length");
+    expect(contentLimitsSql).toContain("replies_content_length");
+    expect(contentLimitsSql).toContain("char_length(display_name) <= 80");
+    expect(contentLimitsSql).toContain("char_length(title) <= 160");
+    expect(contentLimitsSql).toContain("char_length(content) <= 5000");
+    expect(contentLimitsSql).toContain("char_length(content) <= 2500");
+    expect(contentLimitsSql).toContain("not valid");
   });
 
   it("allows public forum reads without granting public forum writes or profile emails", () => {

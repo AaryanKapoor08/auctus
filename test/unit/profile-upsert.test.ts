@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { parseOnboardingForm, upsertRoleProfile } from "@/lib/profile/upsert";
+import {
+  PROFILE_DISPLAY_NAME_MAX_CHARS,
+  PROFILE_KEYWORD_MAX_CHARS,
+  PROFILE_KEYWORD_MAX_COUNT,
+  PROFILE_REQUIRED_TEXT_MAX_CHARS,
+  parseOnboardingForm,
+  upsertRoleProfile,
+} from "@/lib/profile/upsert";
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
@@ -123,6 +130,49 @@ describe("profile onboarding upsert", () => {
 
     expect(() => parseOnboardingForm("business", form)).toThrow(
       "Numeric fields must contain non-negative valid numbers",
+    );
+  });
+
+  it("rejects oversized profile fields before persistence", () => {
+    const form = new FormData();
+    form.set("display_name", "a".repeat(PROFILE_DISPLAY_NAME_MAX_CHARS + 1));
+    form.set("business_name", "Ada Labs");
+
+    expect(() => parseOnboardingForm("business", form)).toThrow(
+      `Display name must be ${PROFILE_DISPLAY_NAME_MAX_CHARS} characters or less`,
+    );
+
+    const business = new FormData();
+    business.set("display_name", "Ada Founder");
+    business.set("business_name", "a".repeat(PROFILE_REQUIRED_TEXT_MAX_CHARS + 1));
+
+    expect(() => parseOnboardingForm("business", business)).toThrow(
+      `Business name must be ${PROFILE_REQUIRED_TEXT_MAX_CHARS} characters or less`,
+    );
+  });
+
+  it("bounds professor research keyword storage", () => {
+    const tooManyKeywords = new FormData();
+    tooManyKeywords.set("display_name", "Ada Professor");
+    tooManyKeywords.set("research_area", "Computer Science");
+    tooManyKeywords.set("career_stage", "early");
+    tooManyKeywords.set(
+      "research_keywords",
+      Array.from({ length: PROFILE_KEYWORD_MAX_COUNT + 1 }, (_, index) => `kw${index}`).join(","),
+    );
+
+    expect(() => parseOnboardingForm("professor", tooManyKeywords)).toThrow(
+      `Research keywords must include ${PROFILE_KEYWORD_MAX_COUNT} items or fewer`,
+    );
+
+    const longKeyword = new FormData();
+    longKeyword.set("display_name", "Ada Professor");
+    longKeyword.set("research_area", "Computer Science");
+    longKeyword.set("career_stage", "early");
+    longKeyword.set("research_keywords", "a".repeat(PROFILE_KEYWORD_MAX_CHARS + 1));
+
+    expect(() => parseOnboardingForm("professor", longKeyword)).toThrow(
+      `Research keyword must be ${PROFILE_KEYWORD_MAX_CHARS} characters or less`,
     );
   });
 

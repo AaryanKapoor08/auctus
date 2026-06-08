@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  FORUM_REPLY_CONTENT_MAX_CHARS,
+  FORUM_TAG_MAX_CHARS,
+  FORUM_THREAD_CONTENT_MAX_CHARS,
+  FORUM_TITLE_MAX_CHARS,
   createReply,
   createThread,
   deleteReply,
@@ -136,6 +140,62 @@ describe("forum queries", () => {
 
     await expect(createThread(form)).rejects.toThrow("Invalid forum category");
     expect(insert).not.toHaveBeenCalled();
+  });
+
+  it("rejects oversized public forum content before database writes", async () => {
+    const insert = vi.fn().mockReturnThis();
+    mocks.createClient.mockResolvedValue({
+      from: vi.fn(() => ({ insert })),
+    });
+
+    const longTitle = new FormData();
+    longTitle.set("title", "a".repeat(FORUM_TITLE_MAX_CHARS + 1));
+    longTitle.set("content", "Body");
+    longTitle.set("category", "Funding");
+
+    await expect(createThread(longTitle)).rejects.toThrow(
+      `Title must be ${FORUM_TITLE_MAX_CHARS} characters or less`,
+    );
+
+    const longContent = new FormData();
+    longContent.set("title", "Bounded thread");
+    longContent.set("content", "a".repeat(FORUM_THREAD_CONTENT_MAX_CHARS + 1));
+    longContent.set("category", "Funding");
+
+    await expect(createThread(longContent)).rejects.toThrow(
+      `Content must be ${FORUM_THREAD_CONTENT_MAX_CHARS} characters or less`,
+    );
+
+    const longReply = new FormData();
+    longReply.set("content", "a".repeat(FORUM_REPLY_CONTENT_MAX_CHARS + 1));
+
+    await expect(createReply("thread-1", longReply)).rejects.toThrow(
+      `Reply content must be ${FORUM_REPLY_CONTENT_MAX_CHARS} characters or less`,
+    );
+    expect(insert).not.toHaveBeenCalled();
+  });
+
+  it("caps forum tag length before persisting", async () => {
+    const insert = vi.fn().mockReturnThis();
+    const select = vi.fn().mockReturnThis();
+    const single = vi.fn().mockResolvedValue({ data: { id: "thread-1" }, error: null });
+    mocks.createClient.mockResolvedValue({
+      from: vi.fn(() => ({ insert, select, single })),
+    });
+
+    const form = new FormData();
+    form.set("title", "Funding question");
+    form.set("content", "How should I prepare?");
+    form.set("category", "Funding");
+    form.set("tags", `#${"a".repeat(FORUM_TAG_MAX_CHARS + 10)}`);
+
+    await createThread(form);
+
+    expect(insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tags: ["a".repeat(FORUM_TAG_MAX_CHARS)],
+      }),
+    );
   });
 
   it("marks replies helpful through the RPC instead of direct row updates", async () => {
